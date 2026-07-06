@@ -19,6 +19,154 @@
 -->
 <!--
   ============================================================
+  _43 UPDATE (this file) - FEATURES/BENEFITS CAROUSEL: TEXT MOVED
+  ONTO THE IMAGE + CENTERING FIXED TO NOT VISIBLY EXIT VIEWPORT FIRST,
+  per explicit feedback referencing the travel-app reference image:
+    1. TEXT OVERLAY, not a separate block below the image. Per the
+       reference (title sits directly on the photo over a dark
+       gradient), .vstrip-copy moved from a sibling block under
+       .vstrip-media to a child INSIDE it, absolutely positioned at
+       the bottom over a gradient - same overlay pattern already used
+       by .bento-hero/.bento-card-a elsewhere on this page, reused
+       for consistency rather than inventing a new treatment. Desktop
+       also changed from a 2-up split (image left, text column right)
+       to one full-bleed image with the same bottom overlay, matching
+       the reference's single-card look instead of a text-beside-
+       photo layout the reference never showed. Panel max-height cap
+       lowered 720->560px - the text no longer adds its own height
+       below the image, so the panel only needs to fit the photo.
+    2. CENTERING NO LONGER LOOKS LIKE TWO STEPS. The _42 fix waited
+       for the expand animation to finish, THEN scrolled to center -
+       which visibly read as "expands off-screen, then jumps to
+       center," the opposite of what was asked. Fixed by computing
+       the target scroll position UP FRONT from .vstrip-panel-inner's
+       scrollHeight (which reports the natural/final content height
+       even while still visually clipped by max-height:0 - a real
+       DOM behaviour, not an approximation) and starting the scroll
+       in the same tick as the expand transition, so both animate
+       together. Desktop is intentionally excluded from this - its
+       row height is fixed whether a strip is open or closed (only
+       width flexes), so there's never anything to correct there.
+  ============================================================
+-->
+<!--
+  ============================================================
+  _42 UPDATE (this file) - FEATURES/BENEFITS CAROUSEL: BIGGER IMAGE
+  + KEEP THE OPEN STRIP IN VIEW, per explicit feedback:
+    1. Opening a strip now re-centers it in the viewport once its
+       expand transition finishes (scrollIntoView block:'center',
+       delayed ~580ms to match the CSS transition durations). Before
+       this, opening a strip on mobile could leave part of it hanging
+       off the bottom of the screen - nothing scrolled to compensate
+       for the accordion pushing content down.
+    2. Image card enlarged - felt small per feedback. Mobile:
+       aspect-ratio 16/10 -> 1/1 (explicitly cleared to change this),
+       a meaningfully bigger crop at the same card width. Desktop:
+       row height 400->460px, media column 42%->48%. Panel max-height
+       cap raised 520->720px to give the taller mobile image room
+       (max-height is a ceiling, not a forced height - this doesn't
+       add dead space under the shorter Benefits copy).
+  ============================================================
+-->
+<!--
+  ============================================================
+  _41 UPDATE (this file) - BENTO GRID CLEANUP + CAROUSEL REVEAL
+  ANIMATION + MOBILE CRAFT SIZING, per explicit client direction:
+    1. SIZE & FIT CARD REMOVED FROM THE GRID. Note: the v39 changelog
+       claimed this card was "removed from the grid entirely," but it
+       was still live in the actual markup (.bento-card-sizefit, full
+       diagram) - that changelog entry was inaccurate, not a
+       description of what actually shipped. It's genuinely removed
+       now. .sizefit-* CSS is left in the file, flagged dead, not
+       deleted (same treatment as .makers-journey elsewhere in this
+       project).
+    2. FEATURED CARD REMOVED FROM THE GRID, per explicit feedback
+       that it and the Hero card were doing near-identical jobs (both
+       full-bleed lifestyle photo + overlay text) - one was redundant.
+       .bento-card-a CSS left in place, unused except for the
+       aspect-ratio rule it still shares with .bento-hero.
+    3. Desktop bento-grid layout simplified from a 4-column row
+       ("featured craft sizefit carepair") to 2 columns ("craft
+       carepair") under the hero, now that two of those four cards
+       are gone. .bento-card-craft has no explicit grid-area and
+       auto-places into the one remaining open cell - same implicit-
+       placement behaviour the grid already relied on pre-_41, not a
+       new mechanism.
+    4. CRAFT CAROUSEL ENLARGED ON MOBILE - .craft-track was a flat
+       200px regardless of screen size, which read as too small.
+       Now height:min(70vw,480px) so it scales with the device and
+       reads as a genuinely large block on mobile (slide width also
+       widened 78%->88% to match). Desktop untouched (240px, already
+       fine) - this was flagged as a mobile-only problem.
+    5. FEATURES/BENEFITS CAROUSEL NOW HAS THE SAME FLOATING SCROLL-
+       REVEAL AS THE BENTO GRID. Each of the 6 strips got its own
+       data-dir (alternating up/down) and a parallel opacity/transform
+       rule matching .mosaic-cell's visual effect - NOT the mosaic-
+       cell class itself, to avoid that class's own border-radius/
+       background/transition values fighting the .vstrip rules
+       already declared for those same properties (which would have
+       silently dropped the flex-grow transition the open/close
+       accordion animation depends on). The existing global reveal
+       engine's query was widened from '.mosaic-cell' to '.mosaic-
+       cell, .vstrip' - zero other JS changes needed, the engine was
+       already written generically (getBoundingClientRect + classList
+       toggle, nothing mosaic-cell-specific in its logic).
+  ============================================================
+-->
+<!--
+  ============================================================
+  _40 UPDATE (this file) - FEATURES + BENEFITS REBUILT AS A
+  VERTICAL-STRIP CAROUSEL, per explicit client direction referencing
+  Fey's "a few more things" pattern (hover/click-expand vertical
+  strips) and a travel-app VR reference image (card-style expand).
+  This SUPERSEDES the v39 scrollytelling prototype as the active
+  design - it is not deleted (per the never-overwrite-content
+  convention), just wrapped in an HTML comment directly below its
+  old spot and left out of the render path. If the carousel gets
+  rejected, reverting is a one-line uncomment + delete, not a
+  rebuild.
+    1. NEW markup: two independent vstrip-group carousels (one for
+       Features, one for Benefits), each with 3 strips. Desktop:
+       strips sit side by side, one open at a time (flex-basis
+       animates from a collapsed ~68px rail to fill the row),
+       collapsed label runs vertically (writing-mode:vertical-rl,
+       matching the Fey reference's rotated sliver labels). Mobile:
+       strips stack full-width, collapsed = a short horizontal bar,
+       tap expands (max-height animates open), matching the
+       explicit "click-to-expand" mobile spec.
+    2. One strip is pre-opened by default in each group (first
+       item - Build for Features, Durability for Benefits), per
+       "one pre-opened" direction. Clicking a different strip in
+       the same group closes the current one and opens the clicked
+       one - single-open accordion, not independently toggleable,
+       so there's always exactly one expanded panel per group (never
+       zero, never more than one - avoids an empty-looking row).
+    3. Chose CLICK/TAP for both breakpoints rather than hover-to-
+       preview on desktop like the raw Fey reference. Reasoning: this
+       page already treats mobile as the primary surface (v39's own
+       header called out the audit's flagged mobile CVR gap), and
+       hover-expand doesn't have a mobile equivalent - one consistent
+       interaction model avoids a desktop-only behaviour nobody
+       tests on the surface that matters most. Easy to layer hover-
+       preview on top later if desired.
+    4. Content is the FINAL locked Features/Benefits copy (Build/
+       Finish/Style, Durability/Individuality/Organisation) - not
+       template-bracketed, since per-project docs this copy was
+       already finalized for Astra specifically, unlike the Material
+       Hero/bento pass in v38 which generalized to {VARIABLE} tokens.
+    5. Images are onerror-placeholder'd exactly like every other
+       image slot in this file (real photography not sourced yet) -
+       same pattern, same fallback div, nothing new invented here.
+    6. Old .fb-story CSS/JS (sticky image, callouts, IntersectionObserver
+       controller) is left completely untouched in the file. It's
+       dead code now (zero .fb-step elements exist in the render
+       path once the section is commented out) - the controller's own
+       existing `if(!steps.length)return;` guard makes this a no-op
+       automatically, so nothing needed to change there.
+  ============================================================
+-->
+<!--
+  ============================================================
   _29 UPDATE (this file) - A+ CONTENT RESTRUCTURE, per the A+
   master handoff doc (fableroom-aplus-master-handoff.md). Content/
   structure work only - no gallery, badge, or CTA changes in this
@@ -331,6 +479,45 @@
   already even 1fr/1fr/1fr. Added text-align:center to the label
   spans - now each one centres within its own column, which is what
   actually makes the row read as evenly spaced.
+  ============================================================
+-->
+<!--
+  ============================================================
+  _38 UPDATE (this file) - CONTENT GENERALIZED INTO A TEMPLATE, per
+  explicit direction. Scope: AV1 Material Hero (id="finish") +
+  the consolidated bento grid (Hero/Featured/Craft/Size & Fit/Care/
+  Practical) only - everything else in the file (dimstrip, pricing-
+  transparency modules, compare table, FAQ, reviews, bundle, etc.)
+  is untouched and still carries real Astra copy.
+  Every real headline/body/label/caption in that scope was replaced
+  with a bracketed placeholder describing WHAT the slot is and WHAT
+  it should contain (e.g. "[Hero headline - short style/mood
+  statement, tied to this photo]") instead of an actual example
+  string. Per-SKU numeric values (Astra's width/depth/height) became
+  {WIDTH}/{DEPTH}/{HEIGHT} tokens, matching the {VARIABLE} convention
+  already used in the reusable M7/T6/C5 content modules from the A+
+  master handoff doc - this section now reads the same way those
+  modules do. The standard-door reference height stayed a plain
+  bracketed placeholder rather than a {VARIABLE} since it's a fixed
+  comparison constant, not a per-SKU attribute.
+  This turns the section into what section 9 of the A+ master
+  handoff doc called "a clean template file" (build priority #9) -
+  not yet extracted into its own separate file, but the real Astra
+  content in this scope is now gone from THIS file. If Astra's actual
+  copy needs to come back, it's preserved verbatim in the _29 through
+  _37 changelog entries above (each one quotes the real strings being
+  changed at the time).
+  Structure, layout, animations, carousel, modal, and all CSS are
+  completely unchanged - this was a text-only pass, with one
+  necessary CSS fix: the {WIDTH}/{DEPTH}/{HEIGHT} tokens are longer
+  than the real numbers they replace ("{HEIGHT}cm" vs "82cm"), and
+  CSS Grid items don't shrink below their content size by default -
+  the third stat card was overflowing straight out of the card's
+  right edge. Fixed with min-width:0 on the grid items plus a
+  smaller font + ellipsis truncation on overflow, so long tokens
+  stay contained instead of breaking the layout. Real per-SKU
+  numbers (5-6 chars) will never hit this truncation - only the
+  placeholder tokens are long enough to need it.
   ============================================================
 -->
 <!--
@@ -1909,6 +2096,222 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 @media(prefers-reduced-motion:reduce){.px-card,.px-disk,.px-label{transform:none!important}.px-card--hero{transform:translate(-50%,-50%)!important}}
 
 /* ============================================================
+   _39 NEW - FEATURES + BENEFITS SCROLLYTELLING (prototype).
+   Mobile-first, single column only for now - see the HTML comment
+   above the markup for the full mechanism explanation. Uses the
+   same #241c14/bronze dark palette as the bento grid below it, so
+   this reads as one continuous zone rather than a visual seam.
+   ============================================================ */
+.fb-story{
+  position:relative;background:#1b1408;padding:0 16px;overflow:visible;
+  width:100vw;margin-left:calc(50% - 50vw);
+  /* same full-bleed technique used by .parallax-story/.bento-section
+     above - escapes .aplus's inherited desktop gutter. */
+}
+.fb-part{ position:relative; }
+.fb-part-features{ padding-bottom:12px; }
+
+/* --- Part A: Features (sticky image + converging callouts) --- */
+.fb-sticky-wrap{
+  position:sticky;top:64px;z-index:1;
+  padding-top:24px;padding-bottom:16px;
+}
+.fb-sticky-img{
+  position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;
+  max-width:420px;margin:0 auto;background:#241c14;
+}
+.fb-sticky-img img{ width:100%;height:100%;object-fit:cover;display:block }
+.fb-sticky-img .placeholder{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:10px;font-size:10.5px;line-height:1.5;color:rgba(255,255,255,.55);
+}
+.fb-callout{
+  position:absolute;left:var(--cx);top:var(--cy);transform:translate(-50%,-50%) scale(.8);
+  background:rgba(20,14,6,.85);border:1px solid rgba(183,126,69,.5);color:#fff;
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;
+  opacity:0;transition:opacity .5s ease,transform .5s cubic-bezier(.22,.61,.36,1);
+  pointer-events:none;white-space:nowrap;
+}
+.fb-callout.is-shown{ opacity:1;transform:translate(-50%,-50%) scale(1); }
+
+.fb-track{ max-width:480px;margin:0 auto; }
+.fb-step{
+  min-height:56vh;display:flex;flex-direction:column;justify-content:center;
+  opacity:.25;transition:opacity .5s ease;
+}
+.fb-step.is-active{ opacity:1; }
+.fb-step-combine{ min-height:30vh; }
+.fb-kicker{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--bronze);margin-bottom:10px;
+}
+.fb-step h3{
+  font-family:var(--ff-d);font-weight:400;font-size:clamp(22px,5vw,28px);color:#fff;margin-bottom:8px;
+}
+.fb-step p{ font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.75);max-width:34ch; }
+
+/* --- Part B: Benefits (sequential reveal, then a plain image) --- */
+.fb-part-benefits{ padding:12px 0 48px; }
+.fb-benefit-img{
+  position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/10;
+  max-width:480px;margin:16px auto 0;background:#241c14;
+  opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.22,.61,.36,1);
+}
+.fb-benefit-img.is-shown{ opacity:1;transform:translateY(0); }
+.fb-benefit-img img{ width:100%;height:100%;object-fit:cover;display:block }
+.fb-benefit-img .placeholder{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:10px;font-size:10.5px;line-height:1.5;color:rgba(255,255,255,.55);
+}
+@media(prefers-reduced-motion:reduce){
+  .fb-step,.fb-callout,.fb-benefit-img{ transition:opacity .3s ease; transform:none!important; }
+  .fb-step{ opacity:1; }
+}
+
+/* ============================================================
+   _40 NEW - FEATURES/BENEFITS VERTICAL-STRIP CAROUSEL. Replaces
+   the .fb-story scrollytelling prototype above (that markup is now
+   commented out, not deleted - see the section-level HTML comment
+   for the swap rationale). Same dark #1b1408/bronze zone as the
+   rest of this A+ block, so it still reads as one continuous area.
+   Two independent single-open accordions (Features, Benefits) -
+   see the _40 top-of-file changelog entry for the full mechanism
+   and why click/tap was chosen over hover for both breakpoints.
+   ============================================================ */
+.vstrip-zone{
+  position:relative;background:#1b1408;padding:8px 16px 44px;overflow:visible;
+  width:100vw;margin-left:calc(50% - 50vw);
+  /* same full-bleed technique used throughout this A+ block */
+}
+.vstrip-group{ max-width:1040px;margin:0 auto;padding:28px 0; }
+.vstrip-group + .vstrip-group{ border-top:1px solid rgba(232,201,164,.12); }
+.vstrip-group-head{ margin-bottom:16px; }
+.vstrip-kicker{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--bronze);
+}
+
+/* --- MOBILE (default): stacked bars, tap to expand --- */
+.vstrip-row{ display:flex;flex-direction:column;gap:10px; }
+.vstrip{
+  position:relative;background:#241c14;border:1px solid rgba(183,126,69,.24);
+  border-radius:12px;overflow:hidden;
+  /* _41 NEW - floating reveal-on-scroll, same engine/timing as the
+     bento grid's .mosaic-cell (see the JS query update at the bottom
+     of the file: '.mosaic-cell, .vstrip'). Deliberately NOT just
+     adding the mosaic-cell class itself - that class also carries its
+     own border-radius/background/transition values which would have
+     fought the .vstrip rules already declared for those same
+     properties (last-in-source-order would silently win and could
+     strip the flex-grow transition needed for the open/close
+     animation). A parallel, vstrip-scoped rule gets the identical
+     visual effect without that collision risk. */
+  opacity:0;transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+}
+.vstrip[data-dir="up"]{ transform:translateY(36px); }
+.vstrip[data-dir="down"]{ transform:translateY(-36px); }
+.vstrip.is-visible{ opacity:1;transform:translate(0,0); }
+@media(prefers-reduced-motion:reduce){ .vstrip{ transition:opacity .3s ease; } }
+.vstrip-trigger{
+  all:unset;box-sizing:border-box;display:block;width:100%;padding:16px 18px;cursor:pointer;color:#fff;
+}
+.vstrip-trigger:focus-visible{ outline:2px solid var(--bronze);outline-offset:-2px; }
+.vstrip-trigger-content{ display:flex;align-items:center;gap:12px;width:100%; }
+.vstrip-index{ font-family:var(--ff-b);font-size:11px;font-weight:700;color:var(--bronze);flex-shrink:0; }
+.vstrip-label{ font-family:var(--ff-d);font-weight:400;font-size:17px;color:#fff; }
+.vstrip-chevron{
+  margin-left:auto;flex-shrink:0;color:rgba(255,255,255,.5);
+  transition:transform .35s cubic-bezier(.22,.61,.36,1);
+}
+.vstrip.is-open .vstrip-chevron{ transform:rotate(180deg); }
+.vstrip-panel{
+  max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .5s cubic-bezier(.22,.61,.36,1),opacity .35s ease;
+}
+/* _43 FIX: was 720px, sized for image+separate-text-block. Text is
+   now an overlay ON the image (no added height), so the panel only
+   needs to fit the image itself - lowered accordingly. */
+.vstrip.is-open .vstrip-panel{ max-height:560px;opacity:1; }
+.vstrip-panel-inner{ padding:0 18px 20px; }
+/* _43 FIX: text moved from a separate block BELOW the image to an
+   overlay ON the image, per the travel-app reference (title sits
+   directly on the photo, bottom-anchored, over a dark gradient for
+   legibility) - matching the same overlay pattern already used by
+   .bento-hero/.bento-card-a elsewhere on this page (reused gradient
+   values for visual consistency, not invented fresh). This also
+   removed the text block's own height contribution, so the panel's
+   total height is now just the image - see the lowered max-height
+   cap below. */
+.vstrip-media{
+  position:relative;border-radius:8px;overflow:hidden;
+  aspect-ratio:4/5;background:#1b1408;
+}
+.vstrip-media img{ width:100%;height:100%;object-fit:cover;display:block }
+.vstrip-media .placeholder{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:10px;font-size:10.5px;line-height:1.5;color:rgba(255,255,255,.55);
+}
+.vstrip-media::after{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(0deg,rgba(10,7,3,.82) 0%,rgba(10,7,3,.2) 45%,transparent 68%);
+}
+.vstrip-copy{ position:absolute;left:16px;right:16px;bottom:16px;z-index:2;color:#fff; }
+.vstrip-copy p{ font-size:14px;line-height:1.5;color:rgba(255,255,255,.85); }
+.vstrip-copy h4{ font-family:var(--ff-d);font-weight:400;font-size:19px;color:#fff;margin-bottom:5px; }
+
+/* --- DESKTOP: side-by-side strips, collapsed label rotates -90deg.
+   Uses transform:rotate on the wrapped .vstrip-trigger-content span
+   rather than writing-mode:vertical-rl - writing-mode combined with
+   flex-direction:column was clipping longer words (Individuality,
+   Organisation) against the strip's fixed height. Rotating a normal
+   horizontal line of text swaps its axes cleanly: the (long) text
+   width lands in the tall dimension (plenty of room) and the (short)
+   text height lands in the narrow collapsed-strip width - no clipping
+   regardless of word length. */
+@media(min-width:820px){
+  /* _42 FIX: row height bumped 400->460 and media width 42%->48% -
+     same "feels too small, make it bigger" feedback applied to the
+     desktop layout, not just mobile. */
+  .vstrip-row{ flex-direction:row;align-items:stretch;height:460px;gap:12px; }
+  .vstrip{
+    flex:0 0 68px;display:flex;flex-direction:column;overflow:hidden;
+    transition:flex-grow .55s cubic-bezier(.22,.61,.36,1), opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+  }
+  .vstrip.is-open{ flex:1 1 auto; }
+  .vstrip-trigger{
+    position:relative;height:100%;width:100%;padding:0;
+  }
+  .vstrip-trigger-content{
+    position:absolute;left:50%;top:50%;width:auto;white-space:nowrap;
+    transform:translate(-50%,-50%) rotate(-90deg);
+    transition:transform .45s cubic-bezier(.22,.61,.36,1),left .45s ease,top .45s ease;
+  }
+  .vstrip.is-open .vstrip-trigger{ display:flex;align-items:center;height:auto;padding:18px 22px; }
+  .vstrip.is-open .vstrip-trigger-content{
+    position:static;transform:none;
+  }
+  .vstrip-panel{
+    max-height:none;opacity:0;flex:1;display:flex;overflow:hidden;
+    transition:opacity .4s ease .12s;
+  }
+  .vstrip.is-open .vstrip-panel{ opacity:1; }
+  .vstrip-panel-inner{
+    /* _43 FIX: was a 2-up flex row (image left, text column right) -
+       per the reference image, the text belongs ON the photo, not
+       beside it in its own column. Now a single full-bleed media
+       block, same overlay treatment as mobile. */
+    display:flex;padding:0 22px 22px;width:100%;height:100%;
+  }
+  .vstrip-media{ flex:1;aspect-ratio:auto;height:100%;margin-bottom:0; }
+  .vstrip-copy{ left:22px;right:22px;bottom:20px; }
+  .vstrip-copy h4{ font-family:var(--ff-d);font-weight:400;font-size:23px;color:#fff;margin-bottom:6px; }
+  .vstrip-copy p{ font-size:14.5px;max-width:52ch; }
+}
+@media(prefers-reduced-motion:reduce){
+  .vstrip,.vstrip-panel,.vstrip-chevron,.vstrip-trigger-content{ transition:none;opacity:1;transform:none!important; }
+}
+
+/* ============================================================
    PHOTO GRID — "the evidence" (v93 rewrite)
    Per the content-grounding review: this section's job is to PROVE
    things the parallax doesn't already cover (dimensions, doors/
@@ -2033,15 +2436,18 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 }
 @media(min-width:820px){
   .bento-grid{
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(2,1fr);
     grid-template-areas:
-      "hero hero hero hero"
-      "featured craft sizefit carepair";
+      "hero hero"
+      "craft carepair";
     gap:12px;
   }
   .bento-hero{ grid-area:hero; }
-  .bento-card-a{ grid-area:featured; }
   .bento-pair{ grid-area:carepair; }
+  /* .bento-card-craft has no explicit grid-area - it's the only
+     item left without one, so it auto-places into the sole
+     remaining open cell (the "craft" slot), same implicit-placement
+     behaviour this grid already relied on pre-_41. */
 }
 
 /* --- TYPE A: full-bleed photo + overlaid text (hero + featured).
@@ -2179,6 +2585,10 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .bento-card-practical .av6-card-copy b{ display:block;font-family:var(--ff-d);font-weight:400;font-size:19px;color:#fff;margin-bottom:3px; }
 .bento-card-practical .av6-card-copy small{ display:block;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:.03em;text-transform:uppercase; }
 
+/* _41 NOTE: the .sizefit-* rules below are now DEAD CSS - the Size &
+   Fit card that used them was removed from the bento grid (see the
+   _41 top-of-file changelog entry). Left in place, unused, rather
+   than deleted, in case it's revived later. */
 /* --- Size & Fit diagram - Scale comparison per the provided
    "Space & Dimension Fit" reference - Astra's real height (82cm,
    verified) against a standard UK internal door (198cm, general
@@ -2238,10 +2648,19 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
   color:rgba(255,255,255,.6);white-space:nowrap;
 }
 .sizefit-stats{ display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px; }
+/* _38 FIX: {WIDTH}/{DEPTH}/{HEIGHT} placeholder tokens are longer
+   than the real numbers they replace ("{HEIGHT}cm" vs "82cm"), and
+   CSS Grid items default to min-width:auto, which stops them
+   shrinking below their content size - the third stat card was
+   overflowing straight out of the card's right edge. min-width:0
+   lets the grid track actually shrink to the space available, and
+   a slightly smaller font plus overflow-wrap lets long tokens wrap
+   instead of forcing the card wider. */
 .sizefit-stat{
   background:rgba(255,255,255,.05);border-radius:8px;padding:10px 6px;text-align:center;
+  min-width:0;
 }
-.sizefit-stat b{ display:block;font-size:17px;font-weight:700;color:#fff; }
+.sizefit-stat b{ display:block;font-size:12px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .sizefit-stat small{ display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:2px; }
 .sizefit-caption{ font-size:12px;line-height:1.55;color:rgba(255,255,255,.65); }
 /* _35 FIX: on desktop this card sits in a row with Craft and
@@ -2282,11 +2701,19 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .bento-card-craft{ display:flex;flex-direction:column; }
 .bento-card-craft .craft-carousel{ flex:1;display:flex;flex-direction:column;justify-content:center; }
 .craft-track{
-  position:relative;height:200px;touch-action:pan-y;cursor:grab;
+  /* _41 FIX: was a flat 200px on mobile regardless of screen size -
+     read as too small ("Craftsmanship right now for mobile view is
+     too small"). Now scales with the viewport (70vw, capped so it
+     doesn't get silly-tall on large phones/small tablets) so the
+     carousel reads as a genuinely large, prominent block on mobile,
+     matching the size/prominence of the reference screenshot. */
+  position:relative;height:min(70vw,480px);touch-action:pan-y;cursor:grab;
 }
 @media(min-width:820px){ .craft-track{ height:240px; } }
 .craft-slide{
-  position:absolute;top:0;left:50%;width:78%;height:100%;border-radius:10px;overflow:hidden;
+  /* _41: widened 78% -> 88% to match the larger track - the old 78%
+     left more empty side-margin than makes sense at this new size. */
+  position:absolute;top:0;left:50%;width:88%;height:100%;border-radius:10px;overflow:hidden;
   transition:transform .55s cubic-bezier(.22,.61,.36,1), opacity .55s ease, filter .55s ease;
   will-change:transform,opacity,filter;
   opacity:0; /* _32: overrides .mosaic-cell's reveal-driven opacity - the
@@ -3473,40 +3900,260 @@ footer{background:#EDECE9;color:#433122}
 <!-- ============ A+ CONTENT (from here down) ============ -->
 <div class="aplus">
 
-  <!-- A+ · THE FINISH (parallax story) -->
+  <!-- A+ · MATERIAL HERO (parallax story) - _38: copy generalized into
+       template placeholders per explicit direction, rather than
+       showing Astra's real finish-specific text. This section (and
+       the bento grid below it) is now meant to read as a content
+       template - what each slot IS and what it should contain -
+       not a finished example. Real per-SKU copy (the "Galaxy-
+       inspired" version this replaces) is preserved in the _29-_37
+       changelog history above if this needs to be re-populated for
+       Astra specifically later. -->
   <section id="finish" class="parallax-story">
     <div class="parallax-pin">
       <div class="parallax-shell">
         <div class="parallax-copy">
-          <span class="eyebrow">The finish</span>
-          <h2>Galaxy-inspired.<br>Built to last.</h2>
-          <p>A galaxy-inspired finish on solid iron - it shifts with the light, catching depth and intrigue as the room moves around it.</p>
-          <div class="parallax-meta"><span>Metal</span><span>Hand-Finished</span><span>Lasting Quality</span></div>
-          <!-- _29 FIX: "Artisanal Craftsmanship" swapped to "Hand-Finished" -
-               the old label duplicated a claim AV3 (Craft Process, added
-               this version) now owns with actual process proof. Per the
-               A+ master handoff doc, section 6. -->
-          <!-- PRD NOTE - M7 (Metal - Structural Beauty) generic material
-               module exists in the reusable content-system doc but is NOT
-               placed here: this headline/body is already Astra's bespoke
-               finish-specific copy ("Galaxy-inspired"), which the handoff
-               doc flags as stronger for this specific SKU than the
-               material-generic M7 text would be. M7 is kept as the
-               fallback template for future iron SKUs that ship without a
-               named finish. Open question (handoff doc, section 10):
-               whether "Galaxy-inspired" needs a sub-variant tier below M7
-               once more iron finishes exist - not decided, not built. -->
+          <span class="eyebrow">[Eyebrow - names the pillar, e.g. "The Finish"]</span>
+          <h2>[Headline - 2 lines max, evocative material/finish statement]</h2>
+          <p>[Body copy - 1-2 sentences, sensory description of the material/finish. Swappable by {MATERIAL}.]</p>
+          <div class="parallax-meta"><span>[Benefit label 1]</span><span>[Benefit label 2]</span><span>[Benefit label 3]</span></div>
+          <!-- PRD NOTE - this 3-label row is a FIXED slot per the A+
+               master handoff doc (section 5) - always exactly 3
+               labels, regardless of material. Only the words inside
+               change per SKU. -->
         </div>
-        <div class="parallax-scene" aria-label="Layered views of the Astra galaxy finish">
+        <div class="parallax-scene" aria-label="Layered views of the material/finish">
           <span class="px-disk px-disk--one" data-depth="-0.08"></span>
           <span class="px-disk px-disk--two" data-depth="0.14"></span>
-          <figure class="px-card px-card--left" data-depth="0.1" data-rotate="-3"><img src="./assets-web/cabinet-in-living-room.jpg" alt="Astra cabinet styled in a living room"></figure>
-          <figure class="px-card px-card--hero" data-depth="-0.12" data-rotate="2"><img src="./assets-web/cabinet-patina-closeup.jpg" alt="Macro of the hand-applied galaxy patina"></figure>
-          <figure class="px-card px-card--right" data-depth="0.18" data-rotate="3"><img src="./assets-web/cabinet-three-quarter-view.jpg" alt="Three-quarter view of the Astra cabinet"></figure>
-          <div class="px-label" data-depth="-0.2">Light moves across the finish before the room does.</div>
+          <figure class="px-card px-card--left" data-depth="0.1" data-rotate="-3"><img src="./assets-web/cabinet-in-living-room.jpg" alt="[Lifestyle/context photo]"></figure>
+          <figure class="px-card px-card--hero" data-depth="-0.12" data-rotate="2"><img src="./assets-web/cabinet-patina-closeup.jpg" alt="[Material/finish macro detail photo]"></figure>
+          <figure class="px-card px-card--right" data-depth="0.18" data-rotate="3"><img src="./assets-web/cabinet-three-quarter-view.jpg" alt="[Three-quarter product photo]"></figure>
+          <div class="px-label" data-depth="-0.2">[Closing sensory line - permanent slot, one short evocative sentence]</div>
         </div>
       </div>
     </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ============================================================
+       _40 - old fb-story (Features/Benefits scrollytelling prototype)
+       COMMENTED OUT, not deleted, per the never-overwrite-content
+       convention - see the _40 top-of-file changelog entry for why.
+       Its CSS (.fb-story, .fb-sticky-img, .fb-callout, .fb-track,
+       .fb-step, .fb-benefit-img etc.) and its IntersectionObserver
+       JS controller further down the file are both left untouched;
+       the JS controller's own `if(!steps.length)return;` guard makes
+       it a silent no-op now that zero .fb-step elements render.
+
+  <section class="fb-story" id="fbStory">
+
+    <div class="fb-part fb-part-features">
+      <div class="fb-sticky-wrap">
+        <div class="fb-sticky-img" id="fbFeatImg">
+          <img src="./assets-web/cabinet-front-view.jpg" alt="[Product photo - features callouts land here]"
+               onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+          <div class="placeholder" style="display:none">cabinet-front-view.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+          <span class="fb-callout" data-callout style="--cx:14%;--cy:22%">Build</span>
+          <span class="fb-callout" data-callout style="--cx:78%;--cy:30%">Finish</span>
+          <span class="fb-callout" data-callout style="--cx:50%;--cy:82%">Style</span>
+        </div>
+      </div>
+      <div class="fb-track">
+        <div class="fb-step" data-fb-step="0">
+          <span class="fb-kicker">Features</span>
+          <h3>[Build]</h3>
+          <p>Solid iron - not painted MDF or particleboard</p>
+        </div>
+        <div class="fb-step" data-fb-step="1">
+          <h3>[Finish]</h3>
+          <p>Finish applied by hand, not machine</p>
+        </div>
+        <div class="fb-step" data-fb-step="2">
+          <h3>[Style]</h3>
+          <p>Suits contemporary, eclectic, glam, rustic, and industrial interiors</p>
+        </div>
+        <div class="fb-step fb-step-combine" data-fb-step="combine"></div>
+      </div>
+    </div>
+
+    <div class="fb-part fb-part-benefits">
+      <div class="fb-track">
+        <div class="fb-step" data-fb-step="ben0">
+          <span class="fb-kicker">Benefits</span>
+          <h3>[Durability]</h3>
+          <p>Won't sag, wobble, or warp the way cheaper furniture can</p>
+        </div>
+        <div class="fb-step" data-fb-step="ben1">
+          <h3>[Individuality]</h3>
+          <p>No two are exactly alike, so it feels genuinely yours, not off a shelf</p>
+        </div>
+        <div class="fb-step" data-fb-step="ben2">
+          <h3>[Organisation]</h3>
+          <p>Two doors open to real storage - a genuine way to keep linens, books, and everyday clutter out of sight</p>
+        </div>
+      </div>
+      <div class="fb-benefit-img" id="fbBenImg">
+        <img src="./assets-web/cabinet-in-living-room.jpg" alt="[Lifestyle photo - appears after benefits copy, no callouts]"
+             onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+        <div class="placeholder" style="display:none">cabinet-in-living-room.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+      </div>
+    </div>
+
+  </section>
+  ============================================================ -->
+
+  <!-- ============================================================
+       _40 NEW - FEATURES/BENEFITS VERTICAL-STRIP CAROUSEL. Two
+       independent single-open accordions built from the FINAL
+       locked copy (Section 6.3 of the project context doc). See
+       the _40 top-of-file changelog entry for the interaction-model
+       rationale (click/tap on both breakpoints, one pre-opened).
+       ============================================================ -->
+  <section class="vstrip-zone" id="fbCarousels">
+
+    <!-- FEATURES -->
+    <div class="vstrip-group" data-vstrip-group>
+      <div class="vstrip-group-head"><span class="vstrip-kicker">Features</span></div>
+      <div class="vstrip-row">
+
+        <div class="vstrip is-open" data-vstrip data-dir="up">
+          <button class="vstrip-trigger" type="button" aria-expanded="true">
+            <span class="vstrip-trigger-content"><span class="vstrip-index">01</span>
+            <span class="vstrip-label">Build</span>
+            <svg class="vstrip-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="vstrip-panel">
+            <div class="vstrip-panel-inner">
+              <div class="vstrip-media">
+                <img src="./assets-web/feature-build.jpg" alt="[Feature photo - Build]"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">feature-build.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+              <div class="vstrip-copy">
+                <h4>[Build]</h4>
+                <p>Solid iron - not painted MDF or particleboard</p>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vstrip" data-vstrip data-dir="down">
+          <button class="vstrip-trigger" type="button" aria-expanded="false">
+            <span class="vstrip-trigger-content"><span class="vstrip-index">02</span>
+            <span class="vstrip-label">Finish</span>
+            <svg class="vstrip-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="vstrip-panel">
+            <div class="vstrip-panel-inner">
+              <div class="vstrip-media">
+                <img src="./assets-web/feature-finish.jpg" alt="[Feature photo - Finish]"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">feature-finish.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+              <div class="vstrip-copy">
+                <h4>[Finish]</h4>
+                <p>Finish applied by hand, not machine</p>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vstrip" data-vstrip data-dir="up">
+          <button class="vstrip-trigger" type="button" aria-expanded="false">
+            <span class="vstrip-trigger-content"><span class="vstrip-index">03</span>
+            <span class="vstrip-label">Style</span>
+            <svg class="vstrip-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="vstrip-panel">
+            <div class="vstrip-panel-inner">
+              <div class="vstrip-media">
+                <img src="./assets-web/feature-style.jpg" alt="[Feature photo - Style]"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">feature-style.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+              <div class="vstrip-copy">
+                <h4>[Style]</h4>
+                <p>Suits contemporary, eclectic, glam, rustic, and industrial interiors</p>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BENEFITS -->
+    <div class="vstrip-group" data-vstrip-group>
+      <div class="vstrip-group-head"><span class="vstrip-kicker">Benefits</span></div>
+      <div class="vstrip-row">
+
+        <div class="vstrip is-open" data-vstrip data-dir="up">
+          <button class="vstrip-trigger" type="button" aria-expanded="true">
+            <span class="vstrip-trigger-content"><span class="vstrip-index">01</span>
+            <span class="vstrip-label">Durability</span>
+            <svg class="vstrip-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="vstrip-panel">
+            <div class="vstrip-panel-inner">
+              <div class="vstrip-media">
+                <img src="./assets-web/benefit-durability.jpg" alt="[Benefit photo - Durability]"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">benefit-durability.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+              <div class="vstrip-copy">
+                <h4>[Durability]</h4>
+                <p>Won't sag, wobble, or warp the way cheaper furniture can</p>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vstrip" data-vstrip data-dir="down">
+          <button class="vstrip-trigger" type="button" aria-expanded="false">
+            <span class="vstrip-trigger-content"><span class="vstrip-index">02</span>
+            <span class="vstrip-label">Individuality</span>
+            <svg class="vstrip-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="vstrip-panel">
+            <div class="vstrip-panel-inner">
+              <div class="vstrip-media">
+                <img src="./assets-web/benefit-individuality.jpg" alt="[Benefit photo - Individuality]"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">benefit-individuality.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+              <div class="vstrip-copy">
+                <h4>[Individuality]</h4>
+                <p>No two are exactly alike, so it feels genuinely yours, not off a shelf</p>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vstrip" data-vstrip data-dir="up">
+          <button class="vstrip-trigger" type="button" aria-expanded="false">
+            <span class="vstrip-trigger-content"><span class="vstrip-index">03</span>
+            <span class="vstrip-label">Organisation</span>
+            <svg class="vstrip-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <div class="vstrip-panel">
+            <div class="vstrip-panel-inner">
+              <div class="vstrip-media">
+                <img src="./assets-web/benefit-organisation.jpg" alt="[Benefit photo - Organisation]"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">benefit-organisation.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+              <div class="vstrip-copy">
+                <h4>[Organisation]</h4>
+                <p>Two doors open to real storage - a genuine way to keep linens, books, and everyday clutter out of sight</p>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </section>
 
   <div class="section-divider"></div>
@@ -3564,30 +4211,25 @@ footer{background:#EDECE9;color:#433122}
            entry), so it travels with the asset rather than staying
            pinned to a card position. -->
       <div class="mosaic-cell bento-hero ph-accent2" data-dir="up">
-        <img src="./assets-web/cabinet-lifestyle-wide.jpg" alt="Astra Two Door Cabinet in a styled room, wide shot"
+        <img src="./assets-web/cabinet-lifestyle-wide.jpg" alt="[Lifestyle photo - wide/landscape shot for the hero slot]"
              onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
         <div class="placeholder" style="display:none">cabinet-lifestyle-wide.jpg<br><span style="opacity:.6">(placeholder - real file not present in this environment)</span></div>
-        <span class="bento-tag">The details</span>
+        <span class="bento-tag">[Tag pill - e.g. "The Details"]</span>
         <div class="bento-overlay">
-          <h2>Celestial charm</h2>
-          <p>Contemporary, glam, eclectic interiors.</p>
+          <h2>[Hero headline - short style/mood statement, tied to this photo]</h2>
+          <p>[Hero subtext - one short supporting line]</p>
         </div>
       </div>
 
-      <!-- FEATURED - Type A. Now carries the generic framing headline
-           that used to sit above the whole grid - not tied to one
-           specific verified photo, so it can live on whichever
-           lifestyle shot isn't the hero. -->
-      <div class="mosaic-cell bento-card-a ph-accent1" data-dir="down">
-        <img src="./assets-web/cabinet-in-living-room.jpg" alt="Astra Two Door Cabinet styled in a living room"
-             onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
-        <div class="placeholder" style="display:none">cabinet-in-living-room.jpg<br><span style="opacity:.6">(fallback - shows only if the real file fails to load)</span></div>
-        <span class="bento-tag">Featured</span>
-        <div class="bento-overlay">
-          <b>Built to earn its place.</b>
-          <small>Every angle, every finish - proof, not just polish.</small>
-        </div>
-      </div>
+      <!-- _41 REMOVED: the FEATURED (Type A) card used to sit here -
+           a second full-bleed lifestyle photo doing essentially the
+           same job as the Hero card above it. Per explicit feedback
+           ("Featured image and the hero image almost do things that
+           are the same") it's cut, not just hidden - see the _41
+           top-of-file changelog entry. .bento-card-a's CSS stays in
+           the file (shared aspect-ratio rule with .bento-hero, plus
+           its own now-unused overlay rules) in case a genuinely
+           distinct second photo-led card gets added later. -->
 
       <!-- THE CRAFT - Type B, _32 REBUILD: was one static contained
            image - now an embedded fan/stack carousel of the 4 "Meet
@@ -3605,35 +4247,35 @@ footer{background:#EDECE9;color:#433122}
       <div class="bento-card-b bento-card-craft">
         <div class="bento-card-b-head">
           <div>
-            <h3>The craft</h3>
-            <p>Hand-applied, piece by piece</p>
+            <h3>[Pillar name - Craftsmanship]</h3>
+            <p>[One-line process summary]</p>
           </div>
         </div>
         <div class="craft-carousel" id="craftCarousel">
           <div class="craft-track" id="craftTrack">
             <div class="mosaic-cell craft-slide ph-accent1" data-dir="left">
-              <img src="./assets-web/cabinet-top-corner-closeup.jpg" alt="Iron workshop detail"
+              <img src="./assets-web/cabinet-top-corner-closeup.jpg" alt="[Process photo - step 1]"
                    onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
               <div class="placeholder" style="display:none">cabinet-top-corner-closeup.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 01</span><h4>The workshop, India</h4></div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">[Step 01]</span><h4>[Step 1 short title]</h4></div>
             </div>
             <div class="mosaic-cell craft-slide ph-rust" data-dir="left">
-              <img src="./assets-web/cabinet-patina-closeup.jpg" alt="Patina applied by hand"
+              <img src="./assets-web/cabinet-patina-closeup.jpg" alt="[Process photo - step 2]"
                    onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
               <div class="placeholder" style="display:none">cabinet-patina-closeup.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 02</span><h4>Finished by hand</h4></div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">[Step 02]</span><h4>[Step 2 short title]</h4></div>
             </div>
             <div class="mosaic-cell craft-slide ph-bronze" data-dir="left">
-              <img src="./assets-web/cabinet-front-view.jpg" alt="Cabinet quality checked"
+              <img src="./assets-web/cabinet-front-view.jpg" alt="[Process photo - step 3]"
                    onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
               <div class="placeholder" style="display:none">cabinet-front-view.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 03</span><h4>Quality checked</h4></div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">[Step 03]</span><h4>[Step 3 short title]</h4></div>
             </div>
             <div class="mosaic-cell craft-slide ph-accent2" data-dir="left">
-              <img src="./assets-web/cabinet-in-living-room.jpg" alt="Arrives in your home"
+              <img src="./assets-web/cabinet-in-living-room.jpg" alt="[Process photo - step 4]"
                    onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
               <div class="placeholder" style="display:none">cabinet-in-living-room.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 04</span><h4>Arrives at your door</h4></div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">[Step 04]</span><h4>[Step 4 short title]</h4></div>
             </div>
           </div>
           <div class="craft-controls">
@@ -3666,53 +4308,11 @@ footer{background:#EDECE9;color:#433122}
            below, both pulled from the verified product description
            (see the Product Description accordion) rather than invented
            separately for this card. -->
-      <div class="mosaic-cell bento-card-b bento-card-sizefit" data-dir="right">
-        <div class="bento-card-b-head">
-          <div>
-            <h3>Size &amp; fit</h3>
-            <!-- _36 FIX: dropped the "104 x 46 x 82 cm" subhead - it
-                 duplicated the exact same three numbers shown seconds
-                 later in the stat cards below, pure redundancy. Freed
-                 space redistributed as breathing room within the card
-                 (see the increased gaps below) rather than left empty. -->
-          </div>
-        </div>
-        <div class="sizefit-diagram">
-          <div class="sizefit-compare" aria-hidden="true">
-            <div class="sizefit-silhouette sizefit-door">
-              <div class="sizefit-sil-col">
-                <span class="sizefit-sil-label">Standard door</span>
-                <div class="sizefit-sil-box"></div>
-              </div>
-              <div class="sizefit-dim" style="--dim-h:180px">
-                <span class="sizefit-dim-arrow up"></span>
-                <span class="sizefit-dim-label">198cm</span>
-                <span class="sizefit-dim-arrow down"></span>
-              </div>
-            </div>
-            <div class="sizefit-silhouette sizefit-astra">
-              <div class="sizefit-sil-col">
-                <span class="sizefit-sil-label">Astra</span>
-                <div class="sizefit-sil-box">
-                  <span class="sizefit-astra-split"></span>
-                </div>
-              </div>
-              <div class="sizefit-dim" style="--dim-h:75px">
-                <span class="sizefit-dim-arrow up"></span>
-                <span class="sizefit-dim-label">82cm</span>
-                <span class="sizefit-dim-arrow down"></span>
-              </div>
-            </div>
-          </div>
-          <div class="sizefit-floor"></div>
-          <div class="sizefit-stats">
-            <div class="sizefit-stat"><b>104cm</b><small>Width</small></div>
-            <div class="sizefit-stat"><b>46cm</b><small>Depth</small></div>
-            <div class="sizefit-stat"><b>82cm</b><small>Height</small></div>
-          </div>
-          <p class="sizefit-caption">Two doors open to ample storage - a chic way to organise linens, books, or everyday essentials.</p>
-        </div>
-      </div>
+      <!-- _41 REMOVED: the SIZE & FIT (Type B, scale-diagram) card
+           used to sit here. Per explicit direction, cut entirely -
+           see the _41 top-of-file changelog entry. .sizefit-* CSS
+           stays in the file, unused, in case this gets revived
+           (same "kept, not deleted" treatment as .makers-journey). -->
 
       <!-- CARE + PRACTICAL - paired 2-col row (mobile AND desktop).
            _33 FIX: Care icons now 2x2 (was 1x4/2x4) with a short
@@ -3729,8 +4329,8 @@ footer{background:#EDECE9;color:#433122}
         <button class="mosaic-cell bento-card-b bento-card-care" data-dir="up" onclick="openCareModal()" aria-haspopup="dialog">
           <div class="bento-card-b-head">
             <div>
-              <h3>Care</h3>
-              <p>Simple care, built to last</p>
+              <h3>[Pillar name - Care]</h3>
+              <p>[One-line care summary]</p>
             </div>
             <span class="bento-arrow" aria-hidden="true">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg>
@@ -3739,19 +4339,19 @@ footer{background:#EDECE9;color:#433122}
           <div class="bento-care-icons">
             <div class="bento-care-icon">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-              <span>Dust Regularly</span>
+              <span>[Care action 1]</span>
             </div>
             <div class="bento-care-icon">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2.5s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg>
-              <span>Avoid Moisture</span>
+              <span>[Care action 2]</span>
             </div>
             <div class="bento-care-icon">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-              <span>Avoid Direct Sun</span>
+              <span>[Care action 3]</span>
             </div>
             <div class="bento-care-icon">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-              <span>Check Fittings</span>
+              <span>[Care action 4]</span>
             </div>
           </div>
         </button>
@@ -3761,8 +4361,8 @@ footer{background:#EDECE9;color:#433122}
             <svg class="cell-assembly-icon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16.5V7.5a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 7.5v9a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
           </div>
           <div class="av6-card-copy">
-            <b>Arrives ready</b>
-            <small>Minimal assembly</small>
+            <b>[Practical claim headline]</b>
+            <small>[Practical claim detail]</small>
           </div>
         </div>
       </div>
@@ -4640,6 +5240,112 @@ function fbtCalc(){var t=0,n=0;document.querySelectorAll('.fbt-item input:checke
 
 
 
+/* _39 NEW - Features/Benefits scrollytelling controller. Uses
+   IntersectionObserver (not scroll-position math like the parallax
+   engine below) since this only needs discrete on/off states per
+   step, not continuous depth values. rootMargin centres the trigger
+   line in the middle of the viewport rather than the default
+   top/bottom edges. */
+(function(){
+  var steps=[].slice.call(document.querySelectorAll('.fb-step'));
+  if(!steps.length)return;
+  var callouts=[].slice.call(document.querySelectorAll('.fb-callout'));
+  var benImg=document.getElementById('fbBenImg');
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  if(reduce){
+    steps.forEach(function(s){ s.classList.add('is-active'); });
+    callouts.forEach(function(c){ c.classList.add('is-shown'); });
+    if(benImg)benImg.classList.add('is-shown');
+    return;
+  }
+
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      var step=entry.target;
+      if(entry.isIntersecting){
+        step.classList.add('is-active');
+        var key=step.dataset.fbStep;
+        if(key==='combine'){
+          callouts.forEach(function(c){ c.classList.add('is-shown'); });
+        }
+        if(key==='ben2'&&benImg){
+          benImg.classList.add('is-shown');
+        }
+      }
+    });
+  },{ rootMargin:'-40% 0px -40% 0px', threshold:0 });
+
+  steps.forEach(function(s){ io.observe(s); });
+})();
+
+/* _40 NEW - vertical-strip carousel controller (Features/Benefits).
+   Simple single-open accordion per group: clicking a strip's trigger
+   closes whichever strip in that same group is currently open and
+   opens the clicked one. Clicking the already-open strip is a no-op
+   (there is always exactly one open strip per group - never zero,
+   per the "one pre-opened" direction). Keyboard-operable for free
+   since triggers are real <button> elements.
+   _43 FIX: the _42 version waited ~580ms (until the expand animation
+   finished) before scrolling to center - which visibly looked like
+   "expand off-screen, THEN jump to center" per explicit feedback.
+   Fixed by computing the scroll target BEFORE toggling the open
+   class and starting the scroll in the same tick as the expand
+   transition, so both animate together and it reads as "centers
+   itself as it opens," not two separate steps. The math: .vstrip-
+   panel-inner's scrollHeight reports its natural (uncapped) content
+   height even while the panel is still visually collapsed via max-
+   height clipping - that's a real DOM behaviour (scrollHeight always
+   reflects content, independent of the parent's own height/max-
+   height), not a guess - so we know the FINAL expanded content
+   height up front, without waiting for the animation to actually
+   reach it. Also has to account for the PREVIOUSLY open strip in the
+   same group closing at the same time - if it sits above the one
+   being clicked, its collapse pulls everything below it (including
+   the clicked strip) upward by its own content height, and skipping
+   that correction was the actual bug in the first attempt at this
+   fix (it overshot by roughly the closing strip's height). Desktop
+   is deliberately skipped: the row's height is fixed whether a strip
+   is open or closed there (only its width flexes), so nothing ever
+   moves vertically on desktop - there's nothing to correct. */
+(function(){
+  var groups=[].slice.call(document.querySelectorAll('[data-vstrip-group]'));
+  if(!groups.length)return;
+  groups.forEach(function(group){
+    var strips=[].slice.call(group.querySelectorAll('[data-vstrip]'));
+    strips.forEach(function(strip){
+      var trigger=strip.querySelector('.vstrip-trigger');
+      if(!trigger)return;
+      trigger.addEventListener('click',function(){
+        if(strip.classList.contains('is-open'))return;
+        if(window.innerWidth<820){
+          var prevOpen=strips.filter(function(s){return s!==strip&&s.classList.contains('is-open');})[0];
+          var prevOpenH=0,prevIsBefore=false;
+          if(prevOpen){
+            var prevInner=prevOpen.querySelector('.vstrip-panel-inner');
+            prevOpenH=prevInner?prevInner.scrollHeight:0;
+            prevIsBefore=!!(prevOpen.compareDocumentPosition(strip)&Node.DOCUMENT_POSITION_FOLLOWING);
+          }
+          var panelInner=strip.querySelector('.vstrip-panel-inner');
+          var triggerRect=trigger.getBoundingClientRect();
+          var myContentH=panelInner?panelInner.scrollHeight:0;
+          var vh=window.innerHeight;
+          var adjustedBottom=triggerRect.bottom-(prevIsBefore?prevOpenH:0);
+          var contentCenter=adjustedBottom+myContentH/2;
+          window.scrollBy({top:contentCenter-vh/2,behavior:'smooth'});
+        }
+        strips.forEach(function(s){
+          s.classList.remove('is-open');
+          var t=s.querySelector('.vstrip-trigger');
+          if(t)t.setAttribute('aria-expanded','false');
+        });
+        strip.classList.add('is-open');
+        trigger.setAttribute('aria-expanded','true');
+      });
+    });
+  });
+})();
+
 /* lightweight scroll parallax for [data-depth] layers (reduced-motion safe) */
 (function(){
   var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -4677,7 +5383,7 @@ function fbtCalc(){var t=0,n=0;document.querySelectorAll('.fbt-item input:checke
    data-dir attribute in the HTML. */
 (function(){
   var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var cells=[].slice.call(document.querySelectorAll('.mosaic-cell'));
+  var cells=[].slice.call(document.querySelectorAll('.mosaic-cell, .vstrip'));
   if(!cells.length)return;
   if(reduce){
     cells.forEach(function(c){c.classList.add('is-visible');});
