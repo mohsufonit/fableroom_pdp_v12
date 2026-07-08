@@ -1,6 +1,104 @@
 <!DOCTYPE html>
 <!--
   ============================================================
+  _62 UPDATE (this file, forked from _61) - CARD LIGHTBOX: SCALED UP,
+  MOVED DOWN, SWIPE WIDENED, per explicit direction.
+  1. ~10% LARGER across the board: image slot 42->46vh (max-width
+     88->92vw), heading 22->24px, paragraph 14->15.5px, step tag
+     10.5->11.5px, thumbnails 56->62px. Inter-element gaps nudged up
+     proportionally (caption margin 16->18px, thumbs margin 24->26px,
+     thumb gap 8->9px) so the spacing stays uniform at the new size
+     rather than looking cramped.
+  2. MOVED DOWN: the whole group was viewport-centered, which put it
+     high on the screen / out of thumb reach (per the reference). The
+     overlay is now bottom-anchored (justify-content:flex-end) with a
+     7vh bottom cushion, so image+caption+thumbnails sit lower, closer
+     to a resting thumb, while the cushion keeps the thumb strip off
+     the very bottom edge.
+  3. ARROWS moved inside .clb-media so top:50% centers them on the
+     IMAGE - needed because the group is no longer viewport-centered,
+     so the old viewport-relative top:50% would have floated them away
+     from the image.
+  4. SWIPE widened from just #clbStage to the whole #cardLightbox
+     overlay, so a horizontal swipe anywhere on screen navigates (was
+     only over the image/caption). Added a vertical-vs-horizontal
+     check so a vertical flick doesn't accidentally change cards.
+  CSS + small JS (swipe binding) change; validated with node -c.
+  ============================================================
+  _61 UPDATE (this file, forked from _60) - CARD LIGHTBOX SPACING
+  REBALANCED, per explicit direction (reference screenshot showed a
+  large blank gap between the paragraph and the thumbnail preview
+  strip). Root cause: the _60b fix anchored the stage content to the
+  top (flex-start + 8vh top padding) to stop long paragraphs shifting
+  the image - but because .clb-stage stretches to full height (flex:1),
+  top-anchoring dumped ALL the leftover vertical space into one gap at
+  the bottom, between the paragraph and the thumbnails.
+  Fix: reverted the stage to justify-content:center so the leftover
+  space is split evenly above and below the image+caption group
+  instead of collecting in one place. To keep the long-paragraph
+  stability that _60b was protecting, the paragraph now has a FIXED
+  height (3.1em) instead of a min-height - so the caption block is a
+  constant total height regardless of line count, which means the
+  centered group never shifts when copy length changes (a rare
+  over-long paragraph clips/scrolls rather than growing the block).
+  Also tightened the overall group: image slot 48vh -> 42vh and
+  image-to-caption margin 20px -> 16px, so counter -> image -> caption
+  -> thumbnails read as evenly spaced rather than image-heavy.
+  CSS-only, no JS changes.
+  ============================================================
+  _60 UPDATE (this file, forked from _59) - CARD LIGHTBOX REFINEMENTS,
+  per explicit direction. Three related fixes so the lightbox feels
+  stable as you move between cards:
+  1. IMAGE POSITION NOW FIXED - .clb-media is a fixed-height slot
+     (48vh) instead of a shrink-to-fit box, so the image no longer
+     moves up/down when the caption below it changes length between
+     cards. Image is contained within that fixed box (object-fit).
+  2. HEADING POSITION NOW FIXED - the caption block sits at a fixed
+     margin below the fixed image slot, so the heading always lands
+     in the same place. The paragraph has a reserved min-height
+     (2.6em, ~2 lines) so a longer paragraph grows DOWNWARD into
+     reserved space rather than pushing the heading (or the image
+     above it) upward. Only the paragraph reflows; everything above
+     it stays locked.
+  3. THUMBNAIL PREVIEW STRIP ADDED - an image-only strip of all the
+     set's cards now sits at the bottom (same pattern as the product
+     gallery lightbox), so the next/previous cards are visible as
+     previews. Per direction these are IMAGES ONLY - no text on the
+     thumbnails. Clicking a thumbnail jumps to that card; the active
+     one is highlighted and scrolls into view. Arrows moved up to
+     sit centered on the fixed image slot (top:24vh) rather than the
+     old vertical-center of the whole stage, since the stage layout
+     changed.
+  JS: clb state gains thumbsWrap; openCardLightbox builds the strip
+  per set; clbShow syncs the active thumb. Validated with node -c.
+  ============================================================
+  _59 UPDATE (this file, forked from _58) - THREE CHANGES, per explicit
+  direction.
+  1. CRAFT STEP PILL restyled: was bronze-tinted (bronze bg/border/
+     text), now white and less visually heavy (subtle white-tint bg,
+     faint white border, white text) and ~10% larger (font 9.5->10.5px,
+     padding 3px 9px -> 3.3px 10px). See .craft-step-tag.
+  2. CARD LIGHTBOX added for the Pillars + Craft carousels: clicking a
+     card now opens a fullscreen overlay just like the product gallery
+     lightbox, but with the card's TEXT (heading + paragraph, plus the
+     step tag for Craft cards) shown below the image - since these
+     cards carry copy the gallery images don't. New .card-lightbox
+     overlay (#cardLightbox) reuses the same dark-scrim/close/arrow/
+     counter visual language as the existing .lightbox. New JS engine
+     (clb* namespace) reads each carousel's card data straight from the
+     DOM so it always matches the markup, wires each card to open at
+     its own index, and cycles with arrows/swipe/keyboard within that
+     carousel's set only. A guard ignores the click that fires at the
+     tail of a Pillars carousel drag (via a _fbDragged flag on the
+     track) so swiping to change slides doesn't also pop the lightbox.
+     Only the centered/active card in each carousel is clickable, since
+     the carousel engines already set pointer-events:none on the
+     side cards - so the click target is always the focused card.
+  3. FAQ first question ("How do you offer such low prices?") now opens
+     by default - aria-expanded="true" + acc-body open, matching the
+     Delivery accordion's existing default-open pattern.
+  JS added for #2; validated with node -c. #1 and #3 are markup/CSS.
+  ============================================================
   _58 UPDATE (this file, forked from _57) - COMPARE TABLE ROW HEIGHTS
   REDUCED, per explicit direction to make the whole table fit the
   viewport more easily. Cut the desktop cell vertical padding from
@@ -3343,6 +3441,55 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
   .lb-next{right:24px}
 }
 .g-slide img{display:block}
+/* _60 REWORK: three refinements per explicit direction -
+   (a) the image slot and heading are now FIXED-position: the image
+       lives in a fixed-height/width box and the heading sits at a
+       fixed spot below it, so switching cards never nudges the image
+       or heading up/down. Only the paragraph reflows.
+   (b) the paragraph sits in a reserved-height area below the fixed
+       heading, so a 1-line vs 2-line vs 3-line paragraph changes
+       nothing above it - image and heading stay locked.
+   (c) added an image-only thumbnail preview strip (like the gallery
+       lightbox's) so the next/previous cards are visible; per
+       direction these previews show images only, no text. */
+.card-lightbox{position:fixed;inset:0;z-index:200;background:rgba(15,10,4,.96);display:none;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:7vh;touch-action:pan-y} /* _62 CHANGE: was justify-content:center - shifted the whole image+caption+thumbnails group DOWNWARD (align to bottom with a 7vh bottom cushion) per explicit direction that it felt out of thumb reach up top. The group now sits lower on screen, closer to where a thumb naturally rests, while the 7vh cushion keeps the thumbnail strip clear of the very bottom edge. */
+.card-lightbox.show{display:flex}
+.clb-close{position:absolute;top:16px;right:16px;z-index:3;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.clb-close:hover{background:rgba(255,255,255,.22)}
+.clb-counter{position:absolute;top:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);font-size:12.5px;font-weight:600;letter-spacing:.04em}
+.clb-stage{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y;padding:0 16px} /* _61b FIX: removed flex:1 and max-height. flex:1 forced the stage to fill all vertical space between counter and thumbnails, so even with the group centered there were large even gaps above the image AND below the caption (252px / 277px measured) - the "too much blank space before the thumbnails" complaint. Sizing the stage to its content instead, and centering the whole lightbox (.card-lightbox is already justify-content:center), makes image + caption + thumbnails sit together as one compact group with balanced small gaps. */
+/* fixed image slot - fixed height so the image box never changes size
+   or position between cards; object-fit keeps varying image aspect
+   ratios contained within the same box */
+.clb-media{position:relative;display:flex;align-items:center;justify-content:center;height:46vh;width:100%;flex-shrink:0} /* _62: image slot ~10% larger (42vh -> 46vh) per direction */
+.clb-media img{max-width:92vw;max-height:46vh;object-fit:contain;border-radius:6px}
+/* caption block: fixed margin from the image. Heading fixed; paragraph
+   has a FIXED height (not min-height) so the whole caption block is a
+   constant height regardless of paragraph line count - that's what
+   keeps the centered group from shifting when copy length changes,
+   while also not reserving excessive empty space. overflow lets a rare
+   very-long paragraph scroll rather than break the fixed height. */
+.clb-cap{max-width:560px;text-align:center;margin-top:18px;padding:0 8px;flex-shrink:0} /* _62: margin nudged 16->18px to keep the gap proportional to the larger group */
+.clb-cap .clb-tag{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3.6px 11px;border-radius:20px;margin-bottom:11px} /* _62: ~10% up (10.5->11.5px, padding+radius scaled) */
+.clb-cap h4{font-family:var(--ff-d);font-weight:400;font-size:24px;color:#fff;margin-bottom:8px;line-height:1.2} /* _62: 22->24px (~10%) */
+.clb-cap p{font-size:15.5px;line-height:1.55;color:rgba(255,255,255,.82);height:3.1em;overflow:hidden} /* _62: 14->15.5px (~10%) */
+.clb-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer} /* _62: arrows now live inside .clb-media (position:relative), so top:50% centers them on the IMAGE specifically - stays correct now that the group is bottom-anchored rather than viewport-centered, and regardless of caption height. */
+.clb-arrow:hover{background:rgba(255,255,255,.22)}
+.clb-prev{left:10px}
+.clb-next{right:10px}
+/* image-only thumbnail preview strip */
+.clb-thumbs{display:flex;gap:9px;padding:14px 16px;margin-top:26px;overflow-x:auto;max-width:100%;scrollbar-width:none;justify-content:center} /* _62: gap+margin nudged up to stay proportional to the 10%-larger group */
+.clb-thumbs::-webkit-scrollbar{display:none}
+.clb-thumbs img{width:62px;height:62px;object-fit:cover;border-radius:6px;opacity:.45;cursor:pointer;border:2px solid transparent;flex-shrink:0} /* _62: 56->62px (~10%) */
+.clb-thumbs img.active{opacity:1;border-color:var(--bronze)}
+.fb-slide .bento-lifestyle,.craft-slide{cursor:pointer}
+@media(min-width:820px){
+  .clb-arrow{width:50px;height:50px}
+  .clb-prev{left:24px}
+  .clb-next{right:24px}
+  .clb-cap h4{font-size:28px}
+  .clb-cap p{font-size:16.5px}
+}
 /* .g-badges (container-level) removed - badges now built per-slide via .slide-badges, see JS */
 /* .g-badges.dim removed - no longer applicable, badges are per-slide now */
 .badge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:4px;width:fit-content}
@@ -4721,9 +4868,15 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
   position:absolute;left:10px;bottom:10px;right:10px;z-index:3;color:#fff;
 }
 .craft-step-tag{
-  display:inline-block;background:rgba(183,126,69,.22);border:1px solid rgba(183,126,69,.4);
-  color:var(--bronze);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 9px;border-radius:20px;margin-bottom:6px;
+  /* _59 CHANGE: was bronze-tinted (bg rgba(183,126,69,.22), bronze
+     border + bronze text) - per explicit direction, changed to white
+     and made less visually heavy (subtle white tint bg + faint white
+     border + white text), and bumped ~10% in size (font 9.5->10.5px,
+     padding 3px 9px -> 3.3px 10px) so it reads slightly larger while
+     staying a small pill. */
+  display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+  color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3.3px 10px;border-radius:20px;margin-bottom:6px;
 }
 .craft-slide-copy h4{ font-family:var(--ff-d);font-weight:400;font-size:17px;margin-bottom:4px;color:#fff; }
 .craft-slide-copy p{ font-size:12px;line-height:1.45;color:rgba(255,255,255,.8);text-shadow:0 1px 6px rgba(0,0,0,.4); }
@@ -5813,6 +5966,35 @@ footer{background:#EDECE9;color:#433122}
         </button>
       </div>
       <div class="lb-thumbs" id="lbThumbs"></div>
+    </div>
+
+    <!-- _59 ADD: CARD LIGHTBOX - shared overlay for both the Pillars and
+         Craft carousels. Populated dynamically by openCardLightbox() from
+         whichever card set was clicked. Image on top, caption (optional
+         step tag + heading + paragraph) below - the tag only renders for
+         Craft cards, which have step labels; Pillars cards omit it. -->
+    <div class="card-lightbox" id="cardLightbox" onclick="if(event.target===this)closeCardLightbox()">
+      <button class="clb-close" aria-label="Close" onclick="closeCardLightbox()">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="clb-counter" id="clbCounter">1 / 4</div>
+      <div class="clb-stage" id="clbStage">
+        <div class="clb-media">
+          <button class="clb-arrow clb-prev" aria-label="Previous" onclick="clbNav(-1)">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <img id="clbImg" src="" alt="">
+          <button class="clb-arrow clb-next" aria-label="Next" onclick="clbNav(1)">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+        <div class="clb-cap">
+          <span class="clb-tag" id="clbTag" style="display:none"></span>
+          <h4 id="clbHeading"></h4>
+          <p id="clbText"></p>
+        </div>
+      </div>
+      <div class="clb-thumbs" id="clbThumbs"></div>
     </div>
 
     <!-- PRODUCT INFO -->
@@ -7310,7 +7492,7 @@ footer{background:#EDECE9;color:#433122}
          returns) rather than tacked on at the end. -->
     <div class="acc-grid">
       <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="true" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body open"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
         <!-- _52 FIX: 365-Day Guarantee terms added to this existing
              question rather than a new FAQ entry, per explicit
              direction. The terms already exist elsewhere on the page
@@ -7861,6 +8043,115 @@ function lbSyncIfOpen(){
   if(typeof lb==='undefined'||!lb.open)return;
   lbShow(gi);
 }
+
+/* _59 ADD: CARD LIGHTBOX engine for the Pillars + Craft carousels.
+   Reads each carousel's cards straight from the DOM (image src/alt,
+   optional step tag, heading, paragraph) so the lightbox content always
+   matches whatever's in the markup - no separate hardcoded data array to
+   keep in sync. Clicking any card opens the overlay at that card; arrows/
+   swipe/keyboard cycle within that same carousel's set only. */
+var clb={el:null,img:null,tag:null,heading:null,text:null,counter:null,thumbsWrap:null,set:[],index:0,open:false};
+function clbCollect(){
+  var sets={};
+  /* Pillars: .fb-slide > .bento-lifestyle (img + .bl-cap h3/p), no step tag */
+  sets.pillars=[].slice.call(document.querySelectorAll('#pillarsCarouselCol .fb-slide')).map(function(s){
+    var img=s.querySelector('img'), h=s.querySelector('.bl-cap h3'), p=s.querySelector('.bl-cap p');
+    return {src:img?img.getAttribute('src'):'', alt:img?img.getAttribute('alt'):'', tag:'', heading:h?h.textContent:'', text:p?p.textContent:''};
+  });
+  /* Craft: .craft-slide (img + .craft-slide-copy .craft-step-tag/h4/p), has step tag */
+  sets.craft=[].slice.call(document.querySelectorAll('#craftTrack .craft-slide')).map(function(s){
+    var img=s.querySelector('img'), tag=s.querySelector('.craft-step-tag'), h=s.querySelector('.craft-slide-copy h4'), p=s.querySelector('.craft-slide-copy p');
+    return {src:img?img.getAttribute('src'):'', alt:img?img.getAttribute('alt'):'', tag:tag?tag.textContent:'', heading:h?h.textContent:'', text:p?p.textContent:''};
+  });
+  return sets;
+}
+function clbInit(){
+  clb.el=document.getElementById('cardLightbox');
+  clb.img=document.getElementById('clbImg');
+  clb.tag=document.getElementById('clbTag');
+  clb.heading=document.getElementById('clbHeading');
+  clb.text=document.getElementById('clbText');
+  clb.counter=document.getElementById('clbCounter');
+  clb.thumbsWrap=document.getElementById('clbThumbs');
+  if(!clb.el)return;
+  var sets=clbCollect();
+  /* wire each Pillars card */
+  [].slice.call(document.querySelectorAll('#pillarsCarouselCol .fb-slide')).forEach(function(s,i){
+    var target=s.querySelector('.bento-lifestyle')||s;
+    target.addEventListener('click',function(){
+      /* ignore the click that fires at the tail of a carousel drag */
+      var track=s.closest('.fb-carousel')&&s.closest('.fb-carousel').querySelector('.fb-track');
+      if(track&&track._fbDragged)return;
+      openCardLightbox('pillars',i);
+    });
+  });
+  /* wire each Craft card */
+  [].slice.call(document.querySelectorAll('#craftTrack .craft-slide')).forEach(function(s,i){
+    s.addEventListener('click',function(){openCardLightbox('craft',i)});
+  });
+  /* _62: swipe now bound to the whole overlay (#cardLightbox), not just
+     #clbStage - per direction to make sure it's reliably swipeable, a
+     swipe anywhere on the screen (including over the caption or the
+     empty area) now navigates, not only directly on the image. */
+  var swipeZone=clb.el||document.getElementById('cardLightbox'), sx=0, sy=0;
+  swipeZone.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+  swipeZone.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    /* horizontal swipe only - ignore mostly-vertical gestures so a
+       vertical scroll/flick doesn't accidentally change cards */
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){clbNav(dx<0?1:-1)}
+  },{passive:true});
+  document.addEventListener('keydown',function(e){
+    if(!clb.open)return;
+    if(e.key==='Escape')closeCardLightbox();
+    if(e.key==='ArrowRight')clbNav(1);
+    if(e.key==='ArrowLeft')clbNav(-1);
+  });
+}
+function clbShow(i){
+  if(!clb.set.length)return;
+  clb.index=(i+clb.set.length)%clb.set.length;
+  var c=clb.set[clb.index];
+  clb.img.src=c.src; clb.img.alt=c.alt;
+  if(c.tag){clb.tag.textContent=c.tag;clb.tag.style.display='';}else{clb.tag.style.display='none';}
+  clb.heading.textContent=c.heading;
+  clb.text.textContent=c.text;
+  clb.counter.textContent=(clb.index+1)+' / '+clb.set.length;
+  if(clb.thumbsWrap){
+    clb.thumbsWrap.querySelectorAll('img').forEach(function(t,k){
+      t.classList.toggle('active',k===clb.index);
+      if(k===clb.index)t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    });
+  }
+}
+function clbBuildThumbs(){
+  if(!clb.thumbsWrap)return;
+  clb.thumbsWrap.innerHTML='';
+  clb.set.forEach(function(c,i){
+    var t=document.createElement('img');
+    t.src=c.src; t.alt=c.alt; t.loading='lazy';
+    t.onclick=function(){clbShow(i)};
+    clb.thumbsWrap.appendChild(t);
+  });
+}
+function openCardLightbox(which,i){
+  if(!clb.el)clbInit();
+  var sets=clbCollect();
+  clb.set=sets[which]||[];
+  clbBuildThumbs();
+  clbShow(i);
+  clb.el.classList.add('show');
+  clb.open=true;
+  document.body.style.overflow='hidden';
+}
+function closeCardLightbox(){
+  if(!clb.el)return;
+  clb.el.classList.remove('show');
+  clb.open=false;
+  document.body.style.overflow='';
+}
+function clbNav(dir){ clbShow(clb.index+dir); }
+document.addEventListener('DOMContentLoaded',clbInit);
 
 
 /* dynamic rotating badge - cycles: 44% Off / Pre-Order / Bestseller.
@@ -8503,6 +8794,12 @@ function fbtCalc(){var t=0,n=0;document.querySelectorAll('.fbt-item input:checke
       if(!dragging)return;
       dragging=false;
       if(Math.abs(dragDeltaX)>40){ goTo(active+(dragDeltaX<0?1:-1),true); }
+      /* _59 ADD: remember if this pointer interaction actually moved a
+         meaningful distance, so the card-lightbox click handler can
+         ignore the click that fires at the end of a drag (otherwise a
+         swipe to change slides would also pop the lightbox open). */
+      track._fbDragged=Math.abs(dragDeltaX)>8;
+      setTimeout(function(){track._fbDragged=false;},0);
       dragDeltaX=0;
     }
     track.addEventListener('pointerup',endDrag);
