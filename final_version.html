@@ -1,6 +1,709 @@
 <!DOCTYPE html>
 <!--
   ============================================================
+  _58 UPDATE (this file, forked from _57) - COMPARE TABLE ROW HEIGHTS
+  REDUCED, per explicit direction to make the whole table fit the
+  viewport more easily. Cut the desktop cell vertical padding from
+  18px to 11px (top and bottom), applied to the shared th/td rule so
+  every row - header and body - shrinks by the same amount and stays
+  visually even. Horizontal padding (16px) untouched, so column
+  widths/spacing and the table's left-edge alignment (the _56 fix)
+  are unaffected - this purely compresses row height. Each row was
+  ~60px; now ~46px, taking the whole table from ~375px down to
+  ~290px tall.
+  No JS changes needed - CSS-only.
+  ============================================================
+  _57 UPDATE (this file, forked from _56) - BOTTOM DIVIDER LINE ADDED
+  TO THE RTB STRIP, per explicit direction (reference: a screenshot
+  with a hand-drawn orange line marking where it should go - the
+  colour itself was just annotation, not an instruction to make the
+  real line orange). Added border-bottom to .rtb-strip--inzone,
+  identical in colour/width to its existing border-top, so the new
+  line is automatically the same length as the one above with no
+  separate sizing needed (same element, same box width).
+  Spacing required no new values, per explicit direction that the
+  icon content should sit evenly between the two lines and the gap
+  below the new line should match established rhythm: the existing
+  14px top/bottom padding on this element already puts equal space
+  between each line and the icon+text content, and .carousels-zone's
+  own 36px bottom padding (from the _56 fix, one step up the DOM)
+  already provides the gap from this new line down to the section's
+  actual bottom edge - matching that section's own top/bottom
+  symmetry rather than a fresh number invented for this.
+  No JS changes needed - CSS-only.
+  ============================================================
+  _56 UPDATE (this file, forked from _55) - FOUR FIXES FROM THE
+  SPACING/ALIGNMENT AUDIT, per explicit direction. All four were
+  measured (computed values/bounding boxes), not visual guesses - see
+  the audit conversation for the full before/after numbers.
+  1. #carouselsZone padding symmetrized: was 36px top / 28px bottom,
+     now 36px/36px. Kept top unchanged (it's load-bearing for the _52
+     fix that aligned "Features and Specifications"'s spacing math -
+     36+6=42, matching the 42px below it) and brought bottom up to
+     match instead of the reverse.
+  2. .rtb-strip--inzone padding symmetrized: was 14px top / 32px
+     bottom (inherited from .rtb-strip's base rule), now 14px/14px.
+     Top was deliberately tuned earlier to match the icon-to-label
+     gap - matched bottom to it rather than leaving a 2x+ imbalance.
+  3. Compare table + save-note left-edge alignment fixed: both had
+     their own 820px max-width centered inside the 900px container,
+     creating a 40px inset that put the table's left edge to the
+     right of "Priced with honesty" above it. Widened both to the
+     full 900px to match the container (and the heading) exactly.
+  4. Icon-to-text gap unified: Key Highlights (.kh-item) used 9px,
+     the RTB strip used 5px - the only two icon+text pairings on the
+     page, using two different values. Brought Key Highlights down to
+     5px to match.
+  No JS changes needed - all four are CSS-only.
+  ============================================================
+  _55 UPDATE (this file, forked from _54) - RTB ICON ROW INTERNAL
+  SPACING REVERTED, per explicit direction (reference: a screenshot
+  showing the icon-to-title and title-to-subtext gaps should be tight,
+  not spaced out). The _49 fix had widened .pt-trust-item's gap from
+  5px to 14px specifically to match .rtb-strip--inzone's line-to-icon
+  padding-top (also 14px) - per explicit direction that request is now
+  superseded for the icon/title/subtext spacing specifically. Reverted
+  .pt-trust-item back to gap:5px. .rtb-strip--inzone's own 14px
+  padding-top (the line-to-icon gap, a separate measurement from a
+  different request) is untouched.
+  PROCESS NOTE: direction referenced rolling back to what
+  "_3_48.html" had - checked that file directly and found it already
+  carries the wide 14px value too, not the original tight 5px. Root
+  cause: in the session that produced the _49 changes, this specific
+  edit was made in place on the _48 file before copying it forward to
+  create _49, so the pre-change state was never preserved under the
+  _48 filename - a one-off process slip, flagged here for the record.
+  Didn't block the fix since the actual target value (5px, matching
+  the reference image) was unambiguous either way.
+  No JS changes needed - CSS-only.
+  ============================================================
+  _54 UPDATE (this file, forked from _53) - FULL CROSS-CHECK AGAINST
+  THE LIVE RETURNS & EXCHANGE + DELIVERY & SHIPPING POLICY PAGES, per
+  explicit direction. Fetched both pages directly
+  (fableroom.com/pages/return-refund, dated "Last Updated: 20th April,
+  2026", and fableroom.com/pages/delivery-and-shipping, dated "Last
+  updated: 4 June, 2026") rather than relying on inline PDP snippets
+  again, after the _53 lesson that dated policy pages are the stronger
+  source. Found more discrepancies than just the cancellation gap that
+  prompted this check:
+  1. RETURN WINDOW WAS WRONG EVERYWHERE ON THIS PAGE: every mention of
+     "14-day"/"14 days" for RETURNS (not cancellation, which genuinely
+     is 14 days - a different policy) should be 30 days, per the real
+     "30-Day Easy Returns" policy. Fixed in 6 places: the CTA trust
+     badge, the trust modal (heading + body), the Delivery accordion
+     (button label + body), and 3 FAQ answers ("Do you have a
+     showroom", "What happens if my item arrives damaged", "If I
+     don't like something can I return it", "Will I be charged for
+     returns" - that's 4 FAQ answers, not 3).
+  2. RETURN FEE CATEGORIES REFINED to match the real 3-tier table
+     (Small: cushions/throws/lamps/pouffes = £5; Other Small:
+     rugs/ottomans/stools = £18; Medium/Large: furniture/mirrors =
+     £25) - our copy previously said "soft furnishings" for the £5
+     tier, which doesn't accurately cover lamps (not soft/fabric).
+     Reworded to "cushions, throws, and lamps" and added "ottomans" to
+     the £18 tier, in the trust modal, Delivery accordion, and FAQ.
+  3. CANCELLATION FAQ - THE ORIGINAL GAP THAT PROMPTED THIS CHECK - now
+     states BOTH real conditions instead of just one: the 14-day
+     window (from the Returns page's own Cancellation Policy section)
+     AND the separate "once shipped, cannot be cancelled" rule (from
+     the Delivery & Shipping page) - an order that ships in under 14
+     days is a real case the old answer didn't cover.
+  NOT ADDED (flagged, not implemented, to avoid over-scoping the FAQ):
+  the real policy also has a shorter 14-day/restocking-fee window
+  specifically for CLEARANCE items, and notes that exchanges/
+  replacements (as opposed to straight refunds) are never subject to
+  the return fee - both are real details, neither added here since
+  Astra isn't a clearance item and exchanges aren't currently offered
+  as a page feature. Flagging for awareness, not fixing blind.
+  One item deliberately NOT changed: the alt text on
+  cabinet-review-trust-v11.jpg still says "14-day easy returns" -
+  this describes an actual static image asset (a screenshot-style
+  trust graphic) that this session can't re-render; changing only the
+  alt text would make it inaccurate to what the image actually shows.
+  Flagging as a known stale asset requiring a new image, not a copy
+  fix.
+  No JS changes needed - all copy-only.
+  ============================================================
+  _53 UPDATE (this file, forked from _52) - DELIVERY TIMELINE FIGURES
+  CORRECTED AGAIN, per explicit direction, using a stronger source.
+  _52's fix (5-10 weeks for Pre-Order) was grounded in individual PDP
+  inline snippets (Astra's own product page, plus 5 other live PDPs
+  all matching) - reasonable evidence at the time, but it turns out to
+  be the OUTDATED copy. Shown a screenshot of the actual dedicated
+  "Delivery & Availability" policy page and fetched it directly to
+  confirm (fableroom.com/pages/delivery-and-shipping) - it carries an
+  explicit revision date, "Last updated: 4 June, 2026", making it a
+  stronger source than undated inline PDP copy. Its real, current
+  figures:
+    Ready to Ship - 1-2 weeks (unchanged, already matched)
+    Standard Shipping - 3-8 weeks (was 3-5 weeks on this page)
+    Pre-Order - 8-12 weeks (was just changed TO 5-10 weeks in _52 -
+      reverted back to 8-12, which is what this page originally had
+      before that fix)
+  Fixed in all 3 places these figures appear: the Delivery accordion's
+  "Pre-order timeline" item, the backorder notice near the CTA, and
+  the FAQ's "How long will my delivery take?" answer (which also had
+  the wrong Standard Shipping figure, not just Pre-Order - caught
+  while fixing this).
+  Noting for the record since it's a real finding: fableroom.com's own
+  live site is internally inconsistent between this dated policy page
+  and its individual product pages (which still show 3-5/5-10 weeks,
+  unverified when they were last updated) - not something this file
+  can fix, just flagging that the two real sources disagree with each
+  other, not only with our own copy.
+  No JS changes needed - copy-only.
+  ============================================================
+  _52 UPDATE (this file, forked from _51) - FOUR CONTENT-AUDIT FIXES,
+  per explicit direction, following up on the full-page content
+  validation.
+  1. PRE-ORDER TIMELINE CONTRADICTION RESOLVED - GROUNDED, NOT GUESSED.
+     Explicit direction asked to change the figure to "5-12 weeks", but
+     first crawled the live fableroom.com to verify rather than typing
+     that in directly. Findings: Astra's own real live product page
+     states verbatim "Pre-Order - Arrives in 5-10 weeks", and every
+     other live PDP checked (Eldric Fluted Side Table, both Niel Sheet
+     Sets) uses the identical sitewide template with the same 5-10
+     week figure. "8-12 weeks" (what our Delivery accordion had) only
+     appears on the live site's Coffee Tables CATEGORY page - a
+     different product line, not Astra, not the sitewide standard.
+     Fixed to the verified 5-10 weeks (matching the FAQ, which already
+     had the correct figure) in BOTH places that had the wrong "8-12
+     weeks": the Delivery accordion's "Pre-order timeline" item, and
+     the backorder notice near the CTA (a second instance of the same
+     wrong figure, found while fixing the first - not in the original
+     audit). Did not use "5-12 weeks" as instructed, since that number
+     isn't grounded anywhere on the real site - flagged this
+     explicitly rather than silently substituting a different number
+     than what was asked for.
+  2. 365-DAY GUARANTEE TERMS ADDED TO AN EXISTING FAQ QUESTION, not a
+     new one, per explicit direction. Added to "Are your products
+     authentic and durable?" - the natural fit, since it's already
+     making a durability claim and the guarantee is the concrete
+     backing for it. The guarantee's other existing placements (CTA
+     trust badge/modal, Delivery accordion) are untouched - this is an
+     addition to the FAQ, not a consolidation away from them.
+  3. RETURN FEE FAQ ANSWER EXPANDED to the full fee table (furniture
+     £25, rugs £18, soft furnishings £5) instead of furniture-only -
+     per explicit direction ("let the FAQ have enough info"). Matters
+     because this FAQ is sitewide, not Astra-specific; the fuller
+     numbers were already accurate and live elsewhere (Delivery
+     accordion), just not surfaced in the FAQ itself.
+  4. REFUND PROCESSING TIME ADDED to "How do I return something?" -
+     "refund is issued within 7 days" (of the return being received
+     and inspected) - existed in the Delivery accordion and the trust
+     modal but was missing from the FAQ entirely, despite being
+     exactly the question where someone would look for it.
+  Hand-finish variation (FAQ Q3) confirmed fine as-is per explicit
+  direction - no change made there.
+  No JS changes needed - all four are copy-only.
+  ============================================================
+  _51 UPDATE (this file, forked from _50) - TWO FIXES, per explicit
+  direction (reference: a screenshot with a hand-drawn line marking
+  the misalignment - the line itself isn't part of the site).
+  1. "TRANSPARENT PRICING" LEFT-EDGE ALIGNMENT FIXED. Root cause:
+     #compare's heading ("Priced with honesty") was capped at 860px
+     (shared with #delivery/#faq's ap-head rule), while its own panel
+     content (#ctab-compare/#ctab-pricing/.pt) had already been
+     widened to 900px across the _47/_49 passes. Both are centered
+     independently via margin:auto, so the two different widths meant
+     their LEFT edges didn't line up - "Transparent Pricing" visibly
+     started to the left of "Priced with honesty" above it. Split
+     #compare's ap-head out from the shared 860px rule so it matches
+     its own panel's 900px instead; #delivery/#faq keep 860px since
+     their content wasn't widened the same way.
+  2. TABS UNDERLINE/SPACING REFRESHED. Per explicit feedback the old
+     fixed 56px gap/padding (from the _33 fix era, calibrated for a
+     narrower section) now looks unnaturally tight against the wider
+     900px section. Widened both (gap 56->64px, padding 56->72px) so
+     the divider line and spacing between "How it compares"/"How is
+     this priced?" read proportionate to the new width.
+  No JS changes needed - both are CSS-only.
+  ============================================================
+  _50 UPDATE (this file, forked from _49) - 4 NEW FAQ QUESTIONS ADDED,
+  per explicit direction. Backed by a keyword + sentiment analysis of
+  the site's full 1,031-review Trustpilot dump (Troopod_-_FR_TP_
+  Reviews_-_Dump.xlsx) rather than guessed - each theme was checked
+  for both mention volume AND % of mentions rated 3-star-or-below,
+  since volume alone is misleading (a theme mentioned 100 times while
+  being praised isn't a gap; a theme mentioned 7 times with 86%
+  negative ratings is a real problem). All 11 original verbatim
+  questions/answers are unchanged - only re-sequenced to slot the new
+  ones into the objection hierarchy (pricing/trust doubts first, then
+  logistics, then returns) rather than appended at the end.
+  New questions added (see inline _50 comments at each one for the
+  specific data behind it):
+    1. "Will my item look exactly like the photos?" - 135 review
+       mentions, only 9% negative, but a constantly-recurring
+       unprompted relief point ("colours are an exact match") -
+       pre-empts a live pre-purchase anxiety.
+    2. "How and when will I be charged?" - addresses standard pre-
+       order cart-abandonment ambiguity (payment timing), not itself
+       a review-driven add but a real checkout-stage gap.
+    3. "Can I cancel my order?" - only 7 mentions but 86% rated
+       3-star-or-below, the single sharpest negative signal in the
+       entire dataset ("shockingly bad", "numerous broken promises").
+    4. "What happens if my item arrives damaged or faulty?" - 56
+       mentions, 41% rated 3-star-or-below, the second-highest-volume
+       negative theme found. Split out as its own question rather
+       than staying buried inside "Will I be charged for returns?".
+  Explicitly EXCLUDED per direction: "Is it normal for natural
+  materials to shed fibres or have a smell?" - this was identified in
+  the same analysis (13 + 10 review mentions, wool-specific) but not
+  added to this page's FAQ per explicit instruction.
+  Also explicitly NOT added, per the same review analysis showing
+  they aren't real complaint drivers on this site (contrary to an
+  earlier guess): assembly difficulty (28 mentions, only 4% negative)
+  and doorway/fit issues (12 mentions, 0% negative).
+  #faq's two-column split rebalanced from 6/5 to 8/7 to fit the 4 new
+  entries. No JS changes needed - the generic acc() accordion toggle
+  works off whatever's in the DOM.
+  ============================================================
+  _49 UPDATE (this file, forked from _48) - SIX FIXES, per explicit
+  direction.
+  1. GREEN COLOUR PARTIALLY REVERTED. _48's global --green change is
+     rolled back to its original #108474 - per explicit direction only
+     the pricing/compare table should keep the brighter key-highlight
+     green, everything else goes back to its own original colour.
+     .cm-savings, .cmptable-3fit .cm-yes, and .cm-save-note now
+     hardcode #08BD5E directly (scoped exceptions) instead of via the
+     shared token. .kh-amt reverted to its own independent hardcoded
+     value too (decoupled from var(--green) again, matching its
+     pre-_48 state) since Key Highlights isn't part of "the pricing
+     table section" the revert was scoped to. All 13 matching
+     rgba(8,189,94,X) tints reverted to rgba(16,132,116,X) except
+     .cm-save-note's, which keep the new green's tint.
+  2. "YOU SAVE £X" BANNER NOW ACTUALLY CENTERS ON DESKTOP. Root cause:
+     an inline style="max-width:480px" on the element was overriding
+     the desktop CSS's attempt to widen it to 820px (inline always
+     beats external CSS regardless of specificity) - so it stayed
+     narrow and looked off-center against the much wider table above
+     it, even though it was technically centered within its own small
+     box. Removed the inline style, moved max-width:480px/margin:auto
+     into the base .cm-save-note rule so CSS owns it at every
+     breakpoint without a fight.
+  3. FEATURES AND SPECIFICATIONS SPACING EQUALIZED PROPERLY. Measured
+     real numbers this time (Playwright) instead of trusting the math
+     on paper: gap above the heading was 42px, gap below (to the
+     accordion card) was 70px - #featSpecsCard (the first carousel-
+     group, directly under the heading) was carrying its own inherited
+     28px top padding on top of the heading's own bottom spacing.
+     Zeroed just that top padding - both gaps now measure 42px.
+  4. RTB STRIP ICON SPACING EQUALIZED. Line-to-icon gap (36px) and
+     icon-to-label gap (5px) were very uneven - per explicit direction
+     these should match. Met in the middle at 14px for both rather
+     than either extreme.
+  5. "HOW IS THIS PRICED?" NOW USES THE SAME WIDTH AS "HOW IT
+     COMPARES". Root cause: .pt already had max-width:960px, but its
+     actual parent (#ctab-pricing, sharing the base .cmp-panel{max-
+     width:680px} rule) was still capping it at 680px regardless - a
+     child's own larger max-width doesn't matter if the parent itself
+     is narrower. Added #ctab-pricing{max-width:900px}, matching
+     #ctab-compare exactly, per explicit direction ("use the same
+     space").
+  6. TRANSPARENT PRICING TEXT SIZED UP AND TOP-ALIGNED. Font sizes
+     bumped slightly (28->30px heading, 15->16px body) per explicit
+     feedback that it read too small next to the cost-breakdown card.
+     .pt's align-items switched from center to start so both headings
+     ("Transparent Pricing" / "What goes into your £503") now line up
+     at the same top edge instead of the shorter text block floating
+     vertically centered against the taller card - matches the
+     reference screenshot. Checked for a card/tile background per
+     explicit feedback ("remove the transparent pricing tile") - never
+     had one; this has always been plain text.
+  No JS changes needed - all six are markup/CSS only.
+  ============================================================
+  _48 UPDATE (this file, forked from _47) - GREEN COLOUR UNIFIED, per
+  explicit direction. The Savings (%) column (and every other savings/
+  offer/discount-style badge on the page - .cm-save-note, .fbt-save,
+  .price-save-callout, .setup-badge, .pp-badge, .pcomp-save-banner,
+  .pv2-offer, .comp-row .comp-save - all shared the same var(--green)
+  token) used a muted teal (#108474) that wasn't wanted. Per explicit
+  direction, replaced with the brighter green already used and
+  verified against the live site in the Key Highlights section
+  (.kh-amt's #08BD5E - see the v106 changelog note further down,
+  which confirmed this exact value by inspecting fableroom.com's own
+  computed styles). Changed the --green variable itself (one token,
+  used everywhere) rather than patching each usage individually, plus
+  the 13 matching rgba(16,132,116,X) background/border tints used
+  alongside it, so text and background tints stay in sync. Checked
+  the two spots the v106 note specifically flagged as needing the OLD
+  teal preserved (.revcard .vf, .rchip .rc-vb - real "verified
+  reviewer" badges on the live site, a different accent from the
+  savings figure) - both turned out to be unused/dead CSS with no
+  matching HTML anywhere on this page, so nothing needed a carve-out.
+  Also pointed .kh-amt at var(--green) instead of its own hardcoded
+  #08BD5E, now that they're the same value - one source of truth
+  instead of two independent hex codes that could drift apart later.
+  Old --green value kept commented, not deleted, per the never-delete
+  convention.
+  ============================================================
+  _47 UPDATE (this file, forked from _46) - DESKTOP FEELING SMALL,
+  SIX FIXES, per explicit direction (reference: live Fableroom site
+  screenshots, used for spacing/scale inspiration only - not for
+  content, columns, or copy, which all stay ours).
+  1. COMPARE TABLE SCALED UP ON DESKTOP. Was reusing the same mobile-
+     tightened font-size/padding just stretched onto a wider screen.
+     Widened #ctab-compare and its table/save-note, bumped font-size
+     and row padding, desktop-only (#ctab-compare scope, not a
+     blanket .cmp-panel change) so "How is this priced?" and mobile
+     are untouched.
+  2. "TRANSPARENT PRICING" LEFT COLUMN ADDED ON DESKTOP. New
+     .pt-copy2 (heading + a close paraphrase of the live site's own
+     real supporting paragraph, not invented) sits left of the cost
+     breakdown card in a real two-column grid at desktop widths.
+     Hidden on mobile by design (.pt-copy2{display:none} at the base)
+     since mobile was already confirmed fine and wasn't meant to
+     change. Supersedes the _45 single-column-centered-card fix (that
+     fix's stretched-look problem is solved differently now that
+     there's a second column to fill the width with) - old rules
+     commented, not deleted.
+  3. FEATURES AND SPECIFICATIONS HEADING SPACING FIXED. Top padding
+     (28px, stacking on .carousels-zone's own 36px top padding = 64px
+     total) was uneven against the 42px below it. Reduced to 6px so
+     top and bottom now match (42/42), same rhythm as other section
+     titles. Checked specifically for a stray border/line element per
+     explicit feedback - found none; it was pure spacing imbalance.
+  4. RTB ICON STRIP MOVED INSIDE #carouselsZone. Was its own section
+     directly after the dark carousels zone, sitting on the page's
+     default white background - a jarring white strip right under a
+     dark one. Now a plain div inside that same zone (inherits its
+     #1b1408 background and full-bleed width for free), with a
+     border-top matching the existing divider style already used
+     between the Pillars/Craft groups, and light-on-dark text colours
+     for its labels (the default colours were tuned for a white
+     background).
+  5. "COMPLETE THE LOOK" MOVED AND RENAMED. Relocated from the very
+     end of the page (after Reviews, before the footer) to directly
+     before Fair Pricing, per explicit direction. Renamed from
+     "Complete the look"/"Pairs beautifully with" to "Customer
+     favourites"/"Customers also loved" - fits a social-proof cross-
+     sell positioned right before the value section better than the
+     old styling-suggestion framing did. Its card images were square
+     (1:1) - changed to 3:4, matching every other image ratio on this
+     page.
+  6. CRAFT+RTB "ONE VIEWPORT" FIT - INVESTIGATED, PARTIAL. Per
+     explicit direction this was flagged as desktop-only/best-effort
+     ("on mobile it's very difficult, we can work on that later").
+     Tightened what was safe to tighten (section padding) - full one-
+     screen fit at typical desktop heights (800-900px) isn't realistic
+     without shrinking the Craft images enough to hurt the "scaled up,
+     not small" goal from fix #1-2 above, so this wasn't forced
+     further. Flagging as still open rather than claiming it's solved.
+  No JS changes needed - all six are markup/CSS only.
+  ============================================================
+  _46 UPDATE (this file, forked from _45) - TWO FIXES, per explicit
+  direction.
+  1. "THE DETAILS" AND "THE CRAFT" NOW STACK ONE BELOW THE OTHER ON
+     DESKTOP, not side by side as two columns. Removed the desktop
+     flex layout on .fb-carousel-groups entirely (old rule commented
+     out, not deleted) - both sections now fall back to their base,
+     non-flex, full-width, border-top-divided rules at every
+     breakpoint, the same stacking mobile already used.
+     FOLLOW-THROUGH: since each grid now gets the section's full
+     width instead of sharing it with a sibling column, widened both
+     .craft-track's and .fb-track's desktop grid from 2 columns to 4
+     (their _44 grid-ification was a 2x2 compromise made specifically
+     because they used to sit side by side at half-width each - with
+     that constraint gone, 4-across fits comfortably and matches the
+     original reference image's intent more closely than a 2x2 grid
+     would have).
+  2. FEATURES AND SPECIFICATIONS CARD - UNEVEN TOP/BOTTOM PADDING
+     FIXED. .feat-specs-card was 12px top / 18px bottom (a leftover
+     from an earlier fix that aimed to "balance" against a different
+     rule but never actually landed on equal values) - per explicit
+     direction the gap above "Product Description" and below "Care
+     Guide" should match. Equalized to 18px both sides.
+  No JS changes needed for either fix - both are CSS-only.
+  ============================================================
+  _45 UPDATE (this file, forked from _44) - THREE CHANGES, per
+  explicit direction.
+  1. "SAVINGS (%)" ROW ADDED to both compare tables (#cmpTable3 and
+     its modal twin #cmpTable3Modal, kept in sync per their existing
+     convention), directly after the Price row. Percentages computed
+     from the prices already in the table, not separately sourced:
+     Swoon 22% (146/649), Heal's 33% (246/749), John Lewis 44%
+     (396/899 - same figure the save-note below already cites, not a
+     new number). Fableroom's own column shows an em dash since the
+     claim doesn't apply to itself. Values styled in the same green as
+     the save-note (.cm-savings) so the two reinforce each other.
+     Row padding tightened once more (11px->9px) to reclaim headroom
+     for this 5th row on short mobile viewports, same reasoning as the
+     _42 tightening pass.
+  2. "HOW IS THIS PRICED?" CARD DE-STRETCHED ON DESKTOP. The card was
+     inheriting its container's full 680px width, which spread each
+     row's label and value far apart with a lot of dead space between
+     them - fine on mobile, looked stretched on desktop. Capped
+     .costcard at 480px and centered it, scoped to the existing
+     min-width:820px desktop block only, so mobile sizing (already
+     correct) isn't touched.
+  3. THE 3-ICON TRUST ROW (Fairly priced/Beautifully crafted/Ethically
+     sourced) MOVED OUT of the "How is this priced?" tab and re-placed
+     as a standalone RTB (Reasons To Believe) strip directly after the
+     Craft section, per explicit direction. Moved, not duplicated -
+     same icons/copy, same .pt-trust/.pt-trust-item markup reused
+     verbatim for visual consistency, just relocated and given its own
+     lightweight wrapper (.rtb-strip) instead of being nested inside a
+     tab panel. This follows the same "state a fact once, not several
+     times" convention already established on this page (see the _32
+     changelog entry below, which cut a redundant paragraph for the
+     same reason) - kept the pt-trust icon row as the single home for
+     this claim, now more prominent as its own strip. The now-empty
+     .pt-copy wrapper (which only ever contained this icon row) is
+     gone too. .costcard is now the sole content of the "How is this
+     priced?" tab.
+  No JS changes needed - switchCmpTab(), cmpSetupScroll(), and the
+  generic acc() accordion toggle all already work off whatever's in
+  the DOM.
+  ============================================================
+  _44 UPDATE (this file, forked from _43) - CAROUSELS REMOVED ON
+  DESKTOP, BOTH REPLACED WITH A STATIC GRID (MOBILE UNCHANGED), per
+  explicit direction, inspired by a reference screenshot of numbered
+  steps sitting side by side rather than cycling one at a time - not
+  a pixel-exact copy of that reference (different sizing/text/visual
+  style), just the "no carousel, everything visible at once" idea
+  applied to our own existing card style.
+  Scope: BOTH carousels (The Details/Pillars AND The Craft), per
+  explicit direction ("carousels" plural in the original request).
+  Assumption made and worth flagging: the existing desktop layout has
+  these two carousels sitting side by side as two columns (see
+  .fb-carousel-groups' 2-column flex layout) - rather than also
+  redoing that into two full-width stacked rows (which the reference
+  screenshot's own 4-across layout would need), each carousel's 4
+  slides were arranged as a 2x2 grid WITHIN its existing column width,
+  keeping the current two-column page structure intact. If a full-
+  width 4-across layout matching the reference more closely is
+  actually wanted, that's a bigger follow-up (would also mean undoing
+  the side-by-side column layout).
+  Implementation: mobile's carousel motion (craftRender()/the
+  .fb-carousel engine, both bottom of file) is completely untouched -
+  neither JS function was modified. Both engines keep computing and
+  writing their usual inline transform/opacity/filter/z-index per
+  slide regardless of viewport. At the min-width:820px breakpoint,
+  .craft-track/.fb-track switch from a single-slide-sized flex/aspect-
+  ratio box to display:grid (2 columns), and .craft-slide/.fb-slide
+  get `!important` overrides on every property the JS sets inline
+  (transform:none, filter:none, opacity:1, z-index:auto, position
+  changed from absolute to relative so the grid can lay them out
+  normally) - `!important` is what lets a plain CSS media query
+  override inline JS-set styles without needing any JS changes at
+  all, so there's no risk of the two breakpoints' logic interfering
+  with each other. position:relative (not static) is required on the
+  slides since their own children (.craft-slide-copy/.fb-slide-copy
+  captions, the ::after gradient) are position:absolute and need a
+  positioned ancestor to anchor to - switching to static would have
+  broken caption placement. Both carousels' nav arrows+dots
+  (.craft-controls/.fb-controls) are hidden on desktop via
+  `display:none !important` since there's nothing left to navigate
+  between. Drag/swipe listeners are still technically attached on
+  desktop (harmless dead interaction - JS still runs, but the
+  !important CSS neutralizes any visual effect, so dragging on
+  desktop does nothing rather than causing a layout glitch).
+  Old single-slide desktop sizing rules (.craft-track/.fb-track
+  {max-width:335px}) are commented out at each rule, not deleted, per
+  the never-delete convention.
+  ============================================================
+  _43 UPDATE (this file, forked from _42) - CTA WOOD TEXTURE
+  REMOVED, COLOUR KEPT, per explicit direction. The main "Add to
+  Basket" button (.atc) and the sticky bar's button (.sb-btn, defined
+  in two places - a shared .atc,.sb-btn rule and .sb-btn's own later,
+  higher-priority rule that actually wins for the sticky button) both
+  layered a wood-grain texture image (var(--wood), a base64 PNG) under
+  a semi-transparent gradient tint on top of a solid brown
+  background-color (#5a3d1e). Removed var(--wood) from all 4 affected
+  background-image declarations (base + :hover, both rules) - the
+  brown colour and its existing lighter-top/darker-bottom gradient
+  tint are unchanged, only the underlying wood-grain graphic is gone.
+  Also dropped background-size/background-position on these rules
+  since they only existed to size/position the now-removed image.
+  Scope: only the CTA buttons (.atc/.sb-btn) were touched - .costcard,
+  .statement, and .qcard still use var(--wood) elsewhere on the page
+  and were left as-is, since the request was specifically about the
+  CTA. Old rules commented out, not deleted, per the never-delete
+  convention - see inline comments at each edited rule.
+  ============================================================
+  _40 UPDATE (this file, forked from _39) - PILLARS CAROUSEL TILES
+  RESTYLED TO MATCH LIFESTYLE'S TEXT LAYOUT, per explicit direction.
+  Build+Long-Lasting, Finish+Unique, and Real Storage were the only
+  3 of the 4 Pillars slides still using the icon-row + caption-panel
+  layout (.icon-blend-card / .ibc-panel / .ibc-row / .ibc-col). Per
+  explicit feedback these should visually match Lifestyle's plain
+  heading+paragraph layout (.bento-lifestyle / .bl-cap) instead - so
+  all 4 slides are now visually consistent.
+  Per explicit direction, icons dropped entirely (not kept in a
+  smaller form) - each slide's markup now mirrors Lifestyle exactly:
+  <div class="bento-lifestyle"><img><div class="ibc-scrim">
+  <div class="bl-cap"><h3>headline</h3><p>caption</p></div></div>
+  New SEO/keyword-forward headlines added (none existed before - the
+  old layout only had icon labels, no headline):
+    - Build+Long-Lasting -> "Solid Iron, Built to Last"
+    - Finish+Unique -> "Hand-Finished, One of a Kind"
+    - Real Storage -> "Real Storage, Ample Space"
+  "Solid Iron" and "Hand-Finished" are real, live Fableroom
+  vocabulary (Section 2 of the handover doc), not invented terms.
+  Captions shortened from 13-17 words down to 7-9 words per explicit
+  direction, to match Lifestyle's own caption length (8 words) and
+  because eyetracking research (NN/g) shows users scan rather than
+  read - a fixed-height caption box on a small carousel tile isn't
+  where the full technical justification (MDF-vs-particleboard etc.)
+  needs to live; that detail already exists in Features and Specs /
+  FAQ. Claims preserved, just tightened:
+    - Build+Long-Lasting: "Won't sag, wobble, or warp like cheaper
+      furniture."
+    - Finish+Unique: "Natural variation means no two are ever alike."
+    - Real Storage: "Space for linens, books, and everyday clutter."
+  No JS changes needed - the icon-blend-card controller
+  (querySelectorAll('.icon-blend-card')) and the carousel engine's
+  card._ibcStart/_ibcStop lookups are both null-guarded and simply
+  skip slides with no .icon-blend-card inside, exactly like Lifestyle
+  already did. The #fbCarouselPillars sizing CSS already targets
+  .bento-lifestyle alongside .icon-blend-card (see _50m rule), so no
+  CSS changes were needed for layout/sizing either - only .bl-cap's
+  existing type styles are now used by 4 slides instead of 1.
+  Old .icon-blend-card/.ibc-* markup for these 3 slides is gone from
+  the DOM (not hidden) per this restructure; the underlying
+  .ibc-panel/.ibc-row/.ibc-col/.ibc-caption CSS rules are left in the
+  stylesheet unused, per the never-delete convention.
+  ============================================================
+  _41 UPDATE (this file, forked from _40) - TWO SECTION-LEVEL
+  REORDERS, per explicit direction.
+  1. FEATURES AND SPECS ACCORDION MOVED ON TOP OF THE CAROUSELS.
+     Previously (per the _38 FIX comment further down) the "Features
+     and Specifications" TITLE sat fixed above both carousels, but
+     the accordion CARD itself sat between the two carousels in DOM
+     order and got pushed below both on desktop via flex order+
+     flex-basis (order:3 on #featSpecsCard). Per explicit direction
+     ("move these accordions on top of our carousels"), the card
+     itself now also moves to sit above both carousels, both
+     breakpoints - title and card are no longer decoupled. Achieved
+     by moving #featSpecsCard to be the FIRST child of
+     .fb-carousel-groups (before #pillarsCarouselCol), and removing
+     its order:3 override so DOM order (not a flex-order hack)
+     determines its position now. The old #featSpecsCard{order:3;
+     border-left:none!important;border-top:1px solid...} rule (built
+     for when it followed both columns) is superseded by a new
+     #featSpecsCard + .fb-carousel-group rule (giving the item that
+     now visually follows IT - the Pillars column - the same top-
+     border divider treatment, instead of the default desktop side-
+     by-side left-border rule). Old rule left in the stylesheet
+     unused, per the never-delete convention.
+  2. "FREQUENTLY BOUGHT TOGETHER" MOVED TO RIGHT AFTER THE PARALLAX.
+     Per explicit direction, #bundle relocated from its old position
+     (after the Craft/Specs carousels zone, before Fair Pricing) to
+     directly after the Parallax/Finish section (#finish), before
+     the carousels zone. Content unchanged, only position moved -
+     copied verbatim, not retyped. Net effect (also per explicit
+     direction): since Features and Specs lives inside the carousels
+     zone, and the carousels zone now sits AFTER Bundle, the Features
+     and Specs section is now positioned lower on the page than
+     before, below Bundle - this is the intended outcome, not a side
+     effect to fix.
+  New live top-level order: Finish (parallax) -> Bundle (Frequently
+  Bought Together) -> Carousels Zone (Features and Specs accordion,
+  then Pillars, then Craft) -> Fair Pricing (#compare) -> Delivery ->
+  FAQ -> Reviews.
+  No JS changes needed - the generic acc() accordion toggle, the fb-
+  carousel dot/track engine, the fbtCalc() bundle calculator, and the
+  sticky nav's scroll-highlight (still keyed off id="specs" on the
+  heading, which didn't move) all already work off whatever's in the
+  DOM/whatever id exists, none of them assume a fixed section order.
+  ============================================================
+  _42 UPDATE (this file, forked from _41) - VIEWPORT/STICKY-CTA
+  OVERLAP FIXES, per explicit direction. Diagnosed with real
+  bounding-box measurements (Playwright, 375x600 and 375x812 mobile
+  viewports) rather than guessed - see the _42 fixes below for the
+  actual root cause found for each.
+  1. CRAFT CAROUSEL CONTROLS WERE GETTING HIDDEN BEHIND THE STICKY
+     ADD-TO-BASKET BAR, unlike the Pillars ("Details") carousel right
+     next to it, even though .craft-track/.fb-track and .craft-
+     controls/.fb-controls share identical CSS dimensions. Root cause
+     found by measuring both: .craft-carousel had an extra
+     `margin:0 -16px` that .fb-carousel does NOT have, making Craft's
+     inner track render 32px WIDER (303px vs 271px) and - since both
+     tracks use aspect-ratio:3/4 - proportionally TALLER too (404px
+     vs 361px), a ~43px difference that compounds down the card and
+     pushes Craft's controls into the sticky-bar zone while Pillars'
+     stay clear. Fix: removed the stray `margin:0 -16px` from
+     .craft-carousel so it matches .fb-carousel's sizing exactly (both
+     wrapped identically inside the same .bento-card-b parent). This
+     was already the stated INTENT of the _61 changelog entry further
+     down ("both cards are now pixel-identical in height") - that fix
+     just missed this one property. Verified after the fix: Craft's
+     card height now matches Pillars' to within a few px, and its
+     controls clear the sticky bar the same way Pillars' already did.
+  2. "HOW IT COMPARES" TABLE AND THE "YOU SAVE £X" LINE WERE GETTING
+     CUT OFF BY THE STICKY BAR on shorter mobile viewports, because
+     the Value section sits high up the page (just below the
+     breadcrumb/nav) and its content column was simply taller than
+     the safe space above the sticky bar. Root cause of most of that
+     height: the long .cmp-intro paragraph ("Our pricing benchmarks
+     ensure great savings...") sitting between the tabs and the
+     table. Per explicit direction and matching the pattern already
+     used on Fableroom's own live page (one short line + an info
+     icon opening an info card, not an inline paragraph): the
+     .cmp-intro paragraph is gone from the flow entirely - its exact
+     wording now lives in a tooltip card (.cmp-info-tooltip, same
+     visual pattern as the existing Delivery section's .db-tooltip)
+     toggled by a small (i) icon appended right after the section's
+     own subhead ("Prices that make sense, without the middlemen.").
+     Also tightened the table's row padding and the save-note's
+     padding/margin slightly (see .cmptable-3fit/.cm-save-note below)
+     for extra headroom on the very shortest viewports. Old
+     .cmp-intro markup/CSS left in place per the never-delete
+     convention - just no longer used in this panel.
+  3. "HOW IS THIS PRICED?" TAB'S COST BREAKDOWN CARD AND ICON ROW
+     WERE ALSO RUNNING TALLER than the safe space above the sticky
+     bar. Per explicit direction, reduced .costcard's padding/heading
+     size/row padding and .pt-trust's icon size/gaps proportionally
+     (roughly 15-20% smaller across the board) so the full "What goes
+     into your £503" breakdown AND the Fairly Priced/Beautifully
+     Crafted/Ethically Sourced icon row underneath both fit in view
+     without the sticky bar covering either. Same content, same
+     figures - only sizing changed.
+  No JS changes needed - the existing db-tooltip toggle pattern
+  (classList.toggle('show')) was copied as-is for the new
+  .cmp-info-tooltip, and switchCmpTab()/the carousel engines don't
+  reference any of the specific pixel values that changed.
+  ============================================================
+  _34 UPDATE (this file, forked from _33) - NEW CONSOLIDATED
+  "FEATURES AND SPECIFICATIONS" SECTION, per explicit direction.
+  Two things merged into one:
+  1. Care+Assembly converted from a carousel tile to an accordion -
+     the Pillars carousel goes from 5 slides back to 4 (Build+Long-
+     Lasting, Finish+Unique, Real Storage, Lifestyle). Its content
+     (Easy Care points + Minimal Assembly Required) is now two
+     accordion items instead of an icon grid + assembly block tile.
+  2. The old #specs block (Dimensions & details / Product Description,
+     previously its own 3rd flex item sitting below/between the two
+     carousels) is gone as a separate block - folded into the same
+     new accordion set.
+  New section "Features and Specifications": centered heading, single
+  centered accordion card (max-width 700px, same as before - not
+  widened), sitting ABOVE both carousels in DOM order (same position
+  on mobile and desktop, unlike the old #specs which needed a flex-
+  order hack to reposition itself on desktop only). Card reuses
+  .bento-card-b as-is (same background/radius/padding as "The Details"/
+  "The Craft" cards) per explicit direction to match their container
+  treatment.
+  Accordion order per explicit direction: Product Description, Details
+  and Dimensions, Care Guide, Assembly - not the old Dimensions-first
+  order. Care Guide text is the same verbatim source already used in
+  the Delivery section's "Care & Buying Guide" accordion, not re-typed
+  independently.
+  Old #specs block, .specs-accs 2-column CSS, and the Care+Assembly
+  tile markup were removed from their old locations, not hidden - the
+  underlying CSS classes (.specs-accs, #specs .acc etc.) are left
+  unused in the stylesheet per the never-delete convention.
+  JS unaffected - the generic acc() accordion toggle and the fb-
+  carousel dot/track engine both already work off whatever's in the
+  DOM, no hardcoded counts.
+  Verified via Playwright: 4 accordions present and expand/collapse
+  correctly with real content, Pillars carousel confirmed at 4 slides/
+  4 dots (was 5), heading+card confirmed centered on both mobile and
+  desktop, zero console errors.
+  ============================================================
+-->
+<!--
+  ============================================================
   BRANCH FILE - index-v125-dynbadge-fix.html
   Forked from mainline v125 (NOT v130/v131/latest). Contains ONLY the
   rotating-badge fix, updated to be PER-SLIDE and dynamic (each image
@@ -2286,6 +2989,32 @@
   --ink:#2c2c2c;--ink-2:#505050;--ink-3:#736c58;
   --heading:#31270d;--bronze:#b77e45;--bronze-hi:#a06b35;--tan:#c87b01;
   --line:#e4ddcf;--line-2:#ece6da;
+  /* _48 FIX: --green was #108474 (a muted teal) - per explicit
+     direction, replaced with the brighter #08BD5E already used and
+     verified correct in the Key Highlights section (.kh-amt, see the
+     v106 changelog note above confirming this against the live site).
+     Checked every other live usage of var(--green) on this page
+     first (comp-save/cm-save-note/setup-badge/pp-badge/fbt-save/
+     pcomp-save-banner/pv2-offer etc. - all savings/offer/discount
+     badges, the same family of UI as the key-highlight figure this
+     colour is being matched to) and the two spots historically noted
+     as needing the OLD teal specifically (.revcard .vf, .rchip
+     .rc-vb - both "verified reviewer" style badges, a different real
+     accent on the live site per the v106 note) turned out to be
+     unused/dead CSS with no matching HTML on this page - so there's
+     nothing left that actually needs the old value preserved.
+     Old value kept commented, not deleted, per the never-delete
+     convention: --green:#108474; */
+  /* _49 FIX: reverted _48's global --green change per explicit
+     direction - only the pricing/compare table (Savings %, checkmarks,
+     the "You save £X" banner) should use the brighter key-highlight
+     green; everything else that shares this token (offer badges,
+     delivery estimates, bundle savings, etc.) goes back to its own
+     original colour. Scoped hardcoded overrides for the three pricing-
+     table elements are added at their own rules further down instead
+     of changing this shared token again. Old (_48) value kept
+     commented, not deleted, per the never-delete convention:
+     --green:#08BD5E; */
   --green:#108474;--green-tp:#00b67a;--star:#d8a23b;--sale:#df4047;
   --ff-d:'IvyPresto Display',Georgia,'Times New Roman',serif; /* headings ONLY */
   --ff-b:'HK Grotesk',system-ui,-apple-system,sans-serif;     /* everything else */
@@ -2427,17 +3156,44 @@ body{font-family:var(--ff-b);background:var(--bg);color:var(--ink);line-height:1
 .cmp-scroll3{overflow-x:auto;-webkit-overflow-scrolling:touch;-ms-overflow-style:none;scrollbar-width:none;border-radius:10px;max-width:480px;margin:0 auto}
 .cmp-scroll3::-webkit-scrollbar{display:none}
 .cmptable-3fit{border-collapse:collapse;font-size:13px;table-layout:fixed;width:max-content;min-width:100%}
-.cmptable-3fit th,.cmptable-3fit td{box-sizing:border-box;padding:14px 8px;text-align:center;border-bottom:1px solid var(--line-2)}
+/* _42 NEW - info icon + tooltip for the Value section's subhead,
+   replacing the old inline .cmp-intro paragraph. Visually matches
+   the existing .db-tooltip pattern (Delivery section) - white card,
+   same shadow/radius/font - but positioned to hang below a normal
+   (non-absolute) inline subhead line instead of a right-aligned bar. */
+.ap-sub .cmp-info{display:inline-flex;vertical-align:middle;margin-left:5px;width:16px;height:16px;color:var(--ink-3);cursor:pointer}
+.ap-sub .cmp-info svg{width:16px;height:16px}
+.cmp-info-tooltip{display:none;position:absolute;top:100%;left:0;z-index:20;width:300px;max-width:calc(100vw - 32px);background:#fff;color:var(--ink);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.12);padding:12px;font-size:12px;font-weight:400;line-height:1.5;margin-top:6px}
+.cmp-info-tooltip.show{display:block}
+/* _42 FIX: tightened row padding slightly (14px->11px) and thead's
+   bottom padding (11px->9px) to reclaim a few px per row - part of
+   getting this table clear of the sticky Add to Basket bar on short
+   mobile viewports, alongside removing the .cmp-intro paragraph
+   above (the bigger contributor). */
+/* _45 FIX: row padding tightened once more (11px->9px) - the new
+   Savings (%) row adds a 5th row to this table, so a bit more height
+   needed reclaiming to stay clear of the sticky Add to Basket bar on
+   short mobile viewports, same reasoning as the _42 tightening pass. */
+.cmptable-3fit th,.cmptable-3fit td{box-sizing:border-box;padding:9px 8px;text-align:center;border-bottom:1px solid var(--line-2)}
 .cmptable-3fit tr:last-child td{border-bottom:none}
-.cmptable-3fit thead th{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-bottom:11px}
+.cmptable-3fit thead th{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-bottom:9px}
+/* _45 NEW - Savings (%) row values, styled like the save-note's own
+   green figure below the table so the two reinforce each other. */
+/* _49 FIX: hardcoded #08BD5E instead of var(--green) - this is one of
+   the three pricing-table elements that should keep the brighter
+   key-highlight green while --green itself reverted back to #108474
+   for everything else on the page (see the _49 changelog entry). */
+.cm-savings{color:#08BD5E;font-weight:700}
 .cmptable-3fit th:first-child,.cmptable-3fit td:first-child{text-align:left;font-size:12.5px;color:var(--ink-2);font-weight:600;position:sticky;left:0;background:var(--surface);z-index:2;width:100px}
 .cmptable-3fit th.cm-fr,.cmptable-3fit td.cm-fr{position:sticky;left:100px;z-index:2;width:88px;box-shadow:2px 0 6px rgba(0,0,0,.06)}
 .cmptable-3fit thead th.cm-fr{background:var(--bronze);color:#fff;border-radius:8px 8px 0 0;font-family:var(--ff-d);font-size:10.5px;font-weight:400;letter-spacing:.04em;text-transform:uppercase}
 .cmptable-3fit td.cm-fr{background:#f8f1e6;font-weight:700;color:var(--bronze)}
 .cmptable-3fit th:not(:first-child):not(.cm-fr),.cmptable-3fit td:not(:first-child):not(.cm-fr){width:88px;border-left:1px solid var(--line-2)}
-.cmptable-3fit .cm-yes{color:var(--green);font-weight:700;font-size:16px}
+/* _49 FIX: same scoped exception as .cm-savings above - checkmarks in
+   the live pricing table keep the brighter green. */
+.cmptable-3fit .cm-yes{color:#08BD5E;font-weight:700;font-size:16px}
 .cmptable-3fit .cm-no{color:#ccc;font-size:16px}
-.cmp-scroll-hint{text-align:center;font-size:11px;color:var(--ink-3);margin-top:8px}
+.cmp-scroll-hint{text-align:center;font-size:11px;color:var(--ink-3);margin-top:6px}
 @media(min-width:600px){.cmp-scroll-hint:not(.cmp-scroll-hint--modal){display:none}}
 .cmp-scroll-hint--modal{margin-top:6px;font-size:10.5px}
 /* Visible scroll-track: an always-on indicator of how much more content
@@ -2446,10 +3202,18 @@ body{font-family:var(--ff-b);background:var(--bg);color:var(--ink);line-height:1
    swipe. Read-only/indicative (reflects scroll position), not a draggable
    custom scrollbar. Hidden entirely when there's nothing to scroll to
    (same "only show if overflow exists" rule as before). */
-.cmp-scrolltrack{max-width:480px;margin:10px auto 0;height:4px;background:var(--line-2);border-radius:4px;overflow:hidden}
+.cmp-scrolltrack{max-width:480px;margin:6px auto 0;height:4px;background:var(--line-2);border-radius:4px;overflow:hidden}
 .cmp-scrollthumb{height:100%;background:var(--bronze);border-radius:4px;transition:transform .1s linear;width:75%;transform:translateX(0)}
 .cmp-scroll3--modal{max-width:100%}
-.cm-save-note{margin-top:14px;display:flex;align-items:center;gap:9px;background:rgba(16,132,116,.07);border:1px solid rgba(16,132,116,.18);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--green);line-height:1.4}
+/* _42 FIX: trimmed margin-top (14px->10px) and vertical padding
+   (11px->9px) slightly - small additional headroom on top of the
+   bigger .cmp-intro removal, so this banner clears the sticky bar
+   on short mobile viewports. */
+/* _49 FIX: same scoped exception - the "You save £X" banner keeps the
+   brighter green (background/border tint recalculated for #08BD5E,
+   text hardcoded to it directly) while var(--green) reverted
+   elsewhere. */
+.cm-save-note{max-width:480px;margin:10px auto 0;display:flex;align-items:center;gap:9px;background:rgba(8,189,94,.07);border:1px solid rgba(8,189,94,.18);border-radius:10px;padding:9px 14px;font-size:13px;color:#08BD5E;line-height:1.4}
 .cm-save-note svg{flex-shrink:0}
 .pbar-badge{font-size:10.5px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border-radius:4px;padding:2px 6px}
 /* v124: colour-psychology gradient - as the overpay amount grows, tag+
@@ -2629,11 +3393,11 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 /* KEY HIGHLIGHTS - compact pill-card rows, icon + bold headline + light detail */
 .kh-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0 0 12px}
 .kh-divider{border:none;border-top:1px solid var(--line-2);margin:15px auto 17px;width:25%} /* 15px above, 17px below */
-.kh-item{display:flex;align-items:flex-start;gap:9px;background:none;border:none;padding:0;overflow:visible}
+.kh-item{display:flex;align-items:flex-start;gap:5px;background:none;border:none;padding:0;overflow:visible} /* _56 FIX: was 9px - the only other icon+text pairing on the page (the RTB strip) uses 5px, so this didn't match per the spacing audit. Unified to 5px rather than leaving two different icon-to-text gap values on the same page. */
 .kh-ic{width:17px;height:17px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px}
 .kh-text{font-size:13.5px;color:var(--ink-2);line-height:1.4;flex:0 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip}
 .kh-text b{font-weight:600;color:var(--ink-2)}
-.kh-text .kh-amt{color:#08BD5E}
+.kh-text .kh-amt{color:#08BD5E} /* _49 FIX: reverted back to its own independent hardcoded value (was briefly pointed at var(--green) in _48) - Key Highlights isn't part of "the pricing table section" the revert request was scoped to, so it goes back to standing on its own, same as before _48. */
 .kh-text .detail{color:var(--ink-2)}
 .kh-info{flex-shrink:0;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-3);background:none;border:none;cursor:pointer;margin-top:1px;margin-left:-4px}
 .kh-ic svg{width:17px;height:17px}
@@ -2814,8 +3578,15 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .secnav a.active{color:var(--bronze);border-bottom-color:var(--bronze)}
 
 /* WOOD-TEXTURE CTAs (replaces flat brown) */
-.atc,.sb-btn{background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5)),var(--wood);background-size:cover;background-position:center;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.atc:hover,.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6)),var(--wood)}
+/* _43 FIX: removed the wood-grain texture image (var(--wood)) from
+   the CTA background per explicit direction - the solid brown color
+   (#5a3d1e) and its subtle top/bottom gradient tint are kept exactly
+   as before, only the underlying texture graphic is gone. Old rule
+   commented out, not deleted, per the never-delete convention:
+   .atc,.sb-btn{background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5)),var(--wood);background-size:cover;background-position:center;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+   .atc:hover,.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6)),var(--wood)} */
+.atc,.sb-btn{background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5));text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.atc:hover,.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6))}
 
 /* ============ PARALLAX STORY (The Finish) ============ */
 .parallax-story{position:relative;min-height:170vh;background:#1b1408;color:#f2ece3;overflow:clip;isolation:isolate;width:100vw;margin-left:calc(50% - 50vw)}
@@ -3223,7 +3994,14 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    convention (Craft/Pillars still use their own inner classes
    unchanged, just re-parented under this new shared wrapper). */
 .carousels-zone{
-  position:relative;background:#1b1408;padding:36px 16px 28px;overflow:visible;
+  /* _56 FIX: bottom padding (28px) didn't match top (36px) - the only
+     section on the page without symmetric top/bottom, per the
+     spacing audit. Matched bottom to top (36px) rather than the other
+     way round, since top is load-bearing for the _52 fix that aligned
+     "Features and Specifications"'s spacing (36px zone-padding + 6px
+     heading-padding = 42px, matching the 42px below it) - changing
+     top would have silently re-broken that. */
+  position:relative;background:#1b1408;padding:36px 16px 36px;overflow:visible;
   width:100vw;margin-left:calc(50% - 50vw);
 }
 .carousels-zone::before{
@@ -3251,11 +4029,33 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    onto that new line. */
 @media(min-width:820px){
   .fb-carousel-groups{ flex-wrap:wrap; }
-  #specs{
-    order:3;flex-basis:100%;width:100%;
-    border-left:none!important;border-top:1px solid rgba(232,201,164,.12);
-    padding:28px 0 0!important;margin-top:8px;
-  }
+  /* _47 FIX: FOUND THE REAL CAUSE of both the uneven top/bottom
+     spacing AND the stray line above "Features and Specifications"
+     reported per explicit feedback - this legacy rule (from when
+     #specs was a full accordion block sitting between the two
+     carousels, not just the heading it is now) was still firing at
+     desktop widths via !important, silently overriding the new
+     .feat-specs-head padding fix above it and adding a border-top
+     that's exactly the "line" that was reported. Its own comments
+     even say it's for "the old #specs block" - it should have been
+     inert by now but wasn't, since the current heading element still
+     carries id="specs" (needed for the nav anchor) which this old ID
+     selector still matches, and an ID selector always outranks a
+     class selector regardless of !important on one side only.
+     FIX ATTEMPT 1 (wrong): resetting padding/border here with
+     !important still overrode .feat-specs-head's own padding, since
+     THIS rule is also !important and an ID beats a class either way -
+     ended up with 0/0 padding instead of the intended 6px/16px.
+     FIX (correct): removed the padding/border/order/flex-basis
+     declarations from this rule entirely instead of resetting them -
+     with nothing here to conflict, .feat-specs-head's own (non-
+     !important, but now uncontested) padding rule applies cleanly.
+     order/flex-basis/width don't do anything harmful left unset
+     either, since .fb-carousel-groups no longer uses display:flex at
+     all (removed in _46) - there's no flex context left for them to
+     act on. Old declarations kept commented below for the historical
+     record, per the never-delete convention:
+     #specs{ order:3;flex-basis:100%;width:100%;border-left:none!important;border-top:1px solid rgba(232,201,164,.12);padding:28px 0 0!important;margin-top:8px; } */
 }
 /* _55 NEW - dark re-theme for the relocated specs block. Text,
    structure, and font are UNCHANGED (same .ap-head/.eyebrow/.ap-h/
@@ -3279,6 +4079,65 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 #specs .spectable tr{ border-bottom:1px solid rgba(232,201,164,.12); }
 #specs .spectable td:first-child{ color:rgba(242,233,219,.55); }
 #specs .spectable td:last-child{ color:#f2e9db; }
+
+/* _38 FIX: heading and card decoupled per explicit direction - the
+   "Features and Specifications" TITLE stays fixed above both carousels
+   at all times (both breakpoints - it's simply placed before
+   .fb-carousel-groups in the DOM, not part of the flex reorder at
+   all). Only the CARD moves: sits between the two carousels in DOM
+   order (correct for mobile stacking) and gets pushed below both on
+   desktop via the same flex order+flex-basis trick the old #specs
+   block used - see #featSpecsCard below. id="specs" now lives on the
+   heading itself (a stable, always-in-the-same-place element) for the
+   sticky nav's anchor/scroll-tracking to target. Card reuses
+   .bento-card-b as-is for background/radius/padding (same treatment
+   as "The Details"/"The Craft" cards), with corrected bottom padding
+   since .bento-card-b's own padding is top/sides only. */
+/* _47 FIX: top padding here (28px) stacked on top of .carousels-
+   zone's own top padding (36px) gave this heading 64px of top space
+   vs only 42px below it (16px here + .ap-head's own 26px margin-
+   bottom) - noticeably uneven, and more top-heavy than how every
+   other section title on the page is spaced. Reduced to 6px so the
+   total (36+6=42) matches the 42px below, same top/bottom rhythm as
+   other titles use. (Checked specifically for a stray border/line
+   rule on this heading per explicit feedback - found none; the
+   unevenness was pure spacing, not an extra element.) */
+.feat-specs-head{ max-width:1200px;margin:0 auto;padding:6px 16px 16px;text-align:center; }
+.feat-specs-head .ap-h{ color:#f2e9db; }
+@media(min-width:820px){
+  /* _41 FIX: was order:3 (pushed to the end, below both carousels).
+     Per explicit direction #featSpecsCard now sits FIRST via DOM
+     order (moved above #pillarsCarouselCol in the markup) - order
+     property removed entirely so nothing fights that position on
+     desktop flex. flex-basis/width:100% kept (still a full-width row
+     above the two side-by-side columns, not a third column).
+     margin-top swapped for margin-bottom now that it sits above,
+     not below. The border-left:none!important/border-top override
+     that used to belong on THIS element (correcting the desktop
+     side-by-side left-border rule when it followed both columns) has
+     moved to the element that now visually follows IT instead - see
+     "#featSpecsCard + .fb-carousel-group" below. Old rule commented
+     out, not deleted, per the never-delete convention:
+     #featSpecsCard{ order:3;flex-basis:100%;width:100%;margin-top:8px;border-left:none!important;border-top:1px solid rgba(232,201,164,.12); } */
+  #featSpecsCard{ flex-basis:100%;width:100%;margin-bottom:8px; }
+  #featSpecsCard + .fb-carousel-group{ border-left:none!important;border-top:1px solid rgba(232,201,164,.12); }
+}
+.feat-specs-card{ max-width:700px;margin:0 auto; }
+/* _46 FIX: top/bottom padding was 12px/18px (a leftover from an
+   earlier "balance against .bento-card-b's 20px 20px 0 shorthand"
+   fix that itself never actually landed on equal values) - per
+   explicit direction the gap above the first accordion row and
+   below the last one should match. Equalized to 18px both sides. */
+.bento-card-b.feat-specs-card{ padding:18px 20px; }
+.feat-specs-card .acc{ border-bottom:1px solid rgba(232,201,164,.16); }
+.feat-specs-card .acc:last-child{ border-bottom:none; }
+.feat-specs-card .acc-btn{ color:#f2e9db; }
+.feat-specs-card .acc-btn .pm{ color:rgba(242,233,219,.6); }
+.feat-specs-card .acc-body{ color:rgba(242,233,219,.65); }
+.feat-specs-card .spectable{ background:#241c14;border-color:rgba(232,201,164,.16); }
+.feat-specs-card .spectable tr{ border-bottom:1px solid rgba(232,201,164,.12); }
+.feat-specs-card .spectable td:first-child{ color:rgba(242,233,219,.55); }
+.feat-specs-card .spectable td:last-child{ color:#f2e9db; }
 
 .bento-section{
   position:relative;background:#1b1408;padding:36px 16px 28px;overflow:visible;
@@ -3556,7 +4415,14 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    transform/opacity/filter per slide based on distance from the
    active index - this CSS sets up the stage and the shared
    transition, not the per-slide positions themselves. --- */
-.craft-carousel{ margin:0 -16px;padding:0 16px 16px; }
+/* _42 FIX: removed a stray `margin:0 -16px` that made this render
+   32px wider (and, via aspect-ratio:3/4, ~43px taller) than the
+   otherwise-identical .fb-carousel next to it - that extra height
+   was what pushed Craft's controls into the sticky-bar overlap zone
+   on mobile while Pillars' stayed clear. Old rule commented out, not
+   deleted, per the never-delete convention:
+   .craft-carousel{ margin:0 -16px;padding:0 16px 16px; } */
+.craft-carousel{ padding:0 16px 16px; }
 /* _34 FIX: on desktop this card sits in the same grid row as Size &
    Fit (much taller, due to the diagram+stats+caption), and the grid
    stretches every card in the row to match that height by default.
@@ -3644,6 +4510,13 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .ibc-caption-text{
   display:block;
   transition:opacity .3s ease;
+}
+/* _39 FIX: merged two-claim sentences (Build+Long-Lasting, Finish+
+   Unique) run longer than any single icon's own caption ever did -
+   the fixed 2-line box was clipping their 3rd line via overflow:hidden.
+   Cards in static-caption mode get a taller box sized for 3 lines. */
+.icon-blend-card[data-static-caption] .ibc-caption{
+  height:calc(1.45em * 3 + 11px);
 }
 .ibc-row{ display:flex;z-index:1; }
 .ibc-col{
@@ -3786,18 +4659,49 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
   aspect-ratio:3/4;touch-action:pan-y;cursor:grab;
 }
 @media(min-width:820px){
-  /* _54 FIX: was capped at 340px (narrower than the Pillars carousel's
-     .fb-track, capped at 400px) - explicit feedback the two looked
-     "odd"/mismatched sizes side by side now that they sit in equal-
-     width columns (_53). Matched to 400px so both carousels render
-     the same size at this breakpoint.
-     _61 FIX: both reduced 10% (400->360) per explicit direction to
-     shrink the desktop carousels overall while keeping aspect ratio -
-     kept in sync with .fb-track's matching change. */
-  /* _62 FIX: further 7% reduction (360->335) per explicit direction,
-     kept in sync with .fb-track's matching change. */
-  .craft-track{ max-width:335px; }
+  /* _44 FIX: superseded by the grid rules below - per explicit
+     direction, carousels shouldn't exist on desktop at all (mobile
+     keeps the carousel motion unchanged). Old single-slide desktop
+     sizing kept commented, not deleted, per the never-delete
+     convention:
+     .craft-track{ max-width:335px; } */
+  /* _44 NEW - DESKTOP STATIC GRID (mobile carousel untouched).
+     Per explicit direction, inspired by a reference screenshot of
+     numbered steps sitting side by side rather than one at a time -
+     not a pixel-exact copy, just the "no carousel, all steps visible
+     at once" structure. All 4 steps render together in a 2x2 grid
+     within this column (stays alongside the Pillars column at this
+     width - see .fb-carousel-groups' own 2-column layout). Using
+     !important on the slide-level properties because the JS
+     (craftRender(), bottom of file) still runs unmodified and keeps
+     writing inline transform/opacity/filter/z-index for the mobile
+     carousel motion - !important is what lets this breakpoint
+     override those inline styles cleanly without touching the JS
+     itself (mobile behaviour stays 100% intact, no shared-state risk
+     between breakpoints). position:relative (not static) is
+     required, not just "removing absolute" - .craft-slide-copy and
+     .craft-slide::after are themselves position:absolute and need a
+     positioned ancestor to anchor to. */
+  .craft-track{
+    /* _46 FIX: was repeat(2,1fr) - a compromise made specifically
+       because this carousel used to sit side by side with Pillars,
+       sharing half the page width. Now that they stack full-width
+       instead (see .fb-carousel-groups above), 4 columns fits
+       comfortably and matches the original reference image's intent
+       (all 4 steps in one row) more closely. */
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    position:static;width:100%;max-width:none;aspect-ratio:auto;height:auto;
+    touch-action:auto;cursor:default;
+  }
+  .craft-slide{
+    position:relative !important;top:auto !important;left:auto !important;
+    width:100% !important;height:auto !important;aspect-ratio:3/4;
+    transform:none !important;filter:none !important;
+    opacity:1 !important;z-index:auto !important;pointer-events:auto !important;
+  }
+  .craft-controls{ display:none !important; }
 }
+
 .craft-slide{
   /* _45: widened 88% -> 92% - "increase the size" per explicit
      direction, on top of the track's own bigger 3:4 footprint. */
@@ -3855,14 +4759,35 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    ============================================================ */
 .fb-carousel-groups{ max-width:1200px;margin:0 auto; }
 .fb-carousel-group{ padding:28px 0; }
+/* _49 FIX: #featSpecsCard is the first .fb-carousel-group, sitting
+   directly under the "Features and Specifications" heading - its
+   inherited 28px top padding was stacking on top of the heading's
+   own bottom spacing (.feat-specs-head padding-bottom 16px + .ap-head
+   margin-bottom 26px = 42px already), giving 70px total below the
+   heading vs only 42px above it. Zeroed just the top so both now
+   match at 42px, per explicit direction ("spacing above should be
+   the same as spacing below"). Bottom padding (28px, spacing before
+   Pillars starts) is untouched. */
+#featSpecsCard{ padding-top:0; }
 .fb-carousel-group + .fb-carousel-group{ border-top:1px solid rgba(232,201,164,.12); }
-@media(min-width:820px){
-  .fb-carousel-groups{ display:flex;align-items:flex-start; }
-  .fb-carousel-group{ flex:1;min-width:0;padding:28px 32px; }
-  .fb-carousel-group:first-child{ padding-left:0; }
-  .fb-carousel-group:last-child{ padding-right:0; }
-  .fb-carousel-group + .fb-carousel-group{ border-top:none;border-left:1px solid rgba(232,201,164,.12); }
-}
+/* _46 FIX: per explicit direction, "The Details" and "The Craft"
+   should stack one below the other on desktop, not sit side by side
+   as two columns. Old side-by-side flex layout commented out, not
+   deleted, per the never-delete convention:
+   @media(min-width:820px){
+     .fb-carousel-groups{ display:flex;align-items:flex-start; }
+     .fb-carousel-group{ flex:1;min-width:0;padding:28px 32px; }
+     .fb-carousel-group:first-child{ padding-left:0; }
+     .fb-carousel-group:last-child{ padding-right:0; }
+     .fb-carousel-group + .fb-carousel-group{ border-top:none;border-left:1px solid rgba(232,201,164,.12); }
+   }
+   With that removed, .fb-carousel-groups/.fb-carousel-group fall back
+   to their base (non-flex, full-width, border-top-divided) rules
+   above at every breakpoint - the same stacked layout mobile already
+   used. #featSpecsCard's own flex-basis:100%/border overrides further
+   down (still scoped to min-width:820px) are now moot with no flex
+   context, but left in place per the never-delete convention - they
+   simply have nothing to do now that everything stacks by default. */
 /* _49b FIX: the fan-carousel's blurred side-slides translate well
    beyond the track's own box by design (that's what makes the
    "neighbours peeking in from the edges" effect read) - the
@@ -3888,7 +4813,28 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
   position:relative;width:100%;max-width:420px;margin:0 auto;
   aspect-ratio:3/4;touch-action:pan-y;cursor:grab;
 }
-@media(min-width:820px){ .fb-track{ max-width:335px; } }
+@media(min-width:820px){
+  /* _44 FIX/NEW - same treatment as .craft-track above (see its
+     comment for the full reasoning) - superseding the old single-
+     slide desktop sizing, kept commented not deleted:
+     .fb-track{ max-width:335px; } */
+  /* _46 FIX: was repeat(2,1fr), same reasoning as .craft-track's own
+     _46 comment - now full-width (no more side-by-side column with
+     Craft), 4 columns fits and matches the original reference image
+     more closely. */
+  .fb-track{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    position:static;width:100%;max-width:none;aspect-ratio:auto;height:auto;
+    touch-action:auto;cursor:default;
+  }
+  .fb-slide{
+    position:relative !important;top:auto !important;left:auto !important;
+    width:100% !important;height:auto !important;aspect-ratio:3/4;
+    transform:none !important;filter:none !important;
+    opacity:1 !important;z-index:auto !important;pointer-events:auto !important;
+  }
+  .fb-controls{ display:none !important; }
+}
 .fb-slide{
   position:absolute;top:0;left:50%;width:92%;height:100%;border-radius:10px;overflow:hidden;
   transition:transform .55s cubic-bezier(.22,.61,.36,1), opacity .55s ease, filter .55s ease;
@@ -3953,6 +4899,11 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .aplus{max-width:1280px;margin:0 auto;padding:0 16px}
 .ap{padding:46px 0}
 .ap-head{margin-bottom:26px}
+/* _42 FIX: Value section specifically needed extra vertical headroom
+   reclaimed (sits high on the page, before the sticky Add to Basket
+   bar) - scoped override, doesn't touch .ap-head's default spacing
+   used by every other section. */
+#compare .ap-head{margin-bottom:18px}
 .ap-head .eyebrow{display:block;margin-bottom:9px}
 /* _32 FIX: Fair Pricing / Delivery / FAQ heading blocks were using the
    same 26px margin as every other .ap section, but combined with these
@@ -4114,7 +5065,17 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    content (which sits inward from the box edge by the padding
    amount) lands back at exactly its original screen position - only
    the visible border-bottom footprint gets wider. */
-.cmp-tabs{display:flex;border-bottom:2px solid var(--line-2);margin:0 auto 22px;gap:56px;width:fit-content;padding:0 56px;}
+/* _51 FIX: per explicit feedback, the old fixed 56px/56px padding+gap
+   (from the _33 fix era, calibrated when this section was narrower)
+   now looks unnaturally tight against the wider 900px section from
+   the _47/_49/_51 passes. Refreshed both values for the new width -
+   gap widened slightly (56->64px) for a touch more breathing room
+   between the two tab labels, and the padding that extends the
+   border-bottom line beyond the text (see the comment above this
+   rule explaining the auto-margin mechanic) widened to match
+   (56->72px) so the line reads proportionate to the section's new
+   width instead of looking short and dated next to it. */
+.cmp-tabs{display:flex;border-bottom:2px solid var(--line-2);margin:0 auto 16px;gap:64px;width:fit-content;padding:0 72px;}
 .cmp-tab{flex:0 0 auto;text-align:left;padding:13px 0;font-size:13px;font-weight:700;color:var(--ink-2);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;margin-bottom:-2px;font-family:var(--ff-b);letter-spacing:.02em}
 /* _33 FIX: the 56px padding + 56px gap above is fine on desktop, but on
    mobile ("How it compares" + "How is this priced?" + that much padding/
@@ -4130,13 +5091,22 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .cmp-tab.active{color:var(--bronze);border-bottom-color:var(--bronze)}
 .cmp-panel{display:none}
 .cmp-panel.active{display:block}
-.pt{display:flex;flex-direction:column;gap:16px}
-.costcard{background-color:#3a2510;background-image:linear-gradient(rgba(30,18,6,.68),rgba(20,11,3,.78)),var(--wood);background-size:cover;background-position:center;color:#efe7da;border-radius:var(--radius);padding:24px}
-.costcard h3{color:#fff;font-size:20px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.14)}
-.cr{display:flex;justify-content:space-between;padding:9px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.pt{display:flex;flex-direction:column;gap:10px}
+/* _47 NEW - hidden on mobile by design (mobile stays exactly as
+   confirmed-fine), becomes a visible left column on desktop - see
+   the min-width:820px override further down. */
+.pt-copy2{display:none}
+/* _42 FIX: reduced padding/heading size/row padding roughly 15-20%
+   across the board per explicit direction, so the whole "What goes
+   into your £X" breakdown fits in view above the sticky Add to
+   Basket bar on mobile without needing to scroll further. Same
+   figures, same content - only sizing changed. */
+.costcard{background-color:#3a2510;background-image:linear-gradient(rgba(30,18,6,.68),rgba(20,11,3,.78)),var(--wood);background-size:cover;background-position:center;color:#efe7da;border-radius:var(--radius);padding:14px}
+.costcard h3{color:#fff;font-size:16px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.14)}
+.cr{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.08)}
 .cr .l{color:rgba(239,231,218,.66)}
 .cr .a{font-variant-numeric:tabular-nums}
-.ct{display:flex;justify-content:space-between;padding:14px 0 0;margin-top:3px;border-top:1px solid rgba(255,255,255,.28);font-weight:700;font-size:14px}
+.ct{display:flex;justify-content:space-between;padding:9px 0 0;margin-top:2px;border-top:1px solid rgba(255,255,255,.28);font-weight:700;font-size:13.5px}
 .pt-copy p{font-size:14.5px;color:var(--ink-2);line-height:1.7;margin-bottom:12px}
 .pt-vals{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:14px}
 .pt-vals li{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:600;color:var(--ink)}
@@ -4144,11 +5114,62 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 /* _31 NEW - replaces .pt-vals (plain checkmark list) with a 3-icon row,
    same pattern language as the parallax meta row elsewhere on the page:
    icon on top, short bold label, smaller supporting clause below. */
-.pt-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line-2)}
-.pt-trust-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
-.pt-trust-item svg{color:var(--bronze)}
-.pt-trust-item b{font-family:var(--ff-d);font-weight:400;font-size:14px;color:var(--ink)}
-.pt-trust-item span{font-size:11.5px;color:var(--ink-3);line-height:1.3}
+/* _37 FIX: gap below the card (card bottom -> icon row's divider line)
+   was 46px vs 22px above it (tabs -> card top) - not matching, per
+   explicit direction they should be equal. Root cause: margin-top:18px
+   here used to separate the icon row from a paragraph that sat above
+   it inside .pt-copy - that paragraph was removed earlier, so this
+   margin became pure redundant stacking on top of the parent .pt
+   flex gap. Removed the margin-top (kept padding-top for the border-
+   to-icon breathing room, a different and still-needed gap), and
+   matched .pt's own desktop gap to .cmp-tabs' 22px so both sides
+   land on the same number. */
+/* _42 FIX: gap/padding-top and icon/text sizes reduced roughly 15-20%
+   to match the costcard's shrink above, so this row fits in view
+   along with the card, on the same short mobile viewport. */
+.pt-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-top:12px;border-top:1px solid var(--line-2)}
+/* _45 NEW - RTB strip wrapper (see the new section right after the
+   Craft carousel/grid). Centers and caps the icon row's width so it
+   doesn't stretch edge-to-edge on wide screens, matching how other
+   centered content blocks on this page are capped. The row's own
+   border-top (needed when it sat directly under the cost breakdown
+   card) is dropped here - the .divider already placed before this
+   section handles that separation, a second line right above it
+   would be redundant. */
+.rtb-strip{max-width:680px;margin:0 auto;padding:32px 16px}
+/* _47 NEW - dark-background variant, now that this strip lives inside
+   #carouselsZone (background #1b1408) instead of the page's default
+   light background. .pt-trust-item's default b/span colors (var(--ink)/
+   var(--ink-3)) are tuned for light backgrounds and would be unreadable
+   here - overridden to the same light text colours the Craft/Details
+   card headings already use on this same background. Border-top
+   matches the divider already used between the Pillars/Craft groups
+   above, for visual consistency within the zone (see .rtb-strip's own
+   border-top:none rule below, which still applies - this uses a
+   different divider instead, scoped to this specific instance). */
+/* _49 FIX: line-to-icon gap (36px, this padding-top) and icon-to-
+   label gap (.pt-trust-item's own 5px gap) were wildly different -
+   per explicit direction these should match. Reduced padding-top to
+   14px and raised .pt-trust-item's gap to the same 14px, meeting in
+   the middle rather than either the very tight 5px or the very loose
+   36px original values, so the icon reads as evenly spaced between
+   the divider line above and its own label below. */
+.rtb-strip--inzone{ border-top:1px solid rgba(232,201,164,.12);border-bottom:1px solid rgba(232,201,164,.12);padding-top:14px;padding-bottom:14px; } /* _57 FIX: added border-bottom matching border-top exactly (same color/width), per explicit direction - not the orange shown in the reference, that was hand-drawn annotation, not a colour instruction. Same element as border-top so the new line is automatically the identical length. Spacing works out per the existing rules without further changes: 14px between each line and the icon content (matching top, per explicit direction "properly spaced between these lines"), then this box ends and .carousels-zone's own 36px bottom padding (see the _56 fix) provides the gap from this new line down to the actual bottom edge of the dark section - already matching that section's own established top/bottom rhythm, not a new number invented for this. */
+.rtb-strip--inzone .pt-trust-item b{ color:#f2e9db; }
+.rtb-strip--inzone .pt-trust-item span{ color:rgba(242,233,219,.6); }
+.rtb-strip .pt-trust{border-top:none;padding-top:0}
+/* _55 FIX: reverted back to the original tight 5px gap, per explicit
+   direction and a reference image showing icon-to-title and title-
+   to-subtext should sit close together, not spaced out. The _49
+   change to 14px (to match .rtb-strip--inzone's line-to-icon padding)
+   is superseded - that padding-top is untouched, only this internal
+   icon/title/subtext spacing reverts. Old value commented, not
+   deleted, per the never-delete convention:
+   .pt-trust-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px} */
+.pt-trust-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px}
+.pt-trust-item svg{color:var(--bronze);width:18px;height:18px}
+.pt-trust-item b{font-family:var(--ff-d);font-weight:400;font-size:13px;color:var(--ink)}
+.pt-trust-item span{font-size:11px;color:var(--ink-3);line-height:1.3}
 
 /* PRICE COMPARISON BARS */
 .pricebars{display:flex;flex-direction:column;gap:14px;margin:18px 0 22px}
@@ -4235,7 +5256,12 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .rail{display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:6px}
 .rail::-webkit-scrollbar{display:none}
 .railcard{flex-shrink:0;width:150px;text-decoration:none}
-.railcard .ri{width:150px;height:150px;border-radius:var(--radius);object-fit:cover;background:var(--surface-2);border:1px solid var(--line-2)}
+/* _47 FIX: was width:150px;height:150px (square, 1:1) - per explicit
+   direction changed to 3:4, matching the aspect ratio used
+   everywhere else on this page (Pillars/Craft cards, gallery images).
+   aspect-ratio+height:auto instead of a hardcoded height so this
+   still resizes cleanly if .railcard's own width ever changes. */
+.railcard .ri{width:150px;aspect-ratio:3/4;height:auto;border-radius:var(--radius);object-fit:cover;background:var(--surface-2);border:1px solid var(--line-2)}
 .railcard .rn{font-family:var(--ff-d);font-size:15px;color:var(--heading);margin-top:8px;line-height:1.15} /* product title = heading */
 .railcard .rp{font-size:13px;color:var(--ink-2);font-weight:600;margin-top:3px}
 
@@ -4291,8 +5317,16 @@ footer{background:#EDECE9;color:#433122}
 .sb-price{font-size:12px;font-weight:700;color:var(--ink)}
 .sb-price s{color:var(--ink-3);font-weight:400;margin-left:4px}
 .sb-save{font-size:10.5px;font-weight:700;color:var(--sale);background:rgba(154,37,21,.08);padding:2px 6px;border-radius:4px;margin-left:3px}
-.sb-btn{min-height:42px;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;flex-shrink:0;color:#fff;background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5)),var(--wood);background-size:cover;background-position:center;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6)),var(--wood)}
+/* _43 FIX: same texture removal as the shared .atc,.sb-btn rule
+   above - this rule redefines .sb-btn's full style (appears later in
+   the stylesheet, same specificity, so it's what actually wins for
+   .sb-btn elements) and had its own duplicate var(--wood) reference.
+   Old rule commented out, not deleted, per the never-delete
+   convention:
+   .sb-btn{min-height:42px;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;flex-shrink:0;color:#fff;background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5)),var(--wood);background-size:cover;background-position:center;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+   .sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6)),var(--wood)} */
+.sb-btn{min-height:42px;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;flex-shrink:0;color:#fff;background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5));text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6))}
 
 /* SLIM CONSENT */
 .consent{position:fixed;left:0;right:0;bottom:0;z-index:80;background:var(--heading);color:#efe7da;padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;font-size:12px;transition:transform .45s cubic-bezier(.22,.9,.32,1)}
@@ -4401,7 +5435,18 @@ footer{background:#EDECE9;color:#433122}
   .ap{padding:64px 0}
   .ap-h{font-size:34px}
   .ap-head{max-width:760px}
-  #compare .ap-head, #delivery .ap-head, #faq .ap-head{max-width:860px;margin-left:auto;margin-right:auto}
+  /* _51 FIX: #compare's own heading ("Priced with honesty") was capped
+     at 860px while its panel content (#ctab-compare/#ctab-pricing/.pt,
+     all widened to 900px in the _47/_49 passes) was wider - since both
+     are centered independently, the two different widths meant their
+     LEFT edges didn't line up. "Transparent Pricing" (and the table
+     above it) visibly started to the left of "Priced with honesty",
+     per explicit feedback. Split #compare out from the shared
+     860px rule so it can match its own panel width (900px) instead -
+     #delivery/#faq keep 860px since their own content wasn't widened
+     the same way. */
+  #compare .ap-head{max-width:900px;margin-left:auto;margin-right:auto}
+  #delivery .ap-head, #faq .ap-head{max-width:860px;margin-left:auto;margin-right:auto}
   .dim-cards{grid-template-columns:1fr 1fr}
   .ap-split{display:grid;grid-template-columns:1fr 1fr;gap:56px}
   .ap-split.rev .media{order:2}
@@ -4422,11 +5467,101 @@ footer{background:#EDECE9;color:#433122}
   .qcard{margin:-110px 0 0 56px;max-width:520px;padding:42px}
   .qcard p{font-size:27px}
   .qcard-reviews{min-height:160px}
-  .pt{display:flex;flex-direction:column;gap:28px;max-width:680px;margin:0 auto}
+  /* _45 FIX: "How is this priced?" card looked stretched on desktop -
+     it was inheriting .pt's full 680px width, which spread the
+     label/value pairs in each row far apart with a lot of dead space
+     between them. Capped the card itself narrower and centered it
+     within .pt, independent of .pt-trust (which used to sit below it
+     and wanted the fuller width) - .pt-trust has since moved out of
+     this tab entirely (see the new RTB section below the Craft
+     carousel), so this is scoped to desktop only per explicit
+     direction ("desktop optimised once mobile is"), not touched on
+     mobile where the card was already sized correctly. */
+  /* _45 FIX: margin:0 auto on a flex item (this card is a child of
+     .pt, display:flex) suppresses the normal cross-axis stretch and
+     shrink-to-fit sizes it instead - without an explicit width, the
+     card collapsed to ~194px (its content's own narrowest natural
+     width) instead of filling up to its 480px cap. Added width:100%
+     so the card has a definite width to constrain via max-width, and
+     margin:0 auto then correctly just centers that 480px result
+     instead of fighting the stretch. */
+  /* _47 FIX/NEW - "How is this priced?" now a real two-column desktop
+     layout: Transparent Pricing copy (left) + cost breakdown card
+     (right), per explicit direction. Supersedes the _45 single-
+     column centered treatment (that fix's own reasoning - avoiding
+     the stretched look - still applies, just solved differently now
+     that there's a second column to fill the width with instead of
+     capping the card alone). Old _45 rules commented out, not
+     deleted, per the never-delete convention:
+     .costcard{width:100%;max-width:480px;margin:0 auto}
+     .pt{display:flex;flex-direction:column;gap:22px;max-width:680px;margin:0 auto} */
+  .pt-copy2{display:block}
+  /* _49 FIX: bumped size up slightly (28->30px heading, 15->16px
+     body) per explicit feedback that it read too small/insignificant
+     next to the heavier cost-breakdown card. Also switched .pt's
+     align-items from center to start (see the .pt rule above) so
+     this heading top-aligns with "What goes into your £503" instead
+     of being vertically centered against the taller card - matches
+     the reference screenshot, where both headings start at the same
+     height. padding-top:14px added to match .costcard's own internal
+     top padding (14px, set on .costcard itself) - without it the two
+     headings still sat 14px apart despite align-items:start, since
+     .costcard's padding pushes its h3 down relative to pt-copy2's
+     h3, which had no equivalent offset. No card/tile background was
+     ever added here (checked per explicit feedback "remove the
+     transparent pricing tile") - this has always been plain text, so
+     there was nothing to remove. */
+  .pt-copy2{padding-top:14px}
+  .pt-copy2 h3{font-family:var(--ff-d);font-weight:400;font-size:30px;color:var(--heading);margin-bottom:14px}
+  .pt-copy2 p{font-size:16px;line-height:1.75;color:var(--ink-2);max-width:44ch}
+  .pt{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;max-width:900px;margin:0 auto}
+  .costcard{width:100%;margin:0}
   .pt-copy{max-width:680px}
   .pricebars{max-width:680px;margin-left:auto;margin-right:auto}
   .price-save-callout{max-width:680px;margin-left:auto;margin-right:auto}
   .cmp-panel{max-width:680px;margin:0 auto}
+  /* _47 NEW - desktop felt small/sparse on the Value section's
+     comparison table specifically - it was reusing the same mobile-
+     tightened font-size/padding just stretched onto a wider screen,
+     rather than being scaled up for it. Widened the table itself and
+     bumped font-size/row padding, loosely inspired by a reference
+     screenshot of the live site's own desktop table (spacing
+     reference only, not its content/columns/labels - ours keep our
+     own copy and competitor set). #ctab-compare specifically (not a
+     blanket .cmp-panel change) so "How is this priced?" isn't
+     affected by this. */
+  #ctab-compare{max-width:900px}
+  /* _49 FIX: "How is this priced?" was noticeably narrower/more
+     cramped than "How it compares" (680px vs 900px) even though .pt
+     itself already had max-width:960px set - that never mattered
+     because its actual parent (#ctab-pricing, sharing the base
+     .cmp-panel{max-width:680px} rule) was still capping it at 680px
+     regardless of .pt's own larger max-width (a block child can't
+     exceed its parent's available width just by setting a bigger
+     max-width on itself). Matched to the exact same 900px as
+     #ctab-compare, per explicit direction ("use the same space"). */
+  #ctab-pricing{max-width:900px}
+  /* _56 FIX: table (and the save-note below it) had their own
+     narrower 820px max-width centered inside the 900px container -
+     that created a 40px inset on each side, so the table's left edge
+     landed to the right of "Priced with honesty" above it instead of
+     lining up with it. Widened both to match the container's 900px
+     exactly, per the spacing audit. */
+  #ctab-compare .cmp-scroll3{max-width:900px}
+  #ctab-compare .cmptable-3fit{font-size:15px}
+  /* _58 FIX: reduced vertical cell padding (18px -> 11px top/bottom)
+     to shrink every row's height equally, per explicit direction to
+     make the whole table fit the viewport more easily. Only the
+     vertical padding changed - horizontal (16px) is untouched, so
+     column widths/spacing are unaffected; this purely compresses row
+     height. Applied to the shared th/td rule so header and body rows
+     shrink by the same amount, keeping the rows visually even. */
+  #ctab-compare .cmptable-3fit th,#ctab-compare .cmptable-3fit td{padding:11px 16px}
+  #ctab-compare .cmptable-3fit thead th{font-size:12px;padding-bottom:11px}
+  #ctab-compare .cmptable-3fit th:first-child,#ctab-compare .cmptable-3fit td:first-child{font-size:14px;width:160px}
+  #ctab-compare .cmptable-3fit th.cm-fr,#ctab-compare .cmptable-3fit td.cm-fr{left:160px;width:140px}
+  #ctab-compare .cmptable-3fit th:not(:first-child):not(.cm-fr),#ctab-compare .cmptable-3fit td:not(:first-child):not(.cm-fr){width:140px}
+  #ctab-compare .cm-save-note{max-width:900px;font-size:14.5px;padding:14px 18px}
   .acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 48px;max-width:860px;margin:0 auto}
   #delivery .acc-grid, #faq .acc-grid{display:flex;flex-direction:column;gap:0;max-width:680px;margin:0 auto}
   .revlist{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -4963,7 +6098,7 @@ footer{background:#EDECE9;color:#433122}
         </div>
         <div class="t4" onclick="openTrust('returns')" role="button" tabindex="0">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
-          <span>14-Day Returns</span>
+          <span>30-Day Returns</span>
         </div>
         <div class="t4" onclick="openTrust('bnpl')" role="button" tabindex="0">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
@@ -5029,6 +6164,17 @@ footer{background:#EDECE9;color:#433122}
       </div>
       -->
 
+      <!-- _53 FIX: REVERSED the _52 fix - that fix used PDP inline
+           snippets as ground truth ("5-10 weeks"), but a direct fetch
+           of the actual dedicated policy page (fableroom.com/pages/
+           delivery-and-shipping, explicitly dated "Last updated: 4
+           June, 2026") shows the real current figures are Standard
+           Shipping 3-8 weeks and Pre-Order 8-12 weeks - the PDP
+           snippets are the outdated ones. A dated, dedicated policy
+           page is a stronger source than inline product-page copy
+           that doesn't carry its own revision date. Reverted to
+           8-12 weeks here and fixed the two other places this same
+           number appears (Delivery accordion, FAQ) to match. -->
       <div class="backorder">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;color:var(--tan)"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/></svg>
         <span><b>Pre-order  -  Arrives in 8–12 weeks.</b> Reserve now at the sale price  -  your order is confirmed and ships as soon as production is complete.</span>
@@ -5071,6 +6217,10 @@ footer{background:#EDECE9;color:#433122}
         </thead>
         <tbody>
           <tr><td>Price</td><td class="cm-fr">&#163;503</td><td>&#163;649</td><td>&#163;749</td><td data-overflow="1">&#163;899</td></tr>
+          <!-- _45 NEW: kept in sync with the below-fold table's own new
+               Savings (%) row - same figures, same reasoning, see that
+               table's comment for the calculation. -->
+          <tr><td>Savings (%)</td><td class="cm-fr">&mdash;</td><td><span class="cm-savings">22%</span></td><td><span class="cm-savings">33%</span></td><td data-overflow="1"><span class="cm-savings">44%</span></td></tr>
           <tr><td>Direct from maker</td><td class="cm-fr"><span class="cm-yes">&#10003;</span></td><td><span class="cm-no">&#10005;</span></td><td><span class="cm-no">&#10005;</span></td><td data-overflow="1"><span class="cm-no">&#10005;</span></td></tr>
           <tr><td>365-day guarantee</td><td class="cm-fr"><span class="cm-yes">&#10003;</span></td><td><span class="cm-no">&#10005;</span></td><td><span class="cm-no">&#10005;</span></td><td data-overflow="1"><span class="cm-no">&#10005;</span></td></tr>
           <tr><td>No showroom markup</td><td class="cm-fr"><span class="cm-yes">&#10003;</span></td><td><span class="cm-no">&#10005;</span></td><td><span class="cm-no">&#10005;</span></td><td data-overflow="1"><span class="cm-no">&#10005;</span></td></tr>
@@ -5151,9 +6301,9 @@ footer{background:#EDECE9;color:#433122}
     <div class="tm-drag"></div>
     <button class="tm-close" onclick="closeTrust('returns')">×</button>
     <svg class="tm-icon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
-    <h4>14-Day Returns</h4>
+    <h4>30-Day Returns</h4>
     <p>Faulty or damaged on arrival? Collected free, no questions.</p>
-    <p>Changed your mind? Furniture returns carry a £25 collection fee. Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p>
+    <p>Changed your mind? A collection fee applies (£25 furniture/mirrors/large items, £18 rugs/ottomans, £5 cushions/throws/lamps). Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p>
   </div>
 </div>
 <div class="trust-modal" id="tm-bnpl" onclick="if(event.target===this)closeTrust('bnpl')">
@@ -5173,7 +6323,7 @@ footer{background:#EDECE9;color:#433122}
 <nav class="secnav" id="secnav" aria-label="Sections">
   <div class="secnav-in">
     <a href="#finish" class="active">Overview</a>
-    <a href="#specs">Specs</a>
+    <a href="#specs">Features and Specs</a>
     <a href="#compare">Fair Pricing</a>
     <a href="#delivery">Delivery</a>
     <a href="#reviews">Reviews</a>
@@ -5268,6 +6418,35 @@ footer{background:#EDECE9;color:#433122}
   </section>
 
   <div class="section-divider"></div>
+
+  <!-- _41 MOVED HERE: "Frequently Bought Together" relocated from
+       after the Craft/Specs carousels zone to directly after the
+       Parallax/Finish section, per explicit direction. Content
+       copied verbatim from its old location, not retyped. See the
+       _41 top-of-file changelog entry. -->
+  <!-- A+ · FREQUENTLY BOUGHT TOGETHER -->
+  <section id="bundle" class="ap">
+    <div class="ap-head">
+      <span class="eyebrow">Frequently bought together</span>
+      <h2 class="ap-h">Complete the Astra set</h2>
+      <p class="ap-sub">The cabinet, console and side table share the same hand-applied galaxy finish - buy the trio together and save.</p>
+    </div>
+    <div class="fbt">
+      <div class="fbt-items">
+        <label class="fbt-item"><input type="checkbox" checked onchange="fbtCalc()" data-price="503"><img src="./assets-web/cabinet-in-living-room.jpg" alt="Astra Two Door Cabinet"><span class="fbt-n">Astra Two Door Cabinet <em>(this item)</em></span><span class="fbt-p">£503</span></label>
+        <span class="fbt-plus">+</span>
+        <label class="fbt-item"><input type="checkbox" checked onchange="fbtCalc()" data-price="389"><img src="./assets-web/cabinet-three-quarter-view.jpg" alt="Astra Console Table"><span class="fbt-n">Astra Console Table</span><span class="fbt-p">£389</span></label>
+        <span class="fbt-plus">+</span>
+        <label class="fbt-item"><input type="checkbox" checked onchange="fbtCalc()" data-price="215"><img src="./assets-web/cabinet-top-corner-closeup.jpg" alt="Astra Side Table"><span class="fbt-n">Astra Side Table</span><span class="fbt-p">£215</span></label>
+      </div>
+      <div class="fbt-buy">
+        <div class="fbt-total">Total: <b id="fbtTotal">£1,107</b><span class="fbt-save" id="fbtSave">Save £120 as a set</span></div>
+        <button class="atc fbt-cta" id="fbtCta">Add 3 items to basket</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
 
   <!-- ============================================================
        _40 - old fb-story (Features/Benefits scrollytelling prototype)
@@ -5496,7 +6675,96 @@ footer{background:#EDECE9;color:#433122}
          lighter, bordered tone so the card reads as a distinct card.
        ============================================================ -->
   <section class="carousels-zone" id="carouselsZone">
+    <!-- _34 NEW - "Features and Specifications" consolidated section, per
+         explicit direction. Replaces two previously separate things:
+         1. The old #specs block (Dimensions & details / Product
+            Description accordions) that used to sit between the Details
+            and Craft carousels as its own 3rd flex item.
+         2. The old Care+Assembly carousel tile (5th slide in the Pillars
+            carousel) - its content (Easy Care icon grid + Minimal
+            Assembly Required) is now two accordion items here instead of
+            a tile, per explicit direction ("care guide and stuff lets
+            have it as an accordion instead of a tile").
+         Sits ABOVE both carousels (same DOM position on mobile and
+         desktop - centered heading, centered single-column card, not
+         squeezed between/below the two carousels like the old #specs
+         block was). Card reuses .bento-card-b (same background/radius/
+         padding as "The Details"/"The Craft" cards) per explicit
+         direction ("the external card/container... similar to how craft
+         and the details have it"). Order per explicit direction: Product
+         Description, Details and Dimensions, Care Guide, Assembly - not
+         the old order (Dimensions first). Kept the same accordion width/
+         max-width as before (700px) rather than widening it, and
+         centered it instead of the old 2-column side-by-side desktop
+         layout (.specs-accs, now unused - kept, not deleted). Care Guide
+         text is the same verbatim source already used in the Delivery
+         section's "Care & Buying Guide" accordion (not re-derived,
+         re-typed from the same real source). -->
+    <!-- _36 FIX: moved back to ABOVE both carousels (was briefly placed
+         between/below them in _35) - per explicit direction, and because
+         that positioning was breaking the sticky category nav. The nav's
+         "Specs" tab (<a href="#specs">) and its scroll-tracking JS
+         (secs=navlinks.map(a => document.querySelector(a.getAttribute(
+         'href')))) both depend on an element with id="specs" existing -
+         _34/_35 had renamed this element's id to #featSpecsGroup/
+         #featSpecs, silently breaking that link and the active-tab
+         highlighting. Restored id="specs" on the wrapper so the nav
+         works again, and renamed the nav's own label from "Specs" to
+         "Features and Specs" to match this section's real heading (see
+         the <nav class="secnav"> markup further down).
+         Also removed the Assembly sub-block from the Care Guide
+         accordion per explicit direction - "Assembly Required: Minimal
+         Assembly Required" is already in the Details and Dimensions
+         table above it, so repeating it a second time here added
+         nothing. Back to plain "Care Guide", care text only. -->
+    <!-- _38 FIX: heading and card decoupled - previous versions moved
+         them together as one unit. Per explicit direction: the "Features
+         and Specifications" TITLE always sits above both carousels (both
+         breakpoints, fixed position, not part of the flex reorder below).
+         Only the accordion CARD itself moves: sits between the two
+         carousels in DOM order (correct for mobile - stacks naturally
+         between Details and Craft) and gets pushed below both on desktop
+         via flex order+flex-basis (same trick the old #specs block
+         used, now scoped to just the card, not the heading). -->
+    <div class="ap-head feat-specs-head" id="specs">
+      <h2 class="ap-h">Features and Specifications</h2>
+    </div>
+
     <div class="fb-carousel-groups">
+
+      <!-- _41 MOVED HERE: #featSpecsCard now sits first, on top of
+           both carousels (both breakpoints), per explicit direction.
+           Moved verbatim from its old position between Pillars and
+           Craft - content unchanged. See the _41 top-of-file
+           changelog entry. -->
+      <div class="fb-carousel-group" id="featSpecsCard">
+        <div class="bento-card-b feat-specs-card">
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Product Description<span class="pm">+</span></button>
+            <div class="acc-body"><p>The Astra Cabinet brings celestial beauty into everyday living. Crafted from iron, its luminous galaxy-inspired finish shifts with the light, creating depth and intrigue. Two doors open to ample storage, offering a chic way to organise linens, books, or everyday essentials.</p></div>
+          </div>
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Details and Dimensions<span class="pm">+</span></button>
+            <div class="acc-body">
+              <table class="spectable">
+                <tr><td>SKU</td><td>TRCB00001A</td></tr>
+                <tr><td>Colour</td><td>Metallic</td></tr>
+                <tr><td>Material</td><td>Iron</td></tr>
+                <tr><td>Style</td><td>Contemporary, Eclectic, Glam, Rustic, Industrial</td></tr>
+                <tr><td>Width</td><td>104 cm</td></tr>
+                <tr><td>Depth</td><td>46 cm</td></tr>
+                <tr><td>Height</td><td>82 cm</td></tr>
+                <tr><td>Weight</td><td>42.9 kg</td></tr>
+                <tr><td>Packaging Dimensions</td><td>(W) 112cm | (D) 54cm | (H) 84cm</td></tr>
+                <tr><td>Packaging Weight</td><td>50.52 kg</td></tr>
+                <tr><td>Assembly Required</td><td>Minimal Assembly Required</td></tr>
+                <tr><td>Country Of Origin</td><td>India</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care Guide<span class="pm">+</span></button>
+            <div class="acc-body"><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p></div>
+          </div>
+        </div>
+      </div>
 
       <div class="fb-carousel-group" id="pillarsCarouselCol">
         <!-- _55 FIX: heading had no card background behind it (unlike
@@ -5529,62 +6797,51 @@ footer{background:#EDECE9;color:#433122}
                  .ibc-col / .fb-slide elements exist. -->
 
             <!-- BUILD + LONG-LASTING -->
+            <!-- _39 FIX: was cycling between two separate captions (Build's,
+                 then Long-Lasting's) with the icons switching active state -
+                 per explicit direction, replaced with ONE static combined
+                 sentence (both claims merged, like Lifestyle's single fixed
+                 caption) shown permanently, both icons highlighted together
+                 instead of one at a time. data-static-caption on the card
+                 tells the controller to skip cycling entirely - see the
+                 icon-blend-card controller JS. Sentence is the same merged
+                 copy already drafted earlier this session, not new writing. -->
             <div class="fb-slide" data-dir="left">
-              <figure class="icon-blend-card build-lasting">
+              <div class="bento-lifestyle">
                 <img src="./assets-web/feature-build.jpg" alt="Astra Two Door Cabinet - solid iron corner detail, built to last">
                 <div class="ibc-scrim"></div>
-                <div class="ibc-panel">
-                  <div class="ibc-row">
-                    <button class="ibc-col active" type="button" aria-label="Build" data-copy="Solid iron. Not painted MDF or particleboard.">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M9 6v12M15 6v12"/></svg>
-                      <span>Build</span>
-                    </button>
-                    <button class="ibc-col" type="button" aria-label="Long-Lasting" data-copy="Won't sag, wobble or warp the way cheaper furniture can.">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10M7 20h10M8 4c0 4 2.5 6.5 4 7-1.5.5-4 3-4 7M16 4c0 4-2.5 6.5-4 7 1.5.5 4 3 4 7"/></svg>
-                      <span>Long-Lasting</span>
-                    </button>
-                  </div>
-                  <p class="ibc-caption"><span class="ibc-caption-text"></span></p>
+                <div class="bl-cap">
+                  <h3>Solid Iron, Built to Last</h3>
+                  <p>Won't sag, wobble, or warp like cheaper furniture.</p>
                 </div>
-              </figure>
+              </div>
             </div>
 
             <!-- FINISH + UNIQUE -->
+            <!-- _39 FIX: same treatment as Build+Long-Lasting above - one
+                 static combined sentence instead of cycling between Finish's
+                 and Unique's separate captions. -->
             <div class="fb-slide" data-dir="left">
-              <figure class="icon-blend-card finish-unique">
+              <div class="bento-lifestyle">
                 <img src="./assets-web/cabinet-patina-closeup.jpg" alt="Astra Two Door Cabinet - macro close-up of the hand-applied galaxy finish">
                 <div class="ibc-scrim"></div>
-                <div class="ibc-panel">
-                  <div class="ibc-row">
-                    <button class="ibc-col active" type="button" aria-label="Finish" data-copy="Hand-finished. No two pieces alike.">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M7.5 9.5l9 5"/></svg>
-                      <span>Finish</span>
-                    </button>
-                    <button class="ibc-col" type="button" aria-label="Unique" data-copy="Natural variation means yours will be genuinely one of a kind.">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
-                      <span>Unique</span>
-                    </button>
-                  </div>
-                  <p class="ibc-caption"><span class="ibc-caption-text"></span></p>
+                <div class="bl-cap">
+                  <h3>Hand-Finished, One of a Kind</h3>
+                  <p>Natural variation means no two are ever alike.</p>
                 </div>
-              </figure>
+              </div>
             </div>
 
             <!-- REAL STORAGE (standalone) -->
             <div class="fb-slide" data-dir="left">
-              <figure class="icon-blend-card storage">
+              <div class="bento-lifestyle">
                 <img src="./assets-web/benefit-organisation.jpg" alt="Astra Two Door Cabinet interior with linens and books organised, patina finish and steel hinge visible">
                 <div class="ibc-scrim"></div>
-                <div class="ibc-panel">
-                  <div class="ibc-row">
-                    <button class="ibc-col active" type="button" aria-label="Real Storage" data-copy="Two doors. Real space for linens, books and everyday clutter.">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9Z"/><path d="M4 9l2-4h12l2 4"/><path d="M9 13.5h6"/></svg>
-                      <span>Real Storage</span>
-                    </button>
-                  </div>
-                  <p class="ibc-caption"><span class="ibc-caption-text"></span></p>
+                <div class="bl-cap">
+                  <h3>Real Storage, Ample Space</h3>
+                  <p>Space for linens, books, and everyday clutter.</p>
                 </div>
-              </figure>
+              </div>
             </div>
 
             <!-- LIFESTYLE -->
@@ -5597,60 +6854,6 @@ footer{background:#EDECE9;color:#433122}
                 <div class="bl-cap">
                   <h3>At Home in Any Style</h3>
                   <p>Suits contemporary, eclectic, glam, rustic, and industrial interiors.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- CARE + ASSEMBLY -->
-            <div class="fb-slide" data-dir="left">
-              <div class="care-assembly-card">
-                <div class="cac-top">
-                  <!-- _55 FIX: arrow removed per explicit feedback - this
-                       card isn't a modal trigger (that behaviour was
-                       dropped back in _50m), so an arrow implying "more"
-                       read as broken rather than intentional. -->
-                  <div class="cac-head">
-                    <div>
-                      <h3>Easy Care</h3>
-                      <p class="cac-sub">Simple upkeep, no special products needed.</p>
-                    </div>
-                  </div>
-                  <div class="cac-grid">
-                    <div class="cac-cell">
-                      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-                      <span>Dust regularly</span>
-                    </div>
-                    <div class="cac-cell">
-                      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg>
-                      <span>Avoid moisture &amp; sun</span>
-                    </div>
-                    <div class="cac-cell">
-                      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-                      <span>Check fittings</span>
-                    </div>
-                    <div class="cac-cell">
-                      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7 9 18l-5-5"/><rect x="4" y="7" width="16" height="13" rx="1.5"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
-                      <span>Store dry</span>
-                    </div>
-                  </div>
-                </div>
-                <!-- CARE + ASSEMBLY COMBINED - _50m REPLACE: was two separate
-                     paired cards (Care opening a modal, Practical as its own
-                     slim card). Per explicit direction this content is "text
-                     or visual heavy, no image" - combined into one card,
-                     dropping the modal entirely since all 4 care points are
-                     now directly visible in the grid (no click needed to find
-                     out what they mean). #careModal itself is left in the file,
-                     unreferenced - same "kept, not deleted" treatment as other
-                     superseded pieces. -->
-                <div class="cac-assembly-block">
-                  <div class="cell-assembly-icon-badge">
-                    <svg class="cell-assembly-icon" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16.5V7.5a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 7.5v9a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
-                  </div>
-                  <div class="av6-card-copy">
-                    <b>Minimal Assembly Required</b>
-                    <small>Ready to use in minutes, not hours.</small>
-                  </div>
                 </div>
               </div>
             </div>
@@ -5669,56 +6872,13 @@ footer{background:#EDECE9;color:#433122}
         </div>
       </div>
 
-      <!-- _55 NEW - "Full product details" section, relocated here per
-           explicit direction (previously sat further down the page in
-           the plain white A+ flow, see the top-of-file changelog entry
-           for the full write-up). Same markup/classes as before (.ap-
-           head/.eyebrow/.ap-h/.acc/.acc-btn/.acc-body/.spectable) -
-           text, structure, and font are untouched, only the colours
-           are overridden dark (scoped under #specs, see
-           the CSS above) to match this zone instead of the site's
-           default white theme. Desktop positioning (see .carousels-row
-           CSS): sits BELOW the two carousels, full width - not
-           squeezed in as a 3rd column - via a flex order+flex-basis
-           override; on mobile it naturally falls between them in DOM
-           order (no CSS needed there). -->
-      <div class="fb-carousel-group" id="specs">
-        <!-- _56 FIX: dropped the "Full product details" h2 per explicit
-             direction - having both the eyebrow ("Specifications") and
-             a second, different-wording heading underneath it was
-             redundant. Just the one heading now. -->
-        <div class="ap-head">
-          <h2 class="ap-h">Specifications</h2>
-        </div>
-        <!-- _70 NEW - wrapped both accordions so they can sit side by
-             side on desktop (effective space use in a section that's
-             otherwise just a tall single column) per explicit
-             direction, while staying stacked on mobile - see
-             .specs-accs CSS. -->
-        <div class="specs-accs">
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Dimensions &amp; details<span class="pm">+</span></button>
-          <div class="acc-body">
-            <table class="spectable">
-              <tr><td>SKU</td><td>TRCB00001A</td></tr>
-              <tr><td>Colour</td><td>Metallic</td></tr>
-              <tr><td>Material</td><td>Iron</td></tr>
-              <tr><td>Style</td><td>Contemporary, Eclectic, Glam, Rustic, Industrial</td></tr>
-              <tr><td>Width</td><td>104 cm</td></tr>
-              <tr><td>Depth</td><td>46 cm</td></tr>
-              <tr><td>Height</td><td>82 cm</td></tr>
-              <tr><td>Weight</td><td>42.9 kg</td></tr>
-              <tr><td>Packaging Dimensions</td><td>(W) 112cm | (D) 54cm | (H) 84cm</td></tr>
-              <tr><td>Packaging Weight</td><td>50.52 kg</td></tr>
-              <tr><td>Assembly Required</td><td>Minimal Assembly Required</td></tr>
-              <tr><td>Country Of Origin</td><td>India</td></tr>
-            </table>
-          </div>
-        </div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Product Description<span class="pm">+</span></button>
-          <div class="acc-body"><p>The Astra Cabinet brings celestial beauty into everyday living. Crafted from iron, its luminous galaxy-inspired finish shifts with the light, creating depth and intrigue. Two doors open to ample storage, offering a chic way to organise linens, books, or everyday essentials.</p></div>
-        </div>
-        </div>
-      </div>
+      <!-- _41 MOVED: #featSpecsCard no longer sits here (was between
+           Pillars and Craft, pushed below both on desktop via
+           order:3) - moved to be the FIRST child of
+           .fb-carousel-groups, before #pillarsCarouselCol, so it
+           sits on top of both carousels on both breakpoints, per
+           explicit direction. See the _41 top-of-file changelog
+           entry and its new location above. -->
 
       <div class="fb-carousel-group" id="craftCarouselCol">
         <div class="bento-grid" id="bentoGrid">
@@ -5807,6 +6967,35 @@ footer{background:#EDECE9;color:#433122}
       </div>
 
     </div>
+
+    <!-- _47 FIX: moved INSIDE #carouselsZone (was its own section right
+         after, sitting on the page's default white background - a
+         jarring white strip directly under a dark section). Now a
+         plain div inside the same dark zone, inheriting its #1b1408
+         background and full-bleed width for free, with a border-top
+         matching the same divider style already used between the
+         Pillars/Craft groups above, for visual consistency within the
+         zone. Per explicit direction ("it should be just below the
+         craft thing with the brownish background"). -->
+    <div class="rtb-strip rtb-strip--inzone">
+      <div class="pt-trust">
+        <div class="pt-trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v15M8 21h8M5 7h14M5 7l-2.2 5a3 3 0 0 0 6.2 0L5 7Zm14 0l-2.2 5a3 3 0 0 0 6.2 0L19 7Z"/></svg>
+          <b>Fairly priced</b>
+          <span>No inflated retail markup</span>
+        </div>
+        <div class="pt-trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16L12 21 4 9Z"/><path d="M4 9l4-6h8l4 6"/><path d="M9 3l3 6 3-6"/></svg>
+          <b>Beautifully crafted</b>
+          <span>Traditional techniques</span>
+        </div>
+        <div class="pt-trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16Z"/><path d="M4 20 20 4"/></svg>
+          <b>Ethically sourced</b>
+          <span>Fair wages, vetted makers</span>
+        </div>
+      </div>
+    </div>
   </section>
 
 
@@ -5876,48 +7065,70 @@ footer{background:#EDECE9;color:#433122}
   <div class="divider"></div>
        ============================================================ -->
 
-  <!-- PHASE 2 (see removal note above) - divider that used to follow
-       "In Your Room" also held back, so Frequently Bought Together
-       doesn't get a doubled-up divider against whatever now precedes
-       it (Craft/Specs zone). -->
+  <!-- _41 MOVED: "Frequently Bought Together" (#bundle) no longer
+       sits here - relocated to directly after the Parallax/Finish
+       section (#finish), per explicit direction. See the _41 top-of-
+       file changelog entry and its new location earlier in this
+       file, right after #finish's closing </section>. -->
+
   <div class="divider"></div>
 
-  <!-- A+ · FREQUENTLY BOUGHT TOGETHER -->
-  <section id="bundle" class="ap">
-    <div class="ap-head">
-      <span class="eyebrow">Frequently bought together</span>
-      <h2 class="ap-h">Complete the Astra set</h2>
-      <p class="ap-sub">The cabinet, console and side table share the same hand-applied galaxy finish - buy the trio together and save.</p>
-    </div>
-    <div class="fbt">
-      <div class="fbt-items">
-        <label class="fbt-item"><input type="checkbox" checked onchange="fbtCalc()" data-price="503"><img src="./assets-web/cabinet-in-living-room.jpg" alt="Astra Two Door Cabinet"><span class="fbt-n">Astra Two Door Cabinet <em>(this item)</em></span><span class="fbt-p">£503</span></label>
-        <span class="fbt-plus">+</span>
-        <label class="fbt-item"><input type="checkbox" checked onchange="fbtCalc()" data-price="389"><img src="./assets-web/cabinet-three-quarter-view.jpg" alt="Astra Console Table"><span class="fbt-n">Astra Console Table</span><span class="fbt-p">£389</span></label>
-        <span class="fbt-plus">+</span>
-        <label class="fbt-item"><input type="checkbox" checked onchange="fbtCalc()" data-price="215"><img src="./assets-web/cabinet-top-corner-closeup.jpg" alt="Astra Side Table"><span class="fbt-n">Astra Side Table</span><span class="fbt-p">£215</span></label>
-      </div>
-      <div class="fbt-buy">
-        <div class="fbt-total">Total: <b id="fbtTotal">£1,107</b><span class="fbt-save" id="fbtSave">Save £120 as a set</span></div>
-        <button class="atc fbt-cta" id="fbtCta">Add 3 items to basket</button>
-      </div>
+  <!-- A+ 10 · CUSTOMERS ALSO LOVED (was "Complete the Look" /
+       "Pairs beautifully with") - _47 MOVED here from the very end of
+       the page (was sitting after Reviews, right before the footer)
+       to directly before Fair Pricing, per explicit direction.
+       Renamed per explicit direction ("rename it to something else -
+       customers also loved these or something else that makes
+       sense") - eyebrow/heading now frame it as a social-proof
+       cross-sell rather than a styling suggestion, which fits its new
+       position better (right before the value/pricing section) than
+       the old "pairs beautifully with" framing did. Card image ratio
+       fixed from square (1:1) to 3:4 per explicit direction - see
+       .railcard .ri below. -->
+  <section class="ap">
+    <div class="ap-head"><span class="eyebrow">Customer favourites</span><h2 class="ap-h">Customers also loved</h2></div>
+    <div class="rail">
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-three-quarter-view.jpg" alt=""><div class="rn">Astra Console Table</div><div class="rp">£389</div></a>
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-top-corner-closeup.jpg" alt=""><div class="rn">Astra Side Table</div><div class="rp">£215</div></a>
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-front-view.jpg" alt=""><div class="rn">Alder Two Door Cabinet</div><div class="rp">£472</div></a>
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-angled-detail.jpg" alt=""><div class="rn">Cayman Wooden Cabinet</div><div class="rp">£540</div></a>
     </div>
   </section>
 
   <div class="divider"></div>
 
   <section id="compare" class="ap">
-    <div class="ap-head">
+    <div class="ap-head" style="position:relative">
       <span class="eyebrow">Value</span>
       <h2 class="ap-h">Priced with honesty</h2>
-      <p class="ap-sub">Prices that make sense, without the middlemen.</p>
+      <!-- _42 FIX: the .cmp-intro paragraph that used to sit inside the
+           "How it compares" panel below (a full 3-sentence paragraph
+           between the tabs and the table) was one of the biggest single
+           contributors to that panel running taller than the safe space
+           above the sticky Add to Basket bar - its content is now here
+           instead, in a tooltip opened by a small (i) icon right after
+           this subhead, matching the one-line-plus-info-card pattern
+           already used on Fableroom's own live page for this exact
+           copy. Same .show toggle mechanism as the existing Delivery
+           section's db-tooltip (see .delivbar/.db-info above). -->
+      <p class="ap-sub">Prices that make sense, without the middlemen.
+        <span class="cmp-info" tabindex="0" role="button" aria-label="Pricing comparison info" onclick="document.getElementById('cmpInfoTooltip').classList.toggle('show')">
+          <svg viewBox="0 0 18 18" fill="none"><path d="M15.1648 3.4725C14.0923 2.25 11.7898 1.5 8.99984 1.5C6.20984 1.5 3.90734 2.25 2.83484 3.4725C1.04984 5.5425 1.04984 12.4725 2.83484 14.5275C3.90734 15.75 6.20984 16.5 8.99984 16.5C11.7898 16.5 14.0923 15.75 15.1648 14.5275C16.9498 12.4575 16.9498 5.5425 15.1648 3.4725ZM8.99984 5.0625C9.18526 5.0625 9.36652 5.11748 9.52069 5.2205C9.67486 5.32351 9.79502 5.46993 9.86598 5.64123C9.93694 5.81254 9.9555 6.00104 9.91933 6.1829C9.88316 6.36475 9.79387 6.5318 9.66276 6.66291C9.53164 6.79402 9.3646 6.88331 9.18274 6.91949C9.00088 6.95566 8.81238 6.93709 8.64108 6.86614C8.46977 6.79518 8.32335 6.67502 8.22034 6.52085C8.11733 6.36668 8.06234 6.18542 8.06234 6C8.06234 5.75136 8.16112 5.5129 8.33693 5.33709C8.51275 5.16127 8.7512 5.0625 8.99984 5.0625ZM9.74984 13.125H8.24984C8.05093 13.125 7.86017 13.046 7.71951 12.9053C7.57886 12.7647 7.49984 12.5739 7.49984 12.375C7.49984 12.1761 7.57886 11.9853 7.71951 11.8447C7.86017 11.704 8.05093 11.625 8.24984 11.625V9.375C8.05093 9.375 7.86017 9.29598 7.71951 9.15533C7.57886 9.01468 7.49984 8.82391 7.49984 8.625C7.49984 8.42609 7.57886 8.23532 7.71951 8.09467C7.86017 7.95402 8.05093 7.875 8.24984 7.875H8.99984C9.19876 7.875 9.38952 7.95402 9.53017 8.09467C9.67083 8.23532 9.74984 8.42609 9.74984 8.625V11.625C9.94876 11.625 10.1395 11.704 10.2802 11.8447C10.4208 11.9853 10.4998 12.1761 10.4998 12.375C10.4998 12.5739 10.4208 12.7647 10.2802 12.9053C10.1395 13.046 9.94876 13.125 9.74984 13.125Z" fill="currentColor"/></svg>
+        </span>
+      </p>
+      <div class="cmp-info-tooltip" id="cmpInfoTooltip">Our pricing benchmarks ensure great savings vs traditional retail. While we compare the closest products in terms of design, size, and materials, some variations may exist, and competitor pricing is subject to change.</div>
     </div>
     <div class="cmp-tabs">
       <button class="cmp-tab active" onclick="switchCmpTab(this,'ctab-compare')">How it compares</button>
       <button class="cmp-tab" onclick="switchCmpTab(this,'ctab-pricing')">How is this priced?</button>
     </div>
     <div class="cmp-panel active" id="ctab-compare">
-      <p class="cmp-intro">Our pricing benchmarks ensure great savings vs traditional retail. While we compare the closest products in terms of design, size, and materials, some variations may exist, and competitor pricing is subject to change.</p>
+      <!-- _42 MOVED: the intro paragraph that used to sit here is gone
+           from this panel - its content now lives in the .cmp-info-
+           tooltip above (see the _42 top-of-file changelog entry and
+           the note above .ap-sub). Old markup commented out, not
+           deleted, per the never-delete convention:
+           <p class="cmp-intro">Our pricing benchmarks ensure great savings vs traditional retail. While we compare the closest products in terms of design, size, and materials, some variations may exist, and competitor pricing is subject to change.</p> -->
       <!--
         DOC 1 + swipe-to-4th hybrid: 3 brand columns (Fableroom + 2
         competitors) fit and show together by default, same generous
@@ -5952,6 +7163,16 @@ footer{background:#EDECE9;color:#433122}
           </thead>
           <tbody>
             <tr><td>Price</td><td class="cm-fr">£503</td><td>£649</td><td>£749</td><td data-overflow="1">£899</td></tr>
+            <!-- _45 NEW: Savings (%) row, per explicit direction - shows
+                 at a glance how much less Fableroom costs vs each
+                 competitor, right under the raw price row. Percentages
+                 computed from the same prices already in this table
+                 ((competitor-503)/competitor), not separately sourced:
+                 Swoon 22% (146/649), Heal's 33% (246/749), John Lewis
+                 44% (396/899 - matches the existing save-note figure
+                 below, not a new number). Fableroom's own column shows
+                 "-" since the savings claim doesn't apply to itself. -->
+            <tr><td>Savings (%)</td><td class="cm-fr">&mdash;</td><td><span class="cm-savings">22%</span></td><td><span class="cm-savings">33%</span></td><td data-overflow="1"><span class="cm-savings">44%</span></td></tr>
             <tr><td>Direct from maker</td><td class="cm-fr"><span class="cm-yes">✓</span></td><td><span class="cm-no">✕</span></td><td><span class="cm-no">✕</span></td><td data-overflow="1"><span class="cm-no">✕</span></td></tr>
             <tr><td>365-day guarantee</td><td class="cm-fr"><span class="cm-yes">✓</span></td><td><span class="cm-no">✕</span></td><td><span class="cm-no">✕</span></td><td data-overflow="1"><span class="cm-no">✕</span></td></tr>
             <tr><td>No showroom markup</td><td class="cm-fr"><span class="cm-yes">✓</span></td><td><span class="cm-no">✕</span></td><td><span class="cm-no">✕</span></td><td data-overflow="1"><span class="cm-no">✕</span></td></tr>
@@ -5960,7 +7181,17 @@ footer{background:#EDECE9;color:#433122}
       </div>
       <p class="cmp-scroll-hint" id="cmpScrollHint3">← Swipe to see more competitors →</p>
       <div class="cmp-scrolltrack" id="cmpScrollTrack"><div class="cmp-scrollthumb"></div></div>
-      <div class="cm-save-note" style="max-width:480px;margin:16px auto 0">
+      <!-- _49 FIX: removed the inline max-width:480px - it was overriding
+           the desktop #ctab-compare .cm-save-note{max-width:820px} rule
+           (inline styles always beat external CSS regardless of
+           specificity), so on desktop this banner stayed narrow and
+           looked off-center relative to the much wider table above it,
+           even though it was technically centered within its own
+           narrow box. Kept margin:auto centering (now via the class
+           rules, mobile default 10px auto 0 already had this) and let
+           CSS own the width at every breakpoint instead of fighting an
+           inline style. -->
+      <div class="cm-save-note">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span>You save <b>£396</b>  -  that&rsquo;s <b>44% less</b> than John Lewis</span>
       </div>
@@ -5978,6 +7209,22 @@ footer{background:#EDECE9;color:#433122}
            left in the stylesheet unused, per the never-delete convention,
            in case a future layout wants that chart style again. -->
       <div class="pt">
+        <!-- _47 NEW - "Transparent Pricing" heading+paragraph, per
+           explicit direction ("add the supporting text that the
+           current version has below transparent pricing on the left
+           and on the right the card is there"). Desktop-only by
+           design (.pt-copy2, hidden below 820px via CSS) - mobile
+           was already confirmed fine as-is and wasn't meant to
+           change; this fills out the desktop layout into a two-
+           column split (copy left, cost card right) instead of the
+           single narrow centered column mobile uses. Copy is a close
+           paraphrase of the live site's own real "Transparent
+           pricing" text (grounded in what's actually there, not
+           invented), not a verbatim copy. -->
+        <div class="pt-copy2">
+          <h3>Transparent Pricing</h3>
+          <p>Our direct relationship with makers allows us to make high quality furniture accessible - without compromising on craftsmanship, quality or ethics. We&rsquo;re open about what goes into your pieces, so you understand exactly what you&rsquo;re paying for and why.</p>
+        </div>
         <div class="costcard">
           <h3>What goes into your £503</h3>
           <div class="cr"><span class="l">Materials</span><span class="a">£76.05</span></div>
@@ -5988,42 +7235,16 @@ footer{background:#EDECE9;color:#433122}
           <div class="cr"><span class="l">Duties &amp; taxes</span><span class="a">£90.54</span></div>
           <div class="ct"><span>Our total cost</span><span>£362.00</span></div>
         </div>
-        <div class="pt-copy">
-          <!-- _32 REMOVED: this line ("We work directly with the makers
-               and ship straight to your door - no importers, no
-               distributors, no showroom markup.") was making the same
-               no-middlemen point as: the hero's "Made direct, with no
-               middleman markup" bullet, this whole section's own eyebrow/
-               subhead ("Priced with honesty" / "Prices that make sense,
-               without the middlemen"), AND the "Fairly priced" icon right
-               below it. Four restatements of one fact on one page section
-               was excessive - cut this one since the icon row already
-               covers it more concisely. -->
-          <!-- _31: converted from a plain checkmark list to a 3-icon row,
-               matching the icon+label pattern already used elsewhere on
-               the page (e.g. the parallax meta row) instead of a generic
-               checkmark bullet repeated 3 times. Icons chosen to be
-               literal to each specific claim, not decorative:
-               scale = fairness/balance, faceted gem = crafted quality,
-               leaf = ethical/sustainable sourcing. -->
-          <div class="pt-trust">
-            <div class="pt-trust-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v15M8 21h8M5 7h14M5 7l-2.2 5a3 3 0 0 0 6.2 0L5 7Zm14 0l-2.2 5a3 3 0 0 0 6.2 0L19 7Z"/></svg>
-              <b>Fairly priced</b>
-              <span>No inflated retail markup</span>
-            </div>
-            <div class="pt-trust-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16L12 21 4 9Z"/><path d="M4 9l4-6h8l4 6"/><path d="M9 3l3 6 3-6"/></svg>
-              <b>Beautifully crafted</b>
-              <span>Traditional techniques</span>
-            </div>
-            <div class="pt-trust-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16Z"/><path d="M4 20 20 4"/></svg>
-              <b>Ethically sourced</b>
-              <span>Fair wages, vetted makers</span>
-            </div>
-          </div>
-        </div>
+        <!-- _45 MOVED: the "Fairly priced/Beautifully crafted/Ethically
+             sourced" icon row (.pt-trust) that used to sit here is gone
+             from this tab - relocated to a new standalone RTB strip
+             right after the Craft section, per explicit direction. Its
+             old wrapper (.pt-copy, which only ever contained this icon
+             row - the paragraph that used to also live in it was
+             already removed in an earlier session) is gone too since it
+             would otherwise be an empty div. See the _45 top-of-file
+             changelog entry and the new section right after
+             #carouselsZone closes. -->
       </div>
     </div>
   </section>
@@ -6050,6 +7271,13 @@ footer{background:#EDECE9;color:#433122}
           </div>
         </div>
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Pre-order timeline<span class="pm">+</span></button>
+          <!-- _53 FIX: REVERSED the _52 fix per a stronger source - see
+               the _53 top-of-file changelog entry and the matching
+               comment on the backorder notice above for the full
+               grounding. The dedicated, dated delivery policy page
+               (fableroom.com/pages/delivery-and-shipping, "Last
+               updated: 4 June, 2026") is the real current figure:
+               Pre-Order arrives in 8-12 weeks, not 5-10. -->
           <div class="acc-body"><p><b>Pre-Order  -  Arrives in 8&ndash;12 weeks</b></p><p>These are new designs we&rsquo;ve approved and want to give you early access to. They&rsquo;re still in production on the shop floor, which means they take longer than Standard Shipping. By ordering early, you lock in:</p><ul style="margin-top:10px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)"><li>10% off the regular price (auto-applied)</li><li>Priority dispatch when production is complete</li></ul></div></div>
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care &amp; Buying Guide<span class="pm">+</span></button>
           <div class="acc-body"><p><b>Care Guide</b></p><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p><p style="margin-top:12px"><b>Buying Guide</b></p><p>Many of our cabinets feature natural materials - from solid wood to stone or metal accents - so gentle variations in grain, colour, and texture are expected. Lighting and screen settings may also cause slight colour differences. These natural details aren't flaws; they're what make each FableRoom piece feel unique, crafted with care, and truly one of a kind.</p></div></div>
@@ -6057,8 +7285,8 @@ footer{background:#EDECE9;color:#433122}
       <div>
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Finance &amp; payment<span class="pm">+</span></button>
           <div class="acc-body"><p>We currently accept payment with Visa, Mastercard, Maestro, American Express, Apple Pay, Google Pay, Shop Pay, Paypal and Klarna.</p><p>Or spread the cost with <b>Klarna</b>  -  3 interest-free payments of <b>£167.67</b>, chosen at checkout.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">14-day returns<span class="pm">+</span></button>
-          <div class="acc-body"><p>Faulty or damaged items are collected free. Changed your mind? Furniture returns carry a £25 collection fee (soft furnishings £5, rugs £18).</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:10px"><a href="#" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">30-day returns<span class="pm">+</span></button>
+          <div class="acc-body"><p>Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:10px"><a href="#" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">365-day guarantee<span class="pm">+</span></button>
           <div class="acc-body"><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p></div></div>
       </div>
@@ -6069,33 +7297,96 @@ footer{background:#EDECE9;color:#433122}
 
   <!-- A+ 9 · FAQ -->
   <section id="faq" class="ap">
-    <div class="ap-head"><span class="eyebrow">FAQ</span><h2 class="ap-h">Good to know</h2></div>
+    <div class="ap-head"><span class="eyebrow">FAQ</span><h2 class="ap-h">Everything You Need To Know</h2></div>
+    <!-- _50 UPDATE: 4 new questions added per explicit direction, backed
+         by analysis of the 1,031-review Trustpilot dump (see the _50
+         top-of-file changelog entry for the full reasoning/data behind
+         each one). The "is it normal for natural materials to
+         shed/smell" question from the same analysis was explicitly
+         EXCLUDED per direction - not added here. All 11 original
+         verbatim questions/answers are unchanged, just re-sequenced
+         to fit the new ones in at sensible points in the objection
+         hierarchy (pricing/trust doubts first, then logistics, then
+         returns) rather than tacked on at the end. -->
     <div class="acc-grid">
       <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Why are your prices lower?<span class="pm">+</span></button><div class="acc-body"><p>We source directly from makers and ship straight to you - no importers, distributors or showrooms adding margin. Savings come to you; makers are paid fairly.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will mine look exactly like the photos?<span class="pm">+</span></button><div class="acc-body"><p>The galaxy patina is hand-applied, so each cabinet is genuinely unique - distribution varies subtly. Screen settings can also shift how colour reads.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Where is it made?<span class="pm">+</span></button><div class="acc-body"><p>Handcrafted in India by skilled artisans using traditional iron-working techniques. We visit and vet every partner workshop.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Full specifications<span class="pm">+</span></button><div class="acc-body">
-          <table class="spectable">
-            <tr><td>SKU</td><td>TRCB00001A</td></tr>
-            <tr><td>Colour</td><td>Metallic</td></tr>
-            <tr><td>Material</td><td>Iron</td></tr>
-            <tr><td>Width</td><td>104 cm</td></tr>
-            <tr><td>Depth</td><td>46 cm</td></tr>
-            <tr><td>Height</td><td>82 cm</td></tr>
-            <tr><td>Weight</td><td>42.9 kg</td></tr>
-            <tr><td>Packaging Dimensions</td><td>(W) 112cm | (D) 54cm | (H) 84cm</td></tr>
-            <tr><td>Packaging Weight</td><td>50.52 kg</td></tr>
-            <tr><td>Assembly Required</td><td>Minimal Assembly Required</td></tr>
-            <tr><td>Country Of Origin</td><td>India</td></tr>
-          </table>
-          <p style="margin-top:10px;font-size:12.5px;color:var(--ink-3)">Because the finish is hand-applied, every cabinet is unique - the galaxy patina varies subtly piece to piece. That's the craft, not a flaw.</p>
-        </div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
+        <!-- _52 FIX: 365-Day Guarantee terms added to this existing
+             question rather than a new FAQ entry, per explicit
+             direction. The terms already exist elsewhere on the page
+             (CTA trust badge -> modal, and the Delivery accordion) but
+             weren't in the FAQ at all - this question ("...durable?")
+             is the natural fit since it's already making a durability
+             claim, and the guarantee is the concrete backing for that
+             claim. Those other placements are untouched - this is an
+             addition, not a consolidation. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are your products authentic and durable?<span class="pm">+</span></button><div class="acc-body"><p>Every piece is sourced from carefully vetted makers using premium materials and traditional techniques. Many of our artisans have been perfecting their craft for generations, creating pieces built to last - not just look good in photos.</p><p style="margin-top:10px">Every product is also backed by our 365-Day Guarantee: any verifiable manufacturing or material fault within a year is repaired, replaced, or refunded - your choice. This covers manufacturing and material faults, not accidental damage or normal wear.</p></div></div>
+        <!-- _50 NEW: 135 review mentions, only 9% rated 3-star-or-below -
+             not a common failure, but a constantly-recurring unprompted
+             relief point ("colours are an exact match", "photos don't
+             do it justice"), meaning it's a live pre-purchase anxiety
+             worth pre-empting even though it rarely goes wrong. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will my item look exactly like the photos?<span class="pm">+</span></button><div class="acc-body"><p>Many of our pieces are finished by hand, which means natural variation in colour, grain, or texture is normal and expected - no two pieces are ever perfectly identical. This is part of what makes handcrafted items unique, not a fault. Check the individual product page for details on that item's specific finish.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Where are your products made?<span class="pm">+</span></button><div class="acc-body"><p>Most of our products are handcrafted by skilled artisans in India, using traditional techniques passed down through generations, while a few collections are sourced from Vietnam.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you have a showroom I can visit?<span class="pm">+</span></button><div class="acc-body"><p>We don't operate physical showrooms - this keeps our costs low so we can pass those savings on to you. If a piece doesn't work in your space, our 30-day return policy has you covered.</p></div></div>
+        <!-- _50 NEW: real checkout-stage ambiguity, especially relevant
+             given pre-order items with long wait times - addresses a
+             standard cart-abandonment driver even though it doesn't
+             show up as a post-purchase complaint in the review dump. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How and when will I be charged?<span class="pm">+</span></button><div class="acc-body"><p>All orders are prepaid at checkout - we don't offer cash on delivery. Your payment is taken when your order is confirmed, and the price shown at checkout is the price you pay.</p></div></div>
+        <!-- _50 NEW: sharpest negative signal in the entire review
+             dataset - only 7 mentions, but 86% rated 3-star-or-below
+             ("cancellation and returns process is shockingly bad",
+             "numerous broken promises"). A clear upfront answer won't
+             fix a slow ops process, but removes the "I had no idea
+             this would be this hard" layer of the complaint. -->
+        <!-- _54 FIX: added the missing "once shipped" clause, per
+             explicit direction after this exact gap was flagged. The
+             14-day window alone (from the dedicated Cancellation
+             Policy on the live Returns & Exchange page) doesn't cover
+             the case where an order ships faster than 14 days - the
+             live Delivery & Shipping page states separately "Once an
+             order has been shipped, it cannot be cancelled or
+             modified", which is a real, additional constraint this
+             answer was missing. Both conditions now stated together
+             so whichever happens first is clear. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I cancel my order?<span class="pm">+</span></button><div class="acc-body"><p>You can request a cancellation within 14 days of your order confirmation, provided it hasn't shipped yet - once an order has shipped, it can no longer be cancelled or modified, even within that window. After either point, your item will already be with our makers and we're unable to process a cancellation. To cancel, email us at support@fableroom.com with your order number and we'll take care of the rest.</p></div></div>
+        <!-- _53 FIX: two figures corrected against the dedicated, dated
+             delivery policy page (fableroom.com/pages/delivery-and-
+             shipping, "Last updated: 4 June, 2026") - Standard Shipping
+             was 3-5 weeks (real: 3-8 weeks) and Pre-Order was just
+             reverted from 5-10 back to 8-12 weeks per the _53 changelog
+             entry. Both were sourced from PDP inline snippets last
+             time, which turn out to be the outdated copy - the dated
+             policy page is the stronger source when the two disagree. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How long will my delivery take?<span class="pm">+</span></button><div class="acc-body"><p>Delivery time depends on availability: Ready to Ship arrives in 1-2 weeks, Standard Shipping in 3-8 weeks, and Pre-Order in 8-12 weeks - Astra is currently Pre-Order.</p></div></div>
       </div>
       <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do I track my order?<span class="pm">+</span></button><div class="acc-body"><p>You'll get a tracking email on dispatch, and can follow progress in your Fableroom account under My Orders.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I pay in instalments?<span class="pm">+</span></button><div class="acc-body"><p>Yes - Klarna lets you split into 3 interest-free payments of £167.67. Choose Klarna at checkout. We also accept Apple Pay, Google Pay, PayPal and all major cards.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">What if it doesn't fit my space?<span class="pm">+</span></button><div class="acc-body"><p>Check the dimensions (104 × 46 × 82 cm) shown with the product, and the full specifications above. If it's still not right, our 14-day returns have you covered.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you deliver to my area?<span class="pm">+</span></button><div class="acc-body"><p>We deliver throughout England, Scotland, and Wales. For Northern Ireland, we offer delivery of smaller items with a minimal surcharge.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I track my order?<span class="pm">+</span></button><div class="acc-body"><p>Yes. You'll receive tracking information via email once your order ships, and can check delivery status anytime under My Account &gt; My Orders.</p></div></div>
+        <!-- _50 NEW: second-highest volume negative theme in the whole
+             dataset - 56 mentions, 41% rated 3-star-or-below. Previously
+             this was only implied inside the "Will I be charged for
+             returns?" answer - split out on its own since the volume
+             and negativity here means it deserves a direct answer, not
+             a subordinate clause in a different question. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">What happens if my item arrives damaged or faulty?<span class="pm">+</span></button><div class="acc-body"><p>Contact us within 30 days with your order number and a photo of the damage. We'll arrange a free collection and send a replacement or full refund - whichever you prefer.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">If I don't like something, can I return it?<span class="pm">+</span></button><div class="acc-body"><p>Most products can be returned within 30 days of delivery. Collections are free if your item is damaged or faulty - otherwise a collection fee applies.</p></div></div>
+        <!-- _52 FIX: refund timeframe added, per explicit direction -
+             "refunds within 7 days of receipt" existed in the Delivery
+             accordion and the trust modal but wasn't in the FAQ at all,
+             despite this being exactly the question where someone
+             would look for it. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do I return something?<span class="pm">+</span></button><div class="acc-body"><p>Email support@fableroom.com with your order number, a brief description, and a photo if applicable. For furniture and large items, we'll arrange a doorstep pickup at your home. Once your return is received and inspected, your refund is issued within 7 days.</p></div></div>
+        <!-- _52 FIX: fee breakdown expanded per explicit direction - was
+             furniture-only (£25), which is correct for Astra but
+             incomplete for this FAQ's sitewide scope. Added the full
+             fee table (already accurate and live elsewhere on the
+             page - Delivery accordion) so a rug or cushion customer
+             reading this same FAQ on a different product gets the
+             right fee, not just the furniture one. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will I be charged for returns?<span class="pm">+</span></button><div class="acc-body"><p>Faulty or damaged items are collected free within 30 days. Change-of-mind returns carry a collection fee - £25 for furniture, mirrors, and larger items, £18 for rugs and ottomans, and £5 for cushions, throws, and lamps.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are there items I can't return?<span class="pm">+</span></button><div class="acc-body"><p>Some products are custom-made just for you and aren't eligible for return - this is always shown clearly on the product page before you order.</p></div></div>
       </div>
     </div>
   </section>
@@ -6205,18 +7496,11 @@ footer{background:#EDECE9;color:#433122}
     <button class="revsee-all">Read all reviews <span style="font-size:15px">↓</span></button>
   </section>
 
-  <div class="divider"></div>
-
-  <!-- A+ 10 · COMPLETE THE LOOK -->
-  <section class="ap">
-    <div class="ap-head"><span class="eyebrow">Complete the look</span><h2 class="ap-h">Pairs beautifully with</h2></div>
-    <div class="rail">
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-three-quarter-view.jpg" alt=""><div class="rn">Astra Console Table</div><div class="rp">£389</div></a>
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-top-corner-closeup.jpg" alt=""><div class="rn">Astra Side Table</div><div class="rp">£215</div></a>
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-front-view.jpg" alt=""><div class="rn">Alder Two Door Cabinet</div><div class="rp">£472</div></a>
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-angled-detail.jpg" alt=""><div class="rn">Cayman Wooden Cabinet</div><div class="rp">£540</div></a>
-    </div>
-  </section>
+  <!-- _47 MOVED: "Complete the Look" (renamed) no longer sits here -
+       relocated to right before the Fair Pricing section, per
+       explicit direction. See the _47 top-of-file changelog entry
+       and its new location earlier in this file, right before
+       #compare. -->
 </div>
 
 <!-- BACK TO TOP -->
@@ -6866,10 +8150,31 @@ function fbtCalc(){var t=0,n=0;document.querySelectorAll('.fbt-item input:checke
    caption already mid-cycle (or fading) instead of starting fresh,
    which read as random/distracting. Cards now expose start()/stop()
    (as card._ibcStart / card._ibcStop) and stay paused-on-icon-0 until
-   the carousel engine below tells them their slide became active. */
+   the carousel engine below tells them their slide became active.
+   _39 NEW - static-caption mode: a card with a [data-static-caption]
+   attribute (Build+Long-Lasting, Finish+Unique) skips cycling entirely
+   - both icons stay marked active together and the caption is set once
+   from that attribute instead of swapping between each icon's own
+   data-copy. Per explicit direction: two claims merged into one
+   sentence and shown permanently, same pattern Lifestyle's single
+   fixed caption already uses, rather than one icon's text switching
+   to the other's. */
 (function(){
   var cards=[].slice.call(document.querySelectorAll('.icon-blend-card'));
   cards.forEach(function(card){
+    var staticCaption=card.getAttribute('data-static-caption');
+    var captionText=card.querySelector('.ibc-caption-text');
+    if(staticCaption){
+      /* static mode: no cycling, nothing to start/stop - all icons
+         already carry .active in the HTML, just set the caption once. */
+      if(captionText){
+        captionText.textContent=staticCaption;
+        captionText.style.opacity=1;
+      }
+      card._ibcStart=function(){};
+      card._ibcStop=function(){};
+      return;
+    }
     var cols=[].slice.call(card.querySelectorAll('.ibc-col'));
     if(!cols.length)return;
     /* _26 FIX: target the inner .ibc-caption-text span, not the outer
@@ -6877,7 +8182,6 @@ function fbtCalc(){var t=0,n=0;document.querySelectorAll('.fbt-item input:checke
        (border-top), which was fading in/out along with the text since
        opacity was toggled on the whole box. Now only the text node
        fades; the line stays static/always visible. */
-    var captionText=card.querySelector('.ibc-caption-text');
     var i=0,timer,fadeTimer;
     function show(n,skipFade){
       i=n;
@@ -7393,31 +8697,50 @@ setTimeout(openExit,25000);
   update();
 })();
 
-/* ── Sticky buy bar: v124 ALWAYS ON "for now" per explicit instruction -
-   shows immediately regardless of scroll position. Previous scroll-
-   based trigger (v101: shows once .price scrolls out of view, same on
-   mobile+desktop) is commented out below, not deleted - to re-enable,
-   remove the two forced .add() calls and uncomment the update()/
-   listener block. ── */
+/* ── Sticky buy bar: _42 FIX - REVERTED from "v124 ALWAYS ON" back to
+   a scroll-based trigger, per explicit direction. Sticky bar now
+   starts hidden - only appears once the main "Add to Basket" button
+   (#mainAtc) scrolls out of the thumb-reachable zone (i.e. its own
+   bottom edge leaves the viewport), same logic shape as the old v101
+   trigger but keyed off the actual CTA button element (#mainAtc)
+   rather than the price element, to match "once the main cta is
+   visible... once it's out of the thumb zone the sticky CTA comes
+   up" precisely. Old v124-always-on forced .add() calls removed (not
+   deleted - see the commented block below), old v101 .price-based
+   version also left commented, per the never-delete convention. ── */
 (function(){
   var sticky=document.getElementById('stickybar');
-  var priceEl=document.querySelector('.price');
+  var ctaEl=document.getElementById('mainAtc');
   if(!sticky)return;
 
+  function update(){
+    if(ctaEl){
+      var ctaGone=ctaEl.getBoundingClientRect().bottom<0;
+      sticky.classList.toggle('show',ctaGone);
+      document.body.classList.toggle('sb-visible',ctaGone);
+    }
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',update,{passive:true});
+  update();
+
+  /* _41-and-earlier v124 ALWAYS ON, kept per never-delete convention:
   sticky.classList.add('show');
   document.body.classList.add('sb-visible');
+  */
 
-  /*
-  function update(){
+  /* v101 .price-based version, kept per never-delete convention:
+  var priceEl=document.querySelector('.price');
+  function updateOld(){
     if(priceEl){
       var priceGone=priceEl.getBoundingClientRect().bottom<0;
       sticky.classList.toggle('show',priceGone);
       document.body.classList.toggle('sb-visible',priceGone);
     }
   }
-  window.addEventListener('scroll',update,{passive:true});
-  window.addEventListener('resize',update,{passive:true});
-  update();
+  window.addEventListener('scroll',updateOld,{passive:true});
+  window.addEventListener('resize',updateOld,{passive:true});
+  updateOld();
   */
 })();
 
