@@ -1,44 +1,6 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  v139 UPDATE (this file, forked from v138) - per explicit direction:
-  1. BNPL TRUST MODAL (#tm-bnpl) GENERICIZED: removed the specific "£503
-     into 3 equal payments of £167.67" figures - now reads "Split your
-     order into equal interest-free instalments," generic regardless of
-     order value. Platform list line (Klarna/Shop Pay/Apple Pay/Google
-     Pay/PayPal/cards) unchanged - that was already generic.
-  2. FINANCE & PAYMENT ACCORDION FIXED: was agency-written prose
-     asserting Klarna's own terms ("Or spread the cost with Klarna - 3
-     interest-free payments of £167.67") - replaced with an actual
-     widget-style placeholder (.pv2-widget, matching the pattern already
-     used in the Offer/BNPL accordion higher up the page) instead of
-     Troop claiming what Klarna offers. Still needs Shopify's real
-     native Klarna on-site-messaging component swapped in at dev time -
-     this is a stand-in for their widget, not a final claim.
-  ============================================================
-  v138 UPDATE (this file, forked from v136 - NOT v137, per explicit
-  direction to keep v137's "More Offers" work out of this line) - 6
-  ROLLBACKS per explicit direction this session:
-  1. LOVED-BY PILL: reverted to the pre-v126 split behaviour - hidden on
-     mobile (.loved-badge-inline back to display:none), where
-     .slide-loved-strip (the gallery-overlay banner) is mobile's home
-     for this content again; desktop unchanged (pill next to Trustpilot,
-     .slide-loved-strip hidden there).
-  2. TRUST BADGES ROW BELOW ATC: restored (365-Day Guarantee / Returns /
-     0% Interest Instalments, click-to-modal) - was removed in v126.
-     "30-Day Returns" corrected to "14-Day Returns" while restoring it.
-  3. PAYMENT METHOD ICONS ROW: restored (Klarna/Shop Pay/PayPal logos
-     below the BNPL accordion) - was removed in v126.
-  4. FINANCE & PAYMENT ACCORDION: restored in the Delivery & Returns
-     section - was removed in v126. The merged "Returns Policy"
-     accordion (v126) stays merged, not reverted to separate accordions.
-  5. RETURNS POLICY 14-DAY WINDOW: added an explicit "14 days" mention
-     to the Returns Policy accordion's body copy - it was previously
-     only implied by (now-removed) accordion titles, never stated in
-     this body text itself.
-  6. FAQ / REVIEWS ORDER: reverted to FAQ before Reviews (was swapped to
-     Reviews-before-FAQ in v126).
-  ============================================================
   v136 UPDATE (this file, forked from v135) - per explicit direction:
   1. OFFER COPY CHANGED: "Extra 10% off - use code" -> "Extra 10% off
      with" (reads into the PRIME10 pill immediately following it). Same
@@ -3668,7 +3630,7 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .g-arrow-prev{left:12px}
 .g-arrow-next{right:12px}
 .slide-badges{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
-.slide-loved-strip{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(15,10,4,.82);color:#fff;padding:5px 12px;z-index:2} /* v138 ROLLBACK: reverted to display:flex (visible on mobile as an overlay banner on the gallery image) - per explicit direction to roll back the v126 change. .loved-badge-inline (below) is now desktop-only again, so this strip is back to being mobile's home for this content. */
+.slide-loved-strip{position:absolute;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:rgba(15,10,4,.82);color:#fff;padding:5px 12px;z-index:2} /* v126: was display:flex (visible on mobile as an overlay banner on the gallery image) - now hidden at all breakpoints since .loved-badge-inline (next to Trustpilot) is the single consistent home for this content, per explicit direction. JS still creates/injects this element (see goTo()/render function); harmless, just no longer rendered. */
 .slide-loved-main{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.01em}
 .slide-loved-main svg{flex-shrink:0;color:var(--sale)}
 .slide-expand{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
@@ -3780,7 +3742,7 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .stars{color:var(--star);font-size:15px;letter-spacing:1px}
 .r-link{font-size:13px;color:var(--ink-2);text-decoration:underline;text-underline-offset:2px;flex-shrink:0;white-space:nowrap}
 .tp-badge-inline{display:inline-flex;align-items:center;justify-content:center;text-align:center;gap:5px;font-size:11.5px;color:var(--ink-2);text-decoration:none;background:#f0fbf7;border:1px solid rgba(0,182,122,.25);padding:3px 10px 3px 8px;border-radius:100px;flex-shrink:0;white-space:nowrap}
-.loved-badge-inline{display:none;align-items:center;gap:6px;background:rgba(15,10,4,.82);color:#fff;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:100px;flex-shrink:0;white-space:nowrap} /* v138 ROLLBACK: reverted to display:none (mobile-hidden, desktop-only via the media-query override below) - per explicit direction to roll back the v126 change ("all breakpoints"). Back to the original: mobile shows .slide-loved-strip on the gallery instead. */
+.loved-badge-inline{display:inline-flex;align-items:center;gap:6px;background:rgba(15,10,4,.82);color:#fff;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:100px;flex-shrink:0;white-space:nowrap} /* v126: was display:none (mobile-only hidden, only shown on desktop via the media-query override below) - per explicit direction, this pill now sits next to the Trustpilot badge on ALL breakpoints, not just desktop. padding matched to .tp-badge-inline's 3px vertical (was 5px) so both pills are the same height and sit flush together */
 .loved-badge-inline svg{color:var(--sale);flex-shrink:0}
 .tp-badge-inline b{color:#00b67a;font-weight:700}
 .tp-badge-inline:hover{background:#e3f8f0}
@@ -5818,16 +5780,14 @@ footer{background:#EDECE9;color:#433122}
   .thumbstrip{display:none} /* real site has no thumbnail rail in stacked mode */
   /* badges are already built per-slide (every image has its own Pre-
      Order/dyn-badge) - they just work as-is in the new wrapping grid.
-     v138 ROLLBACK: reverted to the original split - Loved-by banner
-     moves OFF the gallery on desktop (.loved-badge-inline next to the
-     Trustpilot rating instead), so .slide-loved-strip (mobile's home
-     for this content) is hidden here on desktop only. This undoes
-     v126's "same pill at every breakpoint" change per explicit
-     direction. .g-slide still gets cursor:zoom-in on desktop - same
-     affordance the real fableroom.com uses (their
-     .media--zoom{cursor:zoom-in}) - so there's still a visual cue that
-     clicking opens the full image, without needing a dedicated icon on
-     every single photo. */
+     v126: Loved-by banner now lives ONLY next to the Trustpilot rating
+     (.loved-badge-inline) at every breakpoint, not just desktop -
+     .slide-loved-strip is hidden globally now (see its base rule),
+     these two lines are just redundant confirmations, kept harmless.
+     .g-slide still gets cursor:zoom-in on desktop - same affordance
+     the real fableroom.com uses (their .media--zoom{cursor:zoom-in}) -
+     so there's still a visual cue that clicking opens the full image,
+     without needing a dedicated icon on every single photo. */
   .slide-loved-strip{display:none}
   .loved-badge-inline{display:inline-flex}
   .g-slide{cursor:zoom-in}
@@ -6600,13 +6560,15 @@ footer{background:#EDECE9;color:#433122}
             <p>Pay in 3 interest-free payments on purchases from £30-£2,000 with <img src="./assets-web/pay-paypal.png" alt="PayPal" class="pv2-widget-logo">. <a href="#" class="pv2-widget-link">Learn more</a></p>
           </div>
         </div>
-        <!-- v138 ROLLBACK: restored per explicit direction (was removed
-             in v126). -->
+        <!-- v126: payment method icons row (Klarna/Shop Pay/PayPal logos)
+             removed per explicit direction. Markup kept as a comment,
+             not deleted, per the never-delete convention:
         <div class="pv2-methods">
           <img class="pm-img" src="./assets-web/pay-klarna.png" alt="Klarna">
           <img class="pm-img" src="./assets-web/pay-shoppay.png" alt="Shop Pay">
           <img class="pm-img" src="./assets-web/pay-paypal.png" alt="PayPal">
         </div>
+        -->
       </div>
 
       <!-- CTA ROW<!-- CTA ROW -->
@@ -6623,10 +6585,14 @@ footer{background:#EDECE9;color:#433122}
         <button class="atc" id="mainAtc">Add to Basket - £503</button>
       </div>
 
-      <!-- v138 ROLLBACK: restored per explicit direction (was removed in
-           v126, kept as a comment since - see the old v126 note this
-           replaces). "30-Day Returns" corrected to "14-Day Returns" to
-           match the confirmed returns-window decision. -->
+      <!-- v126: RTB/trust badges row below ATC removed per explicit
+           direction. Content redistributed elsewhere per the Delivery &
+           Returns restructure (365-Day Guarantee now lives inside the
+           new "Returns Policy" accordion; 30-Day Returns folded into the
+           same accordion; 0% Interest Instalments already duplicated by
+           the "Pay in 3" BNPL row higher up the page, so not rehomed).
+           Markup kept as a comment, not deleted, per the never-delete
+           convention:
       <div class="trust4">
         <div class="t4" onclick="openTrust('guarantee')" role="button" tabindex="0">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z"/></svg>
@@ -6634,13 +6600,14 @@ footer{background:#EDECE9;color:#433122}
         </div>
         <div class="t4" onclick="openTrust('returns')" role="button" tabindex="0">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
-          <span>14-Day Returns</span>
+          <span>30-Day Returns</span>
         </div>
         <div class="t4" onclick="openTrust('bnpl')" role="button" tabindex="0">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
           <span>0% Interest Instalments</span>
         </div>
       </div>
+      -->
 
       <!--
         PRD NOTE — UGC placement, conditional block:
@@ -6848,7 +6815,7 @@ footer{background:#EDECE9;color:#433122}
     <button class="tm-close" onclick="closeTrust('bnpl')">×</button>
     <svg class="tm-icon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
     <h4>0% Interest Instalments</h4>
-    <p>Split your order into equal interest-free instalments - no fees, no hidden costs. Choose your preferred provider at checkout.</p>
+    <p>Split the £503 into 3 equal payments of <b>£167.67</b>, at 0% interest. Choose your preferred provider at checkout - no fees, no hidden costs.</p>
     <p>We accept Klarna, Shop Pay instalments, Apple Pay, Google Pay, PayPal and all major cards.</p>
   </div>
 </div>
@@ -7832,33 +7799,18 @@ footer{background:#EDECE9;color:#433122}
         -->
       </div>
       <div>
-        <!-- v138 ROLLBACK: restored per explicit direction (was removed
-             in v126). v138 FIX: the old body copy ("Or spread the cost
-             with Klarna - 3 interest-free payments of £167.67") was
-             Troop asserting Klarna's own terms in agency-written prose -
-             replaced with an actual widget placeholder instead, matching
-             the same .pv2-widget pattern already used in the Offer/BNPL
-             accordion higher up the page. This still needs to be swapped
-             for Shopify's real native Klarna on-site-messaging component
-             at dev time - it is NOT us claiming what Klarna offers, it's
-             a stand-in for their own widget. -->
+        <!-- v126: "Finance & payment" accordion removed per explicit
+             direction. Kept as a comment, not deleted:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Finance &amp; payment<span class="pm">+</span></button>
-          <div class="acc-body"><p>We currently accept payment with Visa, Mastercard, Maestro, American Express, Apple Pay, Google Pay, Shop Pay, Paypal and Klarna.</p>
-            <div class="pv2-widget" style="margin-top:10px;border-bottom:none;padding-bottom:0">
-              <p>3 payments at 0% interest with Klarna <a href="#" class="pv2-widget-link">Learn more</a><br>18+, T&amp;C apply, Credit subject to status.</p>
-              <span class="pv2-widget-badge"><img src="./assets-web/pay-klarna.png" alt="Klarna" class="pv2-widget-badge-img"></span>
-            </div>
-          </div></div>
+          <div class="acc-body"><p>We currently accept payment with Visa, Mastercard, Maestro, American Express, Apple Pay, Google Pay, Shop Pay, Paypal and Klarna.</p><p>Or spread the cost with <b>Klarna</b>  -  3 interest-free payments of <b>£167.67</b>, chosen at checkout.</p></div></div>
+        -->
         <!-- v126 NEW: merged "Returns Policy" accordion, per explicit
              direction - combines the former separate "30-day returns"
              and "365-day guarantee" accordions (both removed from below,
              kept as comments) into one. Returns-policy link now points
-             to the real live URL (was a "#" placeholder). v138: added an
-             explicit "14 days" mention to the body per direction - the
-             window was previously only implied by the accordion's old
-             title, never stated in the body copy itself. -->
+             to the real live URL (was a "#" placeholder). -->
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Returns Policy<span class="pm">+</span></button>
-          <div class="acc-body"><p>Most items can be returned within <b>14 days</b> of delivery. Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:12px"><b>365-Day Guarantee</b></p><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p><p style="margin-top:10px"><a href="https://fableroom.com/pages/return-refund" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
+          <div class="acc-body"><p>Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:12px"><b>365-Day Guarantee</b></p><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p><p style="margin-top:10px"><a href="https://fableroom.com/pages/return-refund" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
         <!-- v126: former standalone "30-day returns" accordion. Kept as
              a comment, not deleted, per the never-delete convention:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">30-day returns<span class="pm">+</span></button>
@@ -7875,105 +7827,7 @@ footer{background:#EDECE9;color:#433122}
 
   <div class="divider"></div>
 
-  <!-- A+ 9 · FAQ (moved back above Customer Reviews per explicit direction, v138 rollback) -->
-  <section id="faq" class="ap">
-    <div class="ap-head"><span class="eyebrow">FAQ</span><h2 class="ap-h">Everything You Need To Know</h2></div>
-    <!-- _50 UPDATE: 4 new questions added per explicit direction, backed
-         by analysis of the 1,031-review Trustpilot dump (see the _50
-         top-of-file changelog entry for the full reasoning/data behind
-         each one). The "is it normal for natural materials to
-         shed/smell" question from the same analysis was explicitly
-         EXCLUDED per direction - not added here. All 11 original
-         verbatim questions/answers are unchanged, just re-sequenced
-         to fit the new ones in at sensible points in the objection
-         hierarchy (pricing/trust doubts first, then logistics, then
-         returns) rather than tacked on at the end. -->
-    <div class="acc-grid">
-      <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="true" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body open"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
-        <!-- _52 FIX: 365-Day Guarantee terms added to this existing
-             question rather than a new FAQ entry, per explicit
-             direction. The terms already exist elsewhere on the page
-             (CTA trust badge -> modal, and the Delivery accordion) but
-             weren't in the FAQ at all - this question ("...durable?")
-             is the natural fit since it's already making a durability
-             claim, and the guarantee is the concrete backing for that
-             claim. Those other placements are untouched - this is an
-             addition, not a consolidation. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are your products authentic and durable?<span class="pm">+</span></button><div class="acc-body"><p>Every piece is sourced from carefully vetted makers using premium materials and traditional techniques. Many of our artisans have been perfecting their craft for generations, creating pieces built to last - not just look good in photos.</p><p style="margin-top:10px">Every product is also backed by our 365-Day Guarantee: any verifiable manufacturing or material fault within a year is repaired, replaced, or refunded - your choice. This covers manufacturing and material faults, not accidental damage or normal wear.</p></div></div>
-        <!-- _50 NEW: 135 review mentions, only 9% rated 3-star-or-below -
-             not a common failure, but a constantly-recurring unprompted
-             relief point ("colours are an exact match", "photos don't
-             do it justice"), meaning it's a live pre-purchase anxiety
-             worth pre-empting even though it rarely goes wrong. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will my item look exactly like the photos?<span class="pm">+</span></button><div class="acc-body"><p>Many of our pieces are finished by hand, which means natural variation in colour, grain, or texture is normal and expected - no two pieces are ever perfectly identical. This is part of what makes handcrafted items unique, not a fault. Check the individual product page for details on that item's specific finish.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Where are your products made?<span class="pm">+</span></button><div class="acc-body"><p>Most of our products are handcrafted by skilled artisans in India, using traditional techniques passed down through generations, while a few collections are sourced from Vietnam.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you have a showroom I can visit?<span class="pm">+</span></button><div class="acc-body"><p>We don't operate physical showrooms - this keeps our costs low so we can pass those savings on to you. If a piece doesn't work in your space, our 14-day return policy has you covered.</p></div></div>
-        <!-- _50 NEW: real checkout-stage ambiguity, especially relevant
-             given pre-order items with long wait times - addresses a
-             standard cart-abandonment driver even though it doesn't
-             show up as a post-purchase complaint in the review dump. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How and when will I be charged?<span class="pm">+</span></button><div class="acc-body"><p>All orders are prepaid at checkout - we don't offer cash on delivery. Your payment is taken when your order is confirmed, and the price shown at checkout is the price you pay.</p></div></div>
-        <!-- _50 NEW: sharpest negative signal in the entire review
-             dataset - only 7 mentions, but 86% rated 3-star-or-below
-             ("cancellation and returns process is shockingly bad",
-             "numerous broken promises"). A clear upfront answer won't
-             fix a slow ops process, but removes the "I had no idea
-             this would be this hard" layer of the complaint. -->
-        <!-- _54 FIX: added the missing "once shipped" clause, per
-             explicit direction after this exact gap was flagged. The
-             14-day window alone (from the dedicated Cancellation
-             Policy on the live Returns & Exchange page) doesn't cover
-             the case where an order ships faster than 14 days - the
-             live Delivery & Shipping page states separately "Once an
-             order has been shipped, it cannot be cancelled or
-             modified", which is a real, additional constraint this
-             answer was missing. Both conditions now stated together
-             so whichever happens first is clear. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I cancel my order?<span class="pm">+</span></button><div class="acc-body"><p>You can request a cancellation within 14 days of your order confirmation, provided it hasn't shipped yet - once an order has shipped, it can no longer be cancelled or modified, even within that window. After either point, your item will already be with our makers and we're unable to process a cancellation. To cancel, email us at support@fableroom.com with your order number and we'll take care of the rest.</p></div></div>
-        <!-- _53 FIX: two figures corrected against the dedicated, dated
-             delivery policy page (fableroom.com/pages/delivery-and-
-             shipping, "Last updated: 4 June, 2026") - Standard Shipping
-             was 3-5 weeks (real: 3-8 weeks) and Pre-Order was just
-             reverted from 5-10 back to 8-12 weeks per the _53 changelog
-             entry. Both were sourced from PDP inline snippets last
-             time, which turn out to be the outdated copy - the dated
-             policy page is the stronger source when the two disagree. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How long will my delivery take?<span class="pm">+</span></button><div class="acc-body"><p>Delivery time depends on availability: Ready to Ship arrives in 1-2 weeks, Standard Shipping in 3-8 weeks, and Pre-Order in 8-12 weeks - Astra is currently Pre-Order.</p></div></div>
-      </div>
-      <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you deliver to my area?<span class="pm">+</span></button><div class="acc-body"><p>We deliver throughout England, Scotland, and Wales. For Northern Ireland, we offer delivery of smaller items with a minimal surcharge.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I track my order?<span class="pm">+</span></button><div class="acc-body"><p>Yes. You'll receive tracking information via email once your order ships, and can check delivery status anytime under My Account &gt; My Orders.</p></div></div>
-        <!-- _50 NEW: second-highest volume negative theme in the whole
-             dataset - 56 mentions, 41% rated 3-star-or-below. Previously
-             this was only implied inside the "Will I be charged for
-             returns?" answer - split out on its own since the volume
-             and negativity here means it deserves a direct answer, not
-             a subordinate clause in a different question. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">What happens if my item arrives damaged or faulty?<span class="pm">+</span></button><div class="acc-body"><p>Contact us within 14 days with your order number and a photo of the damage. We'll arrange a free collection and send a replacement or full refund - whichever you prefer.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">If I don't like something, can I return it?<span class="pm">+</span></button><div class="acc-body"><p>Most products can be returned within 14 days of delivery. Collections are free if your item is damaged or faulty - otherwise a collection fee applies.</p></div></div>
-        <!-- _52 FIX: refund timeframe added, per explicit direction -
-             "refunds within 7 days of receipt" existed in the Delivery
-             accordion and the trust modal but wasn't in the FAQ at all,
-             despite this being exactly the question where someone
-             would look for it. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do I return something?<span class="pm">+</span></button><div class="acc-body"><p>Email support@fableroom.com with your order number, a brief description, and a photo if applicable. For furniture and large items, we'll arrange a doorstep pickup at your home. Once your return is received and inspected, your refund is issued within 7 days.</p></div></div>
-        <!-- _52 FIX: fee breakdown expanded per explicit direction - was
-             furniture-only (£25), which is correct for Astra but
-             incomplete for this FAQ's sitewide scope. Added the full
-             fee table (already accurate and live elsewhere on the
-             page - Delivery accordion) so a rug or cushion customer
-             reading this same FAQ on a different product gets the
-             right fee, not just the furniture one. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will I be charged for returns?<span class="pm">+</span></button><div class="acc-body"><p>Faulty or damaged items are collected free within 14 days. Change-of-mind returns carry a collection fee - £25 for furniture, mirrors, and larger items, £18 for rugs and ottomans, and £5 for cushions, throws, and lamps.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are there items I can't return?<span class="pm">+</span></button><div class="acc-body"><p>Some products are custom-made just for you and aren't eligible for return - this is always shown clearly on the product page before you order.</p></div></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- A+ 10 · CUSTOMER REVIEWS (moved back below FAQ per explicit direction, v138 rollback) -->
+  <!-- A+ 9 · CUSTOMER REVIEWS (moved above FAQ per explicit direction, v126) -->
   <section id="reviews" class="ap">
     <div class="ap-head"><span class="eyebrow">Customer reviews</span><h2 class="ap-h">What buyers say</h2></div>
 
@@ -8074,6 +7928,104 @@ footer{background:#EDECE9;color:#433122}
       </div>
     </div>
     <button class="revsee-all">Read all reviews <span style="font-size:15px">↓</span></button>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- A+ 10 · FAQ (moved below Customer Reviews per explicit direction, v126) -->
+  <section id="faq" class="ap">
+    <div class="ap-head"><span class="eyebrow">FAQ</span><h2 class="ap-h">Everything You Need To Know</h2></div>
+    <!-- _50 UPDATE: 4 new questions added per explicit direction, backed
+         by analysis of the 1,031-review Trustpilot dump (see the _50
+         top-of-file changelog entry for the full reasoning/data behind
+         each one). The "is it normal for natural materials to
+         shed/smell" question from the same analysis was explicitly
+         EXCLUDED per direction - not added here. All 11 original
+         verbatim questions/answers are unchanged, just re-sequenced
+         to fit the new ones in at sensible points in the objection
+         hierarchy (pricing/trust doubts first, then logistics, then
+         returns) rather than tacked on at the end. -->
+    <div class="acc-grid">
+      <div>
+        <div class="acc"><button class="acc-btn" aria-expanded="true" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body open"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
+        <!-- _52 FIX: 365-Day Guarantee terms added to this existing
+             question rather than a new FAQ entry, per explicit
+             direction. The terms already exist elsewhere on the page
+             (CTA trust badge -> modal, and the Delivery accordion) but
+             weren't in the FAQ at all - this question ("...durable?")
+             is the natural fit since it's already making a durability
+             claim, and the guarantee is the concrete backing for that
+             claim. Those other placements are untouched - this is an
+             addition, not a consolidation. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are your products authentic and durable?<span class="pm">+</span></button><div class="acc-body"><p>Every piece is sourced from carefully vetted makers using premium materials and traditional techniques. Many of our artisans have been perfecting their craft for generations, creating pieces built to last - not just look good in photos.</p><p style="margin-top:10px">Every product is also backed by our 365-Day Guarantee: any verifiable manufacturing or material fault within a year is repaired, replaced, or refunded - your choice. This covers manufacturing and material faults, not accidental damage or normal wear.</p></div></div>
+        <!-- _50 NEW: 135 review mentions, only 9% rated 3-star-or-below -
+             not a common failure, but a constantly-recurring unprompted
+             relief point ("colours are an exact match", "photos don't
+             do it justice"), meaning it's a live pre-purchase anxiety
+             worth pre-empting even though it rarely goes wrong. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will my item look exactly like the photos?<span class="pm">+</span></button><div class="acc-body"><p>Many of our pieces are finished by hand, which means natural variation in colour, grain, or texture is normal and expected - no two pieces are ever perfectly identical. This is part of what makes handcrafted items unique, not a fault. Check the individual product page for details on that item's specific finish.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Where are your products made?<span class="pm">+</span></button><div class="acc-body"><p>Most of our products are handcrafted by skilled artisans in India, using traditional techniques passed down through generations, while a few collections are sourced from Vietnam.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you have a showroom I can visit?<span class="pm">+</span></button><div class="acc-body"><p>We don't operate physical showrooms - this keeps our costs low so we can pass those savings on to you. If a piece doesn't work in your space, our 14-day return policy has you covered.</p></div></div>
+        <!-- _50 NEW: real checkout-stage ambiguity, especially relevant
+             given pre-order items with long wait times - addresses a
+             standard cart-abandonment driver even though it doesn't
+             show up as a post-purchase complaint in the review dump. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How and when will I be charged?<span class="pm">+</span></button><div class="acc-body"><p>All orders are prepaid at checkout - we don't offer cash on delivery. Your payment is taken when your order is confirmed, and the price shown at checkout is the price you pay.</p></div></div>
+        <!-- _50 NEW: sharpest negative signal in the entire review
+             dataset - only 7 mentions, but 86% rated 3-star-or-below
+             ("cancellation and returns process is shockingly bad",
+             "numerous broken promises"). A clear upfront answer won't
+             fix a slow ops process, but removes the "I had no idea
+             this would be this hard" layer of the complaint. -->
+        <!-- _54 FIX: added the missing "once shipped" clause, per
+             explicit direction after this exact gap was flagged. The
+             14-day window alone (from the dedicated Cancellation
+             Policy on the live Returns & Exchange page) doesn't cover
+             the case where an order ships faster than 14 days - the
+             live Delivery & Shipping page states separately "Once an
+             order has been shipped, it cannot be cancelled or
+             modified", which is a real, additional constraint this
+             answer was missing. Both conditions now stated together
+             so whichever happens first is clear. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I cancel my order?<span class="pm">+</span></button><div class="acc-body"><p>You can request a cancellation within 14 days of your order confirmation, provided it hasn't shipped yet - once an order has shipped, it can no longer be cancelled or modified, even within that window. After either point, your item will already be with our makers and we're unable to process a cancellation. To cancel, email us at support@fableroom.com with your order number and we'll take care of the rest.</p></div></div>
+        <!-- _53 FIX: two figures corrected against the dedicated, dated
+             delivery policy page (fableroom.com/pages/delivery-and-
+             shipping, "Last updated: 4 June, 2026") - Standard Shipping
+             was 3-5 weeks (real: 3-8 weeks) and Pre-Order was just
+             reverted from 5-10 back to 8-12 weeks per the _53 changelog
+             entry. Both were sourced from PDP inline snippets last
+             time, which turn out to be the outdated copy - the dated
+             policy page is the stronger source when the two disagree. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How long will my delivery take?<span class="pm">+</span></button><div class="acc-body"><p>Delivery time depends on availability: Ready to Ship arrives in 1-2 weeks, Standard Shipping in 3-8 weeks, and Pre-Order in 8-12 weeks - Astra is currently Pre-Order.</p></div></div>
+      </div>
+      <div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you deliver to my area?<span class="pm">+</span></button><div class="acc-body"><p>We deliver throughout England, Scotland, and Wales. For Northern Ireland, we offer delivery of smaller items with a minimal surcharge.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I track my order?<span class="pm">+</span></button><div class="acc-body"><p>Yes. You'll receive tracking information via email once your order ships, and can check delivery status anytime under My Account &gt; My Orders.</p></div></div>
+        <!-- _50 NEW: second-highest volume negative theme in the whole
+             dataset - 56 mentions, 41% rated 3-star-or-below. Previously
+             this was only implied inside the "Will I be charged for
+             returns?" answer - split out on its own since the volume
+             and negativity here means it deserves a direct answer, not
+             a subordinate clause in a different question. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">What happens if my item arrives damaged or faulty?<span class="pm">+</span></button><div class="acc-body"><p>Contact us within 14 days with your order number and a photo of the damage. We'll arrange a free collection and send a replacement or full refund - whichever you prefer.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">If I don't like something, can I return it?<span class="pm">+</span></button><div class="acc-body"><p>Most products can be returned within 14 days of delivery. Collections are free if your item is damaged or faulty - otherwise a collection fee applies.</p></div></div>
+        <!-- _52 FIX: refund timeframe added, per explicit direction -
+             "refunds within 7 days of receipt" existed in the Delivery
+             accordion and the trust modal but wasn't in the FAQ at all,
+             despite this being exactly the question where someone
+             would look for it. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do I return something?<span class="pm">+</span></button><div class="acc-body"><p>Email support@fableroom.com with your order number, a brief description, and a photo if applicable. For furniture and large items, we'll arrange a doorstep pickup at your home. Once your return is received and inspected, your refund is issued within 7 days.</p></div></div>
+        <!-- _52 FIX: fee breakdown expanded per explicit direction - was
+             furniture-only (£25), which is correct for Astra but
+             incomplete for this FAQ's sitewide scope. Added the full
+             fee table (already accurate and live elsewhere on the
+             page - Delivery accordion) so a rug or cushion customer
+             reading this same FAQ on a different product gets the
+             right fee, not just the furniture one. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will I be charged for returns?<span class="pm">+</span></button><div class="acc-body"><p>Faulty or damaged items are collected free within 14 days. Change-of-mind returns carry a collection fee - £25 for furniture, mirrors, and larger items, £18 for rugs and ottomans, and £5 for cushions, throws, and lamps.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are there items I can't return?<span class="pm">+</span></button><div class="acc-body"><p>Some products are custom-made just for you and aren't eligible for return - this is always shown clearly on the product page before you order.</p></div></div>
+      </div>
+    </div>
   </section>
 
   <!-- _47 MOVED: "Complete the Look" (renamed) no longer sits here -
