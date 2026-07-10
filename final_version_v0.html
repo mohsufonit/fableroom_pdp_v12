@@ -1,215 +1,6 @@
 <!DOCTYPE html>
 <!--
   ============================================================
-  v135 UPDATE (this file, forked from v134) - per explicit direction:
-  1. RETURN WINDOW CHANGED 30 DAYS -> 14 DAYS in all live-reachable
-     copy: 4 FAQ answers (showroom, damaged/faulty, "can I return it",
-     "charged for returns") + the orphaned "Returns" trust modal heading
-     (unreachable right now since its trigger badge was removed in
-     v126, fixed anyway for consistency in case it's ever reconnected).
-     The active "Returns Policy" accordion body itself never stated an
-     explicit day count, so no change was needed there.
-     🔴 FLAGGING THIS EXPLICITLY: an earlier session (_54, see that
-     changelog entry below) did a full cross-check directly against
-     Fableroom's live, dated returns policy page and found 30 days was
-     the correct figure at the time, fixing 14->30 in 6 places on
-     exactly this same question. This v135 change reverses that,
-     per this session's explicit instruction that it should be 14 days.
-     Implemented as instructed - flagging so this isn't mistaken for an
-     accidental regression, and so it can be re-confirmed if it turns
-     out to be a mix-up with the (genuinely 14-day) cancellation window
-     mentioned in that same _54 note, or if the live policy has simply
-     changed since _54 checked it.
-  ============================================================
-  v134 UPDATE (this file, forked from v133) - per explicit direction:
-  1. CTA (Add to Basket / sticky bar) COLOUR: changed to #705126 (was
-     #5a3d1e wood-brown, the v127 revert of the earlier dark-gold
-     experiment). Hover state darkened to match (#5b421f). Updated in
-     both places this color is set (the base .atc rule and the later
-     .atc,.sb-btn rule that actually renders) so they stay consistent.
-  ============================================================
-  v133 UPDATE (this file, forked from v132) - badge/pill alignment fixes
-  per explicit feedback this session (changelog entry added
-  retroactively - was missed at the time):
-  1. "2 more offers" PILL HEIGHT: was 36.8px vs PRIME10 pill's 23.4px
-     ("unusually big"). Cause: an explicit line-height:1 override was
-     fighting the inherited line-height PRIME10's pill relies on for its
-     height. Removed the override - both pills now measure exactly
-     23.375px, edges included, not just centers.
-  2. "2" / "more offers" ALIGNMENT: merged from two separate flex items
-     into one flowing text run (<b>2</b> more offers), so they share one
-     baseline by construction instead of two mismatched ones.
-  3. PAY-IN-3 CHEVRON ALIGNED TO THE OFFER BADGE'S CHEVRON (reversed
-     which one follows which, per explicit direction): measured the
-     offer badge chevron's x-position and moved .pv2-chevron to match
-     (right:14px -> 25px). Also unified the badge's left/right padding
-     across mobile and desktop (was 8px/10px on the two) so this
-     alignment holds at every width, not just the one it was measured at.
-  ============================================================
-  v132 UPDATE (this file, forked from v131) - badge fixes per explicit
-  feedback this session:
-  1. ONE CONSISTENT ROW LAYOUT: was column-stacked on mobile (count
-     above chevron) vs row on desktop - now always a single row at every
-     breakpoint, per explicit feedback ("should be aligned in one line,
-     not differ in mobile").
-  2. CHEVRON SIZE RESTORED: was shrunk to 10px in v131, now back to 14px,
-     per explicit feedback ("chevron size should not reduce").
-  3. COUNT/LABEL ALIGNMENT FIXED: count font-size was 9px on mobile vs
-     label's 11px on desktop, contributing to the "look misaligned"
-     feedback - both now consistently 11px.
-  4. DESKTOP BREATHING ROOM: right padding increased (10px->16px) so the
-     chevron isn't touching the pill's rounded edge, per explicit
-     feedback. Trade-off flagged in the CSS comment: this does shift the
-     chevron's exact x-position slightly vs. the Pay-in-3 row's chevron
-     below it on desktop specifically (mobile still matches closely) -
-     prioritised the spacing fix since that's what was flagged this
-     round, not hiding the trade-off.
-  ============================================================
-  v131 UPDATE (this file, forked from v130) - responsive badge rebuild
-  per explicit direction this session:
-  1. ONE BADGE: the count and chevron were two visually-separate stacked
-     circles (v130) - now one single badge (one background/border
-     enclosing both), matching the "should be one badge" direction.
-  2. MOBILE (default): count above chevron, stacked (only the number
-     shows - no room for label text).
-  3. DESKTOP (this file's existing 820px breakpoint): badge reflows to
-     a horizontal pill - "2 more offers" spelled out to the LEFT of the
-     chevron.
-  4. CHEVRON X-POSITION: badge is anchored via right:14px only (no
-     left/width), and the chevron is always last in source order, so
-     it stays pinned to that same right edge at both breakpoints -
-     growing the label on desktop only extends the badge leftward,
-     never moving the chevron off its aligned x-position (still matches
-     .pv2-chevron in the Pay-in-3 row below it).
-  ============================================================
-  v130 UPDATE (this file, forked from v129) - 2 changes per explicit
-  direction this session:
-  1. OFFER-ROW INDICATOR REDESIGNED: chevron now sits inside its own
-     soft rounded badge, with the "2" count sitting above it (was a
-     separate floating notification-dot + bare chevron). Both are
-     centered in a 14px-wide column anchored at right:14px - the exact
-     same anchor/width the old plain chevron used - so the chevron does
-     NOT shift on the x-axis; it stays aligned with the Pay-in-3 row's
-     chevron directly below it, per explicit direction.
-  2. ACCORDION OPEN STATE: removed the border-top + top margin that was
-     showing as an unnecessary line + gap above the first offer item
-     ("£50 off orders over £599") when the panel opens. Only the first
-     item was affected - dividers between the other items are unchanged.
-  ============================================================
-  v129 UPDATE (this file, forked from v128) - 2 fixes per explicit
-  direction/feedback this session:
-  1. "BOX" BETWEEN OFFER ROW AND PAY-IN-3 ROW REMOVED: the closed "2 more
-     offers" <details> was rendering its own padding+border as a blank
-     box even though its <summary> is hidden - same underlying bug fixed
-     once before, back again once the accordion was restored in v128.
-     Fixed properly this time with a :not([open]) rule so the closed
-     state has zero padding/border (true 0 height), while the open state
-     keeps its original spacing unchanged.
-  2. "+2" BADGE REDESIGNED: was a horizontal pill sitting mid-row next to
-     the PRIME10 pill, competing with it for space and reading as an odd
-     floating green blob. Now a small circular notification-dot (showing
-     just "2") tucked at the chevron's top-right corner, with a thin
-     white ring to keep it visually separated - reads as "attached to
-     the chevron" rather than as its own competing element.
-  ============================================================
-  v128 UPDATE (this file, forked from v127) - 6 changes per explicit
-  direction this session:
-  1. COUPON PILL: copy icon moved INSIDE the PRIME10 pill, beside the
-     code text (was a separate button at the row's far right).
-  2. FAR-RIGHT SLOT: now holds a chevron again (where the copy icon used
-     to sit), and the "2 more offers" accordion is restored - both were
-     removed in v127. Added a small "+2" badge next to the chevron as a
-     first-pass visual cue that there's more behind it - flagged as not
-     a final design pick, open for sign-off (could become a dot, a "New"
-     tag, etc. instead).
-  3. BACKGROUND: .pv2-offer changed from green-tinted to white/none, per
-     explicit direction. Text/icon stay green.
-  4. DIMENSION STRIP SPACING: .kh-list bottom margin reduced 24px->20px
-     to exactly match .dimstrip's own 20px margin-bottom, so the gap
-     above (to Key Highlights) and below (to the Price block) is now
-     uniform/balanced instead of two different numbers.
-  5. OFFER STRIP vs PAY-IN-3 STRIP HEIGHT: .pv2-offer vertical padding
-     reduced 11px->10px to exactly match .pv2-klarna--top's 10px, per
-     explicit direction that the two rows should be the same size (the
-     offer row was taller).
-  6. "PAY IN 3" COPY FIXED: was "Pay in 3 - £167.67/mo interest-free
-     BNPL" (didn't parse - mixed a per-instalment amount with "/mo" then
-     tacked "BNPL" on the end). Now "Pay in 3 interest-free instalments
-     of £167.67 each."
-  ============================================================
-  v127 UPDATE (this file, forked from v126) - 5 changes per explicit
-  direction/feedback this session:
-  1. ATC BUTTON: reverted the v126 dark-gold change (#B8860B) back to
-     the original var(--bronze)/#5a3d1e - per explicit feedback it
-     "feels very very odd." No new colour direction given yet, so this
-     is a plain revert, not a new pick.
-  2. OFFER PANEL "RANDOM SPACE" BUG FIXED: the empty space below the
-     coupon row was the closed <details class="pv2-more"> accordion -
-     even with its <summary> hidden, the container itself still carried
-     .pv2-more's own padding+border-bottom, showing as a blank padded
-     strip. Fixed by removing that accordion entirely (see #3), which
-     also resolves the space.
-  3. COUPON ROW: v126's "row doubles as accordion" behaviour reverted -
-     back to a plain, non-interactive row. Text "Copy" button replaced
-     with an icon-only copy button (.pv2-copy-icon). The "2 more offers"
-     panel (2 auto-applied discount tiers + the sign-up-for-10% item) is
-     removed entirely and NOT yet replaced with anything - flagged as an
-     open design question (how to surface those other offers) rather
-     than solved with a quick fix. Markup for all of this kept as HTML
-     comments, not deleted.
-  4. KEY HIGHLIGHT ICONS: opacity reduced to .9 (10% reduction), on top
-     of v126's stroke-width thinning.
-  5. VALUE SECTION COPY: reverted back to the original "Prices that make
-     sense, without the middlemen." - v126's rewrite is undone.
-  ============================================================
-  v126 UPDATE (this file, forked from _62/v125) - 10 changes per explicit
-  direction this session:
-  1. LOVED-BY PILL: now sits next to the Trustpilot badge at ALL
-     breakpoints (was desktop-only; mobile showed a separate overlay
-     banner on the gallery image instead, now hidden everywhere in
-     favour of this single consistent placement). PRD note: a variant
-     for when native in-app reviews exist (vs. the current Trustpilot-
-     only state) still needs to be worked out separately.
-  2. KEY HIGHLIGHTS (the 3 USP checkmarks): stroke-width reduced from 2
-     to 1.5 for a lighter/thinner look.
-  3. USP <-> DIMENSION STRIP: removed the <hr class="kh-divider"> line
-     between them; .kh-list bottom margin increased 12px->24px to
-     rebalance the spacing without the line.
-  4. OFFER + BNPL PANEL: payment method icon row (Klarna/Shop Pay/PayPal
-     logos) removed. BNPL "Pay in 3" row left-aligned (was centered).
-     Coupon offer row now doubles as the accordion trigger for the "2
-     more offers" panel (was two separate click targets). Green
-     background on the coupon row intentionally left unchanged - flagged
-     only, not actioned, pending the wider visual declutter pass.
-  5. RTB/TRUST BADGES ROW below Add to Basket: removed entirely. Content
-     redistributed - 365-Day Guarantee + 30-Day Returns now live inside
-     the new "Returns Policy" accordion (see #7).
-  6. PRE-ORDER/CLEARANCE COPY: PRD note only this round, no HTML change -
-     clearance copy needs to lead with scarcity/finality ("last pieces
-     available"), not just discount %.
-  7. DELIVERY & RETURNS RESTRUCTURE: removed "Pre-order timeline",
-     "Finance & payment", "30-day returns", and "365-day guarantee" as
-     standalone accordions. Added one merged "Returns Policy" accordion
-     (30-day returns + 365-day guarantee combined). "Care & Buying Guide"
-     removed from here - its content moved to Features & Specifications
-     (see #7b). Delivery/returns policy links now point to the real live
-     URLs (were "#" placeholders): delivery-and-shipping and
-     return-refund pages respectively. "Delivery options" stays the
-     default-open accordion, unchanged.
-     7b. FEATURES & SPECIFICATIONS: "Care Guide" renamed to "Care &
-     Buying Guide", now carries the fuller content (Care + Buying Guide
-     paragraphs) that used to live only in the Delivery section.
-  8. REVIEWS moved above FAQ in page order (was FAQ then Reviews).
-  9. ADD TO BASKET button: background changed from bronze/brown
-     (var(--bronze), #b77e45) to dark gold (#B8860B). Hover state
-     updated to match.
-  10. VALUE SECTION COPY: subtext changed to "No middlemen. No markup
-     games. Just the real price." (was "Prices that make sense, without
-     the middlemen.") - alternatives considered and noted inline for
-     sign-off, not picked silently.
-  All removed markup kept as HTML comments per the never-delete
-  convention, not deleted outright.
-  ============================================================
   _62 UPDATE (this file, forked from _61) - CARD LIGHTBOX: SCALED UP,
   MOVED DOWN, SWIPE WIDENED, per explicit direction.
   1. ~10% LARGER across the board: image slot 42->46vh (max-width
@@ -3621,7 +3412,7 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .g-arrow-prev{left:12px}
 .g-arrow-next{right:12px}
 .slide-badges{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
-.slide-loved-strip{position:absolute;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:rgba(15,10,4,.82);color:#fff;padding:5px 12px;z-index:2} /* v126: was display:flex (visible on mobile as an overlay banner on the gallery image) - now hidden at all breakpoints since .loved-badge-inline (next to Trustpilot) is the single consistent home for this content, per explicit direction. JS still creates/injects this element (see goTo()/render function); harmless, just no longer rendered. */
+.slide-loved-strip{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(15,10,4,.82);color:#fff;padding:5px 12px;z-index:2}
 .slide-loved-main{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.01em}
 .slide-loved-main svg{flex-shrink:0;color:var(--sale)}
 .slide-expand{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
@@ -3733,7 +3524,7 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .stars{color:var(--star);font-size:15px;letter-spacing:1px}
 .r-link{font-size:13px;color:var(--ink-2);text-decoration:underline;text-underline-offset:2px;flex-shrink:0;white-space:nowrap}
 .tp-badge-inline{display:inline-flex;align-items:center;justify-content:center;text-align:center;gap:5px;font-size:11.5px;color:var(--ink-2);text-decoration:none;background:#f0fbf7;border:1px solid rgba(0,182,122,.25);padding:3px 10px 3px 8px;border-radius:100px;flex-shrink:0;white-space:nowrap}
-.loved-badge-inline{display:inline-flex;align-items:center;gap:6px;background:rgba(15,10,4,.82);color:#fff;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:100px;flex-shrink:0;white-space:nowrap} /* v126: was display:none (mobile-only hidden, only shown on desktop via the media-query override below) - per explicit direction, this pill now sits next to the Trustpilot badge on ALL breakpoints, not just desktop. padding matched to .tp-badge-inline's 3px vertical (was 5px) so both pills are the same height and sit flush together */
+.loved-badge-inline{display:none;align-items:center;gap:6px;background:rgba(15,10,4,.82);color:#fff;font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:100px;flex-shrink:0;white-space:nowrap} /* padding matched to .tp-badge-inline's 3px vertical (was 5px) so both pills are the same height and sit flush together */
 .loved-badge-inline svg{color:var(--sale);flex-shrink:0}
 .tp-badge-inline b{color:#00b67a;font-weight:700}
 .tp-badge-inline:hover{background:#e3f8f0}
@@ -3747,10 +3538,10 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .p-sub b{color:var(--ink-2);font-weight:600}
 
 /* KEY HIGHLIGHTS - compact pill-card rows, icon + bold headline + light detail */
-.kh-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0 0 20px} /* v128: was 24px - reduced to 20px to exactly match .dimstrip's own margin-bottom:20px below, per explicit direction that the gap above and below the dimension strip (to Key Highlights and to the Price block respectively) should be uniform/balanced, not two different numbers. */
+.kh-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0 0 12px}
 .kh-divider{border:none;border-top:1px solid var(--line-2);margin:15px auto 17px;width:25%} /* 15px above, 17px below */
 .kh-item{display:flex;align-items:flex-start;gap:5px;background:none;border:none;padding:0;overflow:visible} /* _56 FIX: was 9px - the only other icon+text pairing on the page (the RTB strip) uses 5px, so this didn't match per the spacing audit. Unified to 5px rather than leaving two different icon-to-text gap values on the same page. */
-.kh-ic{width:17px;height:17px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px;opacity:.9} /* v127: added opacity:.9 (10% reduction) per explicit direction, on top of v126's stroke-width 2->1.5 thinning */
+.kh-ic{width:17px;height:17px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px}
 .kh-text{font-size:13.5px;color:var(--ink-2);line-height:1.4;flex:0 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip}
 .kh-text b{font-weight:600;color:var(--ink-2)}
 .kh-text .kh-amt{color:#08BD5E} /* _49 FIX: reverted back to its own independent hardcoded value (was briefly pointed at var(--green) in _48) - Key Highlights isn't part of "the pricing table section" the revert request was scoped to, so it goes back to standing on its own, same as before _48. */
@@ -3764,14 +3555,14 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .qty button{width:46px;height:52px;background:none;border:none;font-size:20px;color:var(--ink)}
 .qty input{width:36px;height:52px;border:none;background:none;text-align:center;font-family:var(--ff-b);font-size:16px;font-weight:600;color:var(--ink);-moz-appearance:textfield}
 .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none}
-.atc{flex:1;min-height:54px;background:#705126;color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s} /* v134: background changed to #705126 per explicit direction (was var(--bronze)/#5a3d1e wood-brown from the v127 revert). Note: .atc,.sb-btn further down the cascade (line ~3899) is the rule that actually renders (it comes later and is more specific) - updated to match, see there. */
+.atc{flex:1;min-height:54px;background:var(--bronze);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
 .delivbar{position:relative;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(90.09deg,rgba(90,3,27,.14) .08%,rgba(255,255,255,0) 104.45%);border-radius:6px;padding:8px 12px;min-height:36px;font-size:12px;font-weight:700;color:#5A031B;margin-bottom:10px}
 .delivbar svg{flex-shrink:0}
 .delivbar .db-info{position:absolute;right:12px;top:50%;transform:translateY(-50%);flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#505050}
 .delivbar .db-info svg{width:18px;height:18px}
 .db-tooltip{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:20;width:315px;max-width:calc(100vw - 40px);background:#fff;color:var(--ink);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.12);padding:10px;font-size:12px;font-weight:400;line-height:1.5}
 .db-tooltip.show{display:block}
-.atc:hover{background:#5b421f} /* v134: darker shade of the new #705126 base, was var(--bronze-hi) */
+.atc:hover{background:var(--bronze-hi)}
 .atc small{font-size:10px;font-weight:500;letter-spacing:.02em;text-transform:none;opacity:.88}
 .pre-hint{font-size:11.5px;color:var(--ink-3);text-align:center;margin-bottom:14px}
 .pre-hint b{color:var(--bronze)}
@@ -3941,8 +3732,8 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    commented out, not deleted, per the never-delete convention:
    .atc,.sb-btn{background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5)),var(--wood);background-size:cover;background-position:center;text-shadow:0 1px 2px rgba(0,0,0,.35)}
    .atc:hover,.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6)),var(--wood)} */
-.atc,.sb-btn{background-color:#705126;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5));text-shadow:0 1px 2px rgba(0,0,0,.35)} /* v134: background-color changed to #705126 per explicit direction (was #5a3d1e wood-brown from the v127 revert). Gradient overlay left unchanged - still reads fine over the new color. */
-.atc:hover,.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6))} /* unchanged - gradient-only hover, no explicit background-color override, still darkens the new base color the same way */
+.atc,.sb-btn{background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5));text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.atc:hover,.sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6))}
 
 /* ============ PARALLAX STORY (The Finish) ============ */
 .parallax-story{position:relative;min-height:170vh;background:#1b1408;color:#f2ece3;overflow:clip;isolation:isolate;width:100vw;margin-left:calc(50% - 50vw)}
@@ -5771,11 +5562,10 @@ footer{background:#EDECE9;color:#433122}
   .thumbstrip{display:none} /* real site has no thumbnail rail in stacked mode */
   /* badges are already built per-slide (every image has its own Pre-
      Order/dyn-badge) - they just work as-is in the new wrapping grid.
-     v126: Loved-by banner now lives ONLY next to the Trustpilot rating
-     (.loved-badge-inline) at every breakpoint, not just desktop -
-     .slide-loved-strip is hidden globally now (see its base rule),
-     these two lines are just redundant confirmations, kept harmless.
-     .g-slide still gets cursor:zoom-in on desktop - same affordance
+     Loved-by banner is DIFFERENT: it moves off the gallery entirely on
+     desktop (see .loved-badge-inline next to the Trustpilot rating
+     instead), so .slide-loved-strip (and its expand icon) is hidden
+     here. In its place, .g-slide gets cursor:zoom-in - same affordance
      the real fableroom.com uses (their .media--zoom{cursor:zoom-in}) -
      so there's still a visual cue that clicking opens the full image,
      without needing a dedicated icon on every single photo. */
@@ -6036,48 +5826,19 @@ footer{background:#EDECE9;color:#433122}
 
 /* Payment block redesign */
 .paypanel-v2{border:1px solid var(--line-2);border-radius:14px;background:var(--surface);overflow:hidden;margin-bottom:12px}
-.pv2-offer{display:flex;align-items:center;gap:9px;padding:9px 34px 9px 14px;background:#fff;border-bottom:1px solid var(--line-2);color:var(--green);cursor:pointer;position:relative} /* v128: background changed from green-tinted (rgba(16,132,116,.06)) to white, per explicit direction - text/icon stay green. Padding vertical 11px->9px (tested against .pv2-code's own reduced padding below) so this row's total height matches .pv2-klarna--top's exactly, per explicit direction that the two rows should be the same size. Padding-right 14px->34px for the restored chevron. cursor:pointer + position:relative restored for the chevron + accordion-trigger behaviour (see toggleCouponAccordion). */
-.pv2-offer-badge{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;background:rgba(16,132,116,.08);border:1px solid rgba(16,132,116,.2);border-radius:5px;padding:1px 10px 1px 10px} /* v133 REBUILD: was 36.8px tall against the PRIME10 pill's 23.4px - "unusually big" per explicit feedback. Padding/font-size (below) now mirror .pv2-code's own box model exactly (1px vertical padding, 12.5px font-size, same border-radius) so the two pills match in height and sit flush with each other - both already share the same vertical center (both centered within .pv2-offer's row), so matching height also means their top/bottom edges now align, not just their centers. Right padding (10px) is now the SAME on mobile and desktop (was 8px on mobile, 10px on desktop) specifically so the chevron's x-offset doesn't shift between breakpoints - needed since Pay-in-3's chevron below is now hard-pinned to match this one (see .pv2-chevron). */
-.pv2-offer-badge-text{font-size:12.5px;font-weight:600;color:var(--green);white-space:nowrap} /* v133: line-height:1 override removed - PRIME10's pill text doesn't set an explicit line-height either (inherits the page default, ~1.5), and that inherited line-height is what actually determines its ~23px height. Matching that (rather than fighting it) is what makes the two pills the same height. */
-.pv2-offer-badge-text b{font-weight:700}
-.pv2-offer-badge-label{display:none} /* hidden on mobile - not enough room to spell out "more offers", per explicit direction only the number shows here */
-.pv2-offer-badge-chevron{width:14px;height:14px;display:flex;align-items:center;justify-content:center;color:var(--green);transition:transform .2s ease;flex-shrink:0}
-.pv2-offer[aria-expanded="true"] .pv2-offer-badge-chevron{transform:rotate(180deg)}
-@media(min-width:820px){
-  .pv2-offer-badge-label{display:inline}
-}
-/* v130/superseded: the two-separate-circles version. Kept, not deleted:
-.pv2-offer-indicator{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:14px;display:flex;flex-direction:column;align-items:center;gap:2px}
-.pv2-offer-count{width:12px;height:12px;border-radius:50%;background:var(--green);color:#fff;font-size:8px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pv2-offer-chevron-wrap{width:14px;height:14px;border-radius:50%;background:rgba(16,132,116,.12);display:flex;align-items:center;justify-content:center;color:var(--green);transition:transform .2s ease;flex-shrink:0}
-.pv2-offer[aria-expanded="true"] .pv2-offer-chevron-wrap{transform:rotate(180deg)}
-*/
-/* v129/superseded: the old separate chevron + notification-dot badge -
-   replaced by the combined .pv2-offer-indicator above. Kept, not
-   deleted:
-.pv2-offer-chevron{position:absolute;right:14px;top:50%;transform:translateY(-50%);transition:transform .2s ease;color:var(--green) !important;flex-shrink:0}
-.pv2-offer[aria-expanded="true"] .pv2-offer-chevron{transform:translateY(-50%) rotate(180deg)}
-.pv2-more-badge{position:absolute;right:10px;top:9px;background:var(--green);color:#fff;font-size:9px;font-weight:700;line-height:1;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}
-*/
+.pv2-offer{display:flex;align-items:center;gap:9px;padding:11px 14px;background:rgba(16,132,116,.06);border-bottom:1px solid var(--line-2);color:var(--green)} /* v125: icon (currentColor) + .pv2-label now inherit green - was unstyled/default ink before, out of step with the row's own green-tinted background. .pv2-code and .pv2-copy keep their own explicit colors (bronze / green-outline) so they're unaffected. */
 .pv2-offer .pv2-label{font-size:12px;white-space:nowrap}
-.pv2-offer .pv2-code{font-family:var(--ff-b);font-weight:700;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);padding:1px 6px 1px 8px;border-radius:5px;letter-spacing:.06em;font-size:12.5px;display:inline-flex;align-items:center;gap:5px} /* v128: vertical padding reduced 3px->1px (also left 9px->8px) - the pill was the tallest child in the row (27.4px) and was the actual cause of the offer row being taller than the Pay-in-3 row; tightening it down is what let the row-level padding fix (above) actually equalize the two heights. Also changed to inline-flex to fit the new .pv2-copy-icon-inline snugly inside, beside the code text. */
-.pv2-copy-icon-inline{flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--bronze);background:none;border:none;padding:0;cursor:pointer;opacity:.75} /* v128 NEW: copy icon now lives INSIDE the PRIME10 pill (was a separate button at the row's far right in v127) - inherits the pill's bronze colour rather than green, sized to sit comfortably beside the code text */
-.pv2-copy-icon-inline:hover{opacity:1}
-/* v127/superseded: the old standalone far-right copy icon button - no
-   longer used now that the copy icon lives inside the pill. Kept, not
-   deleted:
-.pv2-copy-icon{margin-left:auto;flex-shrink:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--green);background:none;border:1px solid var(--green);border-radius:5px;cursor:pointer;padding:0}
-*/
+.pv2-offer .pv2-code{font-family:var(--ff-b);font-weight:700;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);padding:3px 9px;border-radius:5px;letter-spacing:.06em;font-size:12.5px}
 .pv2-offer .pv2-copy{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--green);background:none;border:1px solid var(--green);border-radius:5px;padding:4px 10px;cursor:pointer}
 .pv2-pay-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:10px 14px 4px;border-top:1px solid var(--line-2);text-align:center}
 .pv2-klarna{display:flex;align-items:center;justify-content:center;gap:9px;padding:7px 14px;border-bottom:none;font-size:13px;color:var(--ink);background:var(--surface-2)}
-.pv2-klarna--top{border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);padding-top:10px;padding-bottom:10px;background:#fff;justify-content:flex-start} /* v126: added justify-content:flex-start (was inheriting center from .pv2-klarna base rule) - per explicit direction, this row should left-align like .pv2-offer and .pv2-more-item, not center */
+.pv2-klarna--top{border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);padding-top:10px;padding-bottom:10px;background:#fff}
 .pv2-klarna svg{color:var(--bronze);flex-shrink:0}
 .pv2-klarna b{font-weight:700}
 .pv2-methods{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:13px;padding:10px 14px 13px;background:var(--surface-2)}
 /* Pay in 3 accordion toggle */
-.pv2-klarna--top{cursor:pointer;position:relative;padding-left:14px;padding-right:34px} /* v126: padding-left was mirrored to 34px to keep the icon+text group centered against the chevron (see old comment below) - now that the row is left-aligned (justify-content:flex-start above), left padding goes back to the normal 14px matching .pv2-offer; right padding stays at 34px for chevron clearance. v123: was padding-right:34px only (for the chevron) with padding-left still at the base 14px - since the chevron is position:absolute (out of flex flow), that asymmetry just shifted the centered icon+text group left of true-center, out of step with .pv2-methods below which has symmetric padding. Mirrored to 34px both sides so it now centers on the same axis. */
-.pv2-chevron{position:absolute;right:25px;top:50%;transform:translateY(-50%);transition:transform .2s ease;color:var(--bronze) !important;flex-shrink:0} /* v133: right was 14px - moved to 25px, measured to match the "2 more offers" badge's chevron x-position exactly (887px center, on a 919px-wide row, in the reference desktop test), per explicit direction that THIS chevron should align to that one, not the reverse. */
+.pv2-klarna--top{cursor:pointer;position:relative;padding-left:34px;padding-right:34px} /* v123: was padding-right:34px only (for the chevron) with padding-left still at the base 14px - since the chevron is position:absolute (out of flex flow), that asymmetry just shifted the centered icon+text group left of true-center, out of step with .pv2-methods below which has symmetric padding. Mirrored to 34px both sides so it now centers on the same axis. */
+.pv2-chevron{position:absolute;right:14px;top:50%;transform:translateY(-50%);transition:transform .2s ease;color:var(--bronze) !important;flex-shrink:0}
 .pv2-klarna--top[aria-expanded="true"] .pv2-chevron{transform:translateY(-50%) rotate(180deg)}
 /* vendor widget snippets - each vendor owns its own styling/copy; kept close
    to how each actually renders (see PRD note in the HTML) rather than
@@ -6096,7 +5857,6 @@ footer{background:#EDECE9;color:#433122}
 .pv2-signup:hover{background:rgba(183,126,69,.06)}
 .pv2-signup-arrow{margin-left:auto;font-size:13px}
 .pv2-more{padding:10px 14px;border-bottom:1px solid var(--line-2)}
-.pv2-more:not([open]){padding:0;border-bottom:none} /* v129 FIX: when closed, the <summary> is hidden (display:none, see HTML) but this container's own padding+border were still rendering as a blank box between the offer row and the Pay-in-3 row below it - same bug as before, back again once the accordion was restored in v128. Zeroing padding/border while closed collapses it to true 0 height; the open-state values above are unchanged so the panel looks the same once expanded. */
 .pv2-more summary{font-size:12px;color:var(--green);font-weight:600;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;position:relative;padding-right:22px}
 .pv2-more-icon{color:var(--green);flex-shrink:0}
 .pv2-more summary::-webkit-details-marker{display:none}
@@ -6104,7 +5864,6 @@ footer{background:#EDECE9;color:#433122}
 .pv2-more .pv2-more-chevron{position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--green) !important;transition:transform .2s ease}
 .pv2-more[open] .pv2-more-chevron{transform:translateY(-50%) rotate(180deg)}
 .pv2-more-item{font-size:12px;color:var(--ink-2);padding:5px 14px 5px 0;border-top:1px solid var(--line-2);margin-top:5px}
-.pv2-more-item:first-of-type{border-top:none;margin-top:0;padding-top:0} /* v130 FIX: the first item was getting the same border-top+margin-top as every other item, showing an unnecessary line + gap directly below the accordion's own top padding - per explicit direction, removed for the first item only; the divider lines between items 2/3 are untouched. Uses :first-of-type, not :first-child, since the (hidden) <summary> element is the actual first child of <details> - :first-child would never match a sibling div. */
 .pv2-more-item-icon{color:var(--green);vertical-align:-2px;margin-right:2px;flex-shrink:0}
 </style>
 </head>
@@ -6342,31 +6101,23 @@ footer{background:#EDECE9;color:#433122}
       -->
       <ul class="kh-list">
         <li class="kh-item">
-          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs John Lewis</span></span>
           <button class="kh-info" onclick="openCompareModal()" aria-label="See price comparison">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           </button>
         </li>
         <li class="kh-item">
-          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span>
         </li>
         <li class="kh-item">
-          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span>
         </li>
       </ul>
 
-      <!-- v126 FIX: removed the <hr class="kh-divider"> line that used to
-           separate Key Highlights from the dimension strip below, per
-           explicit direction. Spacing rebalanced to a single value
-           (24px) replacing the old combined gap (12px .kh-list margin +
-           15px divider-top + 17px divider-bottom = 44px total) so the
-           visual breathing room stays similar without the line itself.
-           .kh-divider's CSS rules (mobile + desktop) are left in place
-           but now unused - kept, not deleted, per the never-delete
-           convention, in case the line needs reinstating later. -->
+      <hr class="kh-divider">
 
       <!--
         PRD NOTE - customer review ticker commented out, phase 2:
@@ -6418,58 +6169,24 @@ footer{background:#EDECE9;color:#433122}
 
       <!-- PAYMENT + OFFERS ABOVE CTA (#12) -->
       <div class="paypanel-v2">
-        <!-- v128 REBUILD per explicit direction, reversing part of v127:
-             - Copy icon moved INSIDE the PRIME10 pill, beside the code
-               text (was a separate button at the far right of the row).
-             - Far-right slot (where the copy icon used to sit) now holds
-               a chevron again, and the "2 more offers" accordion is
-               restored - both were removed in v127, now reinstated.
-             - Added a small "+2" badge next to the chevron as the
-               visual cue that there's more behind it - this is a first
-               pass, not a final pick; flagging for design sign-off
-               rather than treating as locked (could become a dot, a
-               "New" tag, an offer-count pill in a different style, etc).
-             - Background changed from green-tinted to white/none, per
-               explicit direction - text/icon stay green. -->
-        <div class="pv2-offer" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2MoreOffers" onclick="toggleCouponAccordion(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCouponAccordion(this)}">
+        <div class="pv2-offer">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           <span class="pv2-label">Extra 10% off - use code</span>
-          <span class="pv2-code">
-            PRIME10
-            <button class="pv2-copy-icon-inline" onclick="event.stopPropagation();copyCode(this)" aria-label="Copy code PRIME10">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
-          </span>
-          <!-- v133 REBUILD, per explicit feedback:
-               - Badge padding/font-size now mirror .pv2-code (PRIME10
-                 pill)'s own box model exactly, so both pills match in
-                 height and sit flush with each other (was noticeably
-                 taller/"unusually big").
-               - Count ("2") and label ("more offers") are now ONE
-                 inline text run (<b> + plain span, both flowing
-                 normally) instead of two separate flex items - fixes
-                 the "2 not aligned with more offers" baseline mismatch.
-               - Pay-in-3's chevron (.pv2-chevron, in the row below) is
-                 now positioned to match THIS badge's chevron x-position,
-                 rather than the other way around - see its own comment
-                 further down. -->
-          <span class="pv2-offer-badge" aria-hidden="true">
-            <span class="pv2-offer-badge-text"><b>2</b><span class="pv2-offer-badge-label"> more offers</span></span>
-            <span class="pv2-offer-badge-chevron">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-            </span>
-          </span>
+          <span class="pv2-code">PRIME10</span>
+          <button class="pv2-copy" onclick="copyCode(this)">Copy</button>
         </div>
         <!--
           PRD NOTE - offer count should be DYNAMIC, not hardcoded:
-          "+2" (badge) and "2 more active offers" (below) both currently
-          have "2" hand-typed in. In production this should be calculated
-          from however many additional offers actually apply/exist for
-          the current cart or product, so it updates automatically as
-          offers are added, removed, or expire.
+          "2 more active offers" currently has "2" hand-typed into the
+          copy. In production this should be calculated from however many
+          additional offers actually apply/exist for the current cart or
+          product (e.g. count of active promotions minus the one already
+          shown above), so the number updates automatically as offers are
+          added, removed, or expire - rather than needing someone to
+          manually edit this text every time the offer set changes.
         -->
-        <details class="pv2-more" id="pv2MoreOffers">
-          <summary style="display:none">2 more active offers</summary>
+        <details class="pv2-more">
+          <summary><svg class="pv2-more-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> 2 more active offers<svg class="pv2-more-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary>
           <div class="pv2-more-item"><svg class="pv2-more-item-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> £50 off orders over £599 - <strong>auto-applied</strong></div>
           <div class="pv2-more-item"><svg class="pv2-more-item-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> £75 off orders over £749 - <strong>auto-applied</strong></div>
           <div class="pv2-more-item pv2-signup" onclick="openExit(true)" role="button" tabindex="0">
@@ -6518,15 +6235,7 @@ footer{background:#EDECE9;color:#433122}
         -->
         <div class="pv2-klarna pv2-klarna--top" id="pv2Toggle" onclick="togglePayWidgets(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2Widgets">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          <!-- v128: copy fixed - was "Pay in 3 - £167.67/mo interest-free
-               BNPL", which didn't parse (mixed a per-instalment amount
-               with a "/mo" suffix, then tacked the "BNPL" jargon on the
-               end). Rewritten as a plain, correctly-formed sentence -
-               and kept short enough to stay on one line (adding "each"
-               at the end wrapped to two lines and made this row taller
-               than the offer row above it, which explicit direction
-               said should match). -->
-          <span>Pay in 3 interest-free instalments of <b>£167.67</b></span>
+          <span>Pay in 3 - <b>£167.67/mo</b> interest-free BNPL</span>
           <svg class="pv2-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
         </div>
         <div class="pv2-widgets" id="pv2Widgets" hidden>
@@ -6542,15 +6251,11 @@ footer{background:#EDECE9;color:#433122}
             <p>Pay in 3 interest-free payments on purchases from £30-£2,000 with <img src="./assets-web/pay-paypal.png" alt="PayPal" class="pv2-widget-logo">. <a href="#" class="pv2-widget-link">Learn more</a></p>
           </div>
         </div>
-        <!-- v126: payment method icons row (Klarna/Shop Pay/PayPal logos)
-             removed per explicit direction. Markup kept as a comment,
-             not deleted, per the never-delete convention:
         <div class="pv2-methods">
           <img class="pm-img" src="./assets-web/pay-klarna.png" alt="Klarna">
           <img class="pm-img" src="./assets-web/pay-shoppay.png" alt="Shop Pay">
           <img class="pm-img" src="./assets-web/pay-paypal.png" alt="PayPal">
         </div>
-        -->
       </div>
 
       <!-- CTA ROW<!-- CTA ROW -->
@@ -6567,14 +6272,7 @@ footer{background:#EDECE9;color:#433122}
         <button class="atc" id="mainAtc">Add to Basket - £503</button>
       </div>
 
-      <!-- v126: RTB/trust badges row below ATC removed per explicit
-           direction. Content redistributed elsewhere per the Delivery &
-           Returns restructure (365-Day Guarantee now lives inside the
-           new "Returns Policy" accordion; 30-Day Returns folded into the
-           same accordion; 0% Interest Instalments already duplicated by
-           the "Pay in 3" BNPL row higher up the page, so not rehomed).
-           Markup kept as a comment, not deleted, per the never-delete
-           convention:
+      <!-- TRUST BADGES with popup (#13) - Secure replaced by Pay in 3 -->
       <div class="trust4">
         <div class="t4" onclick="openTrust('guarantee')" role="button" tabindex="0">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z"/></svg>
@@ -6589,7 +6287,6 @@ footer{background:#EDECE9;color:#433122}
           <span>0% Interest Instalments</span>
         </div>
       </div>
-      -->
 
       <!--
         PRD NOTE — UGC placement, conditional block:
@@ -6786,7 +6483,7 @@ footer{background:#EDECE9;color:#433122}
     <div class="tm-drag"></div>
     <button class="tm-close" onclick="closeTrust('returns')">×</button>
     <svg class="tm-icon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
-    <h4>14-Day Returns</h4>
+    <h4>30-Day Returns</h4>
     <p>Faulty or damaged on arrival? Collected free, no questions.</p>
     <p>Changed your mind? A collection fee applies (£25 furniture/mirrors/large items, £18 rugs/ottomans, £5 cushions/throws/lamps). Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p>
   </div>
@@ -7245,15 +6942,8 @@ footer{background:#EDECE9;color:#433122}
               </table>
             </div>
           </div>
-          <!-- v126: renamed "Care Guide" to "Care & Buying Guide" and
-               added the Buying Guide paragraph, per explicit direction -
-               this now carries the same fuller content that used to live
-               in the Delivery section's "Care & Buying Guide" accordion
-               (removed from there, see the Delivery & Returns section
-               changelog note above). Care paragraph itself is unchanged
-               verbatim. -->
-          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care &amp; Buying Guide<span class="pm">+</span></button>
-            <div class="acc-body"><p><b>Care Guide</b></p><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p><p style="margin-top:12px"><b>Buying Guide</b></p><p>Many of our cabinets feature natural materials - from solid wood to stone or metal accents - so gentle variations in grain, colour, and texture are expected. Lighting and screen settings may also cause slight colour differences. These natural details aren't flaws; they're what make each FableRoom piece feel unique, crafted with care, and truly one of a kind.</p></div>
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care Guide<span class="pm">+</span></button>
+            <div class="acc-body"><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p></div>
           </div>
         </div>
       </div>
@@ -7603,10 +7293,6 @@ footer{background:#EDECE9;color:#433122}
            already used on Fableroom's own live page for this exact
            copy. Same .show toggle mechanism as the existing Delivery
            section's db-tooltip (see .delivbar/.db-info above). -->
-      <!-- v127 REVERT: back to the original copy "Prices that make
-           sense, without the middlemen." - the v126 rewrite ("No
-           middlemen. No markup games. Just the real price.") is reverted
-           per explicit direction, restoring what was there before. -->
       <p class="ap-sub">Prices that make sense, without the middlemen.
         <span class="cmp-info" tabindex="0" role="button" aria-label="Pricing comparison info" onclick="document.getElementById('cmpInfoTooltip').classList.toggle('show')">
           <svg viewBox="0 0 18 18" fill="none"><path d="M15.1648 3.4725C14.0923 2.25 11.7898 1.5 8.99984 1.5C6.20984 1.5 3.90734 2.25 2.83484 3.4725C1.04984 5.5425 1.04984 12.4725 2.83484 14.5275C3.90734 15.75 6.20984 16.5 8.99984 16.5C11.7898 16.5 14.0923 15.75 15.1648 14.5275C16.9498 12.4575 16.9498 5.5425 15.1648 3.4725ZM8.99984 5.0625C9.18526 5.0625 9.36652 5.11748 9.52069 5.2205C9.67486 5.32351 9.79502 5.46993 9.86598 5.64123C9.93694 5.81254 9.9555 6.00104 9.91933 6.1829C9.88316 6.36475 9.79387 6.5318 9.66276 6.66291C9.53164 6.79402 9.3646 6.88331 9.18274 6.91949C9.00088 6.95566 8.81238 6.93709 8.64108 6.86614C8.46977 6.79518 8.32335 6.67502 8.22034 6.52085C8.11733 6.36668 8.06234 6.18542 8.06234 6C8.06234 5.75136 8.16112 5.5129 8.33693 5.33709C8.51275 5.16127 8.7512 5.0625 8.99984 5.0625ZM9.74984 13.125H8.24984C8.05093 13.125 7.86017 13.046 7.71951 12.9053C7.57886 12.7647 7.49984 12.5739 7.49984 12.375C7.49984 12.1761 7.57886 11.9853 7.71951 11.8447C7.86017 11.704 8.05093 11.625 8.24984 11.625V9.375C8.05093 9.375 7.86017 9.29598 7.71951 9.15533C7.57886 9.01468 7.49984 8.82391 7.49984 8.625C7.49984 8.42609 7.57886 8.23532 7.71951 8.09467C7.86017 7.95402 8.05093 7.875 8.24984 7.875H8.99984C9.19876 7.875 9.38952 7.95402 9.53017 8.09467C9.67083 8.23532 9.74984 8.42609 9.74984 8.625V11.625C9.94876 11.625 10.1395 11.704 10.2802 11.8447C10.4208 11.9853 10.4998 12.1761 10.4998 12.375C10.4998 12.5739 10.4208 12.7647 10.2802 12.9053C10.1395 13.046 9.94876 13.125 9.74984 13.125Z" fill="currentColor"/></svg>
@@ -7763,53 +7449,133 @@ footer{background:#EDECE9;color:#433122}
             <table class="dtable"><thead><tr><th>Service</th><th>Time</th><th>Cost</th></tr></thead>
             <tbody><tr><td>Doorstep (under £100)</td><td>1–2 wks</td><td>£3.95</td></tr><tr><td>Doorstep (over £100)</td><td>1–2 wks</td><td>£7.95</td></tr><tr><td>2-Man delivery</td><td>1–2 wks</td><td>£14.95</td></tr><tr><td>Room of choice</td><td>Arranged</td><td>£20.00</td></tr></tbody></table>
             <p style="margin-top:10px;font-size:12px;color:var(--ink-3)">Final delivery cost is confirmed and added at checkout.</p>
-            <p style="margin-top:10px"><a href="https://fableroom.com/pages/delivery-and-shipping" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full delivery policy →</a></p>
+            <p style="margin-top:10px"><a href="#" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full delivery policy →</a></p>
           </div>
         </div>
-        <!-- v126: "Pre-order timeline" accordion removed per explicit
-             direction. Kept as a comment, not deleted:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Pre-order timeline<span class="pm">+</span></button>
+          <!-- _53 FIX: REVERSED the _52 fix per a stronger source - see
+               the _53 top-of-file changelog entry and the matching
+               comment on the backorder notice above for the full
+               grounding. The dedicated, dated delivery policy page
+               (fableroom.com/pages/delivery-and-shipping, "Last
+               updated: 4 June, 2026") is the real current figure:
+               Pre-Order arrives in 8-12 weeks, not 5-10. -->
           <div class="acc-body"><p><b>Pre-Order  -  Arrives in 8&ndash;12 weeks</b></p><p>These are new designs we&rsquo;ve approved and want to give you early access to. They&rsquo;re still in production on the shop floor, which means they take longer than Standard Shipping. By ordering early, you lock in:</p><ul style="margin-top:10px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)"><li>10% off the regular price (auto-applied)</li><li>Priority dispatch when production is complete</li></ul></div></div>
-        -->
-        <!-- v126: "Care & Buying Guide" accordion removed from here per
-             explicit direction - moved to the Features & Specifications
-             section instead (replacing the plain "Care Guide" item
-             there with this same content, renamed to match). Kept as a
-             comment here, not deleted:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care &amp; Buying Guide<span class="pm">+</span></button>
           <div class="acc-body"><p><b>Care Guide</b></p><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p><p style="margin-top:12px"><b>Buying Guide</b></p><p>Many of our cabinets feature natural materials - from solid wood to stone or metal accents - so gentle variations in grain, colour, and texture are expected. Lighting and screen settings may also cause slight colour differences. These natural details aren't flaws; they're what make each FableRoom piece feel unique, crafted with care, and truly one of a kind.</p></div></div>
-        -->
       </div>
       <div>
-        <!-- v126: "Finance & payment" accordion removed per explicit
-             direction. Kept as a comment, not deleted:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Finance &amp; payment<span class="pm">+</span></button>
           <div class="acc-body"><p>We currently accept payment with Visa, Mastercard, Maestro, American Express, Apple Pay, Google Pay, Shop Pay, Paypal and Klarna.</p><p>Or spread the cost with <b>Klarna</b>  -  3 interest-free payments of <b>£167.67</b>, chosen at checkout.</p></div></div>
-        -->
-        <!-- v126 NEW: merged "Returns Policy" accordion, per explicit
-             direction - combines the former separate "30-day returns"
-             and "365-day guarantee" accordions (both removed from below,
-             kept as comments) into one. Returns-policy link now points
-             to the real live URL (was a "#" placeholder). -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Returns Policy<span class="pm">+</span></button>
-          <div class="acc-body"><p>Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:12px"><b>365-Day Guarantee</b></p><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p><p style="margin-top:10px"><a href="https://fableroom.com/pages/return-refund" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
-        <!-- v126: former standalone "30-day returns" accordion. Kept as
-             a comment, not deleted, per the never-delete convention:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">30-day returns<span class="pm">+</span></button>
           <div class="acc-body"><p>Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:10px"><a href="#" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
-        -->
-        <!-- v126: former standalone "365-day guarantee" accordion. Kept
-             as a comment, not deleted, per the never-delete convention:
         <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">365-day guarantee<span class="pm">+</span></button>
           <div class="acc-body"><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p></div></div>
-        -->
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- A+ 9 · CUSTOMER REVIEWS (moved above FAQ per explicit direction, v126) -->
+  <!-- A+ 9 · FAQ -->
+  <section id="faq" class="ap">
+    <div class="ap-head"><span class="eyebrow">FAQ</span><h2 class="ap-h">Everything You Need To Know</h2></div>
+    <!-- _50 UPDATE: 4 new questions added per explicit direction, backed
+         by analysis of the 1,031-review Trustpilot dump (see the _50
+         top-of-file changelog entry for the full reasoning/data behind
+         each one). The "is it normal for natural materials to
+         shed/smell" question from the same analysis was explicitly
+         EXCLUDED per direction - not added here. All 11 original
+         verbatim questions/answers are unchanged, just re-sequenced
+         to fit the new ones in at sensible points in the objection
+         hierarchy (pricing/trust doubts first, then logistics, then
+         returns) rather than tacked on at the end. -->
+    <div class="acc-grid">
+      <div>
+        <div class="acc"><button class="acc-btn" aria-expanded="true" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body open"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
+        <!-- _52 FIX: 365-Day Guarantee terms added to this existing
+             question rather than a new FAQ entry, per explicit
+             direction. The terms already exist elsewhere on the page
+             (CTA trust badge -> modal, and the Delivery accordion) but
+             weren't in the FAQ at all - this question ("...durable?")
+             is the natural fit since it's already making a durability
+             claim, and the guarantee is the concrete backing for that
+             claim. Those other placements are untouched - this is an
+             addition, not a consolidation. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are your products authentic and durable?<span class="pm">+</span></button><div class="acc-body"><p>Every piece is sourced from carefully vetted makers using premium materials and traditional techniques. Many of our artisans have been perfecting their craft for generations, creating pieces built to last - not just look good in photos.</p><p style="margin-top:10px">Every product is also backed by our 365-Day Guarantee: any verifiable manufacturing or material fault within a year is repaired, replaced, or refunded - your choice. This covers manufacturing and material faults, not accidental damage or normal wear.</p></div></div>
+        <!-- _50 NEW: 135 review mentions, only 9% rated 3-star-or-below -
+             not a common failure, but a constantly-recurring unprompted
+             relief point ("colours are an exact match", "photos don't
+             do it justice"), meaning it's a live pre-purchase anxiety
+             worth pre-empting even though it rarely goes wrong. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will my item look exactly like the photos?<span class="pm">+</span></button><div class="acc-body"><p>Many of our pieces are finished by hand, which means natural variation in colour, grain, or texture is normal and expected - no two pieces are ever perfectly identical. This is part of what makes handcrafted items unique, not a fault. Check the individual product page for details on that item's specific finish.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Where are your products made?<span class="pm">+</span></button><div class="acc-body"><p>Most of our products are handcrafted by skilled artisans in India, using traditional techniques passed down through generations, while a few collections are sourced from Vietnam.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you have a showroom I can visit?<span class="pm">+</span></button><div class="acc-body"><p>We don't operate physical showrooms - this keeps our costs low so we can pass those savings on to you. If a piece doesn't work in your space, our 30-day return policy has you covered.</p></div></div>
+        <!-- _50 NEW: real checkout-stage ambiguity, especially relevant
+             given pre-order items with long wait times - addresses a
+             standard cart-abandonment driver even though it doesn't
+             show up as a post-purchase complaint in the review dump. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How and when will I be charged?<span class="pm">+</span></button><div class="acc-body"><p>All orders are prepaid at checkout - we don't offer cash on delivery. Your payment is taken when your order is confirmed, and the price shown at checkout is the price you pay.</p></div></div>
+        <!-- _50 NEW: sharpest negative signal in the entire review
+             dataset - only 7 mentions, but 86% rated 3-star-or-below
+             ("cancellation and returns process is shockingly bad",
+             "numerous broken promises"). A clear upfront answer won't
+             fix a slow ops process, but removes the "I had no idea
+             this would be this hard" layer of the complaint. -->
+        <!-- _54 FIX: added the missing "once shipped" clause, per
+             explicit direction after this exact gap was flagged. The
+             14-day window alone (from the dedicated Cancellation
+             Policy on the live Returns & Exchange page) doesn't cover
+             the case where an order ships faster than 14 days - the
+             live Delivery & Shipping page states separately "Once an
+             order has been shipped, it cannot be cancelled or
+             modified", which is a real, additional constraint this
+             answer was missing. Both conditions now stated together
+             so whichever happens first is clear. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I cancel my order?<span class="pm">+</span></button><div class="acc-body"><p>You can request a cancellation within 14 days of your order confirmation, provided it hasn't shipped yet - once an order has shipped, it can no longer be cancelled or modified, even within that window. After either point, your item will already be with our makers and we're unable to process a cancellation. To cancel, email us at support@fableroom.com with your order number and we'll take care of the rest.</p></div></div>
+        <!-- _53 FIX: two figures corrected against the dedicated, dated
+             delivery policy page (fableroom.com/pages/delivery-and-
+             shipping, "Last updated: 4 June, 2026") - Standard Shipping
+             was 3-5 weeks (real: 3-8 weeks) and Pre-Order was just
+             reverted from 5-10 back to 8-12 weeks per the _53 changelog
+             entry. Both were sourced from PDP inline snippets last
+             time, which turn out to be the outdated copy - the dated
+             policy page is the stronger source when the two disagree. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How long will my delivery take?<span class="pm">+</span></button><div class="acc-body"><p>Delivery time depends on availability: Ready to Ship arrives in 1-2 weeks, Standard Shipping in 3-8 weeks, and Pre-Order in 8-12 weeks - Astra is currently Pre-Order.</p></div></div>
+      </div>
+      <div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you deliver to my area?<span class="pm">+</span></button><div class="acc-body"><p>We deliver throughout England, Scotland, and Wales. For Northern Ireland, we offer delivery of smaller items with a minimal surcharge.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I track my order?<span class="pm">+</span></button><div class="acc-body"><p>Yes. You'll receive tracking information via email once your order ships, and can check delivery status anytime under My Account &gt; My Orders.</p></div></div>
+        <!-- _50 NEW: second-highest volume negative theme in the whole
+             dataset - 56 mentions, 41% rated 3-star-or-below. Previously
+             this was only implied inside the "Will I be charged for
+             returns?" answer - split out on its own since the volume
+             and negativity here means it deserves a direct answer, not
+             a subordinate clause in a different question. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">What happens if my item arrives damaged or faulty?<span class="pm">+</span></button><div class="acc-body"><p>Contact us within 30 days with your order number and a photo of the damage. We'll arrange a free collection and send a replacement or full refund - whichever you prefer.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">If I don't like something, can I return it?<span class="pm">+</span></button><div class="acc-body"><p>Most products can be returned within 30 days of delivery. Collections are free if your item is damaged or faulty - otherwise a collection fee applies.</p></div></div>
+        <!-- _52 FIX: refund timeframe added, per explicit direction -
+             "refunds within 7 days of receipt" existed in the Delivery
+             accordion and the trust modal but wasn't in the FAQ at all,
+             despite this being exactly the question where someone
+             would look for it. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do I return something?<span class="pm">+</span></button><div class="acc-body"><p>Email support@fableroom.com with your order number, a brief description, and a photo if applicable. For furniture and large items, we'll arrange a doorstep pickup at your home. Once your return is received and inspected, your refund is issued within 7 days.</p></div></div>
+        <!-- _52 FIX: fee breakdown expanded per explicit direction - was
+             furniture-only (£25), which is correct for Astra but
+             incomplete for this FAQ's sitewide scope. Added the full
+             fee table (already accurate and live elsewhere on the
+             page - Delivery accordion) so a rug or cushion customer
+             reading this same FAQ on a different product gets the
+             right fee, not just the furniture one. -->
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will I be charged for returns?<span class="pm">+</span></button><div class="acc-body"><p>Faulty or damaged items are collected free within 30 days. Change-of-mind returns carry a collection fee - £25 for furniture, mirrors, and larger items, £18 for rugs and ottomans, and £5 for cushions, throws, and lamps.</p></div></div>
+        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are there items I can't return?<span class="pm">+</span></button><div class="acc-body"><p>Some products are custom-made just for you and aren't eligible for return - this is always shown clearly on the product page before you order.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- A+ · CUSTOMER REVIEWS -->
   <section id="reviews" class="ap">
     <div class="ap-head"><span class="eyebrow">Customer reviews</span><h2 class="ap-h">What buyers say</h2></div>
 
@@ -7910,104 +7676,6 @@ footer{background:#EDECE9;color:#433122}
       </div>
     </div>
     <button class="revsee-all">Read all reviews <span style="font-size:15px">↓</span></button>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- A+ 10 · FAQ (moved below Customer Reviews per explicit direction, v126) -->
-  <section id="faq" class="ap">
-    <div class="ap-head"><span class="eyebrow">FAQ</span><h2 class="ap-h">Everything You Need To Know</h2></div>
-    <!-- _50 UPDATE: 4 new questions added per explicit direction, backed
-         by analysis of the 1,031-review Trustpilot dump (see the _50
-         top-of-file changelog entry for the full reasoning/data behind
-         each one). The "is it normal for natural materials to
-         shed/smell" question from the same analysis was explicitly
-         EXCLUDED per direction - not added here. All 11 original
-         verbatim questions/answers are unchanged, just re-sequenced
-         to fit the new ones in at sensible points in the objection
-         hierarchy (pricing/trust doubts first, then logistics, then
-         returns) rather than tacked on at the end. -->
-    <div class="acc-grid">
-      <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="true" onclick="acc(this)">How do you offer such low prices?<span class="pm">+</span></button><div class="acc-body open"><p>We work directly with skilled makers who maintain fair wages and follow sustainable practices, cutting out middlemen. This lets us offer at least 30% savings on most of our products, and often more.</p></div></div>
-        <!-- _52 FIX: 365-Day Guarantee terms added to this existing
-             question rather than a new FAQ entry, per explicit
-             direction. The terms already exist elsewhere on the page
-             (CTA trust badge -> modal, and the Delivery accordion) but
-             weren't in the FAQ at all - this question ("...durable?")
-             is the natural fit since it's already making a durability
-             claim, and the guarantee is the concrete backing for that
-             claim. Those other placements are untouched - this is an
-             addition, not a consolidation. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are your products authentic and durable?<span class="pm">+</span></button><div class="acc-body"><p>Every piece is sourced from carefully vetted makers using premium materials and traditional techniques. Many of our artisans have been perfecting their craft for generations, creating pieces built to last - not just look good in photos.</p><p style="margin-top:10px">Every product is also backed by our 365-Day Guarantee: any verifiable manufacturing or material fault within a year is repaired, replaced, or refunded - your choice. This covers manufacturing and material faults, not accidental damage or normal wear.</p></div></div>
-        <!-- _50 NEW: 135 review mentions, only 9% rated 3-star-or-below -
-             not a common failure, but a constantly-recurring unprompted
-             relief point ("colours are an exact match", "photos don't
-             do it justice"), meaning it's a live pre-purchase anxiety
-             worth pre-empting even though it rarely goes wrong. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will my item look exactly like the photos?<span class="pm">+</span></button><div class="acc-body"><p>Many of our pieces are finished by hand, which means natural variation in colour, grain, or texture is normal and expected - no two pieces are ever perfectly identical. This is part of what makes handcrafted items unique, not a fault. Check the individual product page for details on that item's specific finish.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Where are your products made?<span class="pm">+</span></button><div class="acc-body"><p>Most of our products are handcrafted by skilled artisans in India, using traditional techniques passed down through generations, while a few collections are sourced from Vietnam.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you have a showroom I can visit?<span class="pm">+</span></button><div class="acc-body"><p>We don't operate physical showrooms - this keeps our costs low so we can pass those savings on to you. If a piece doesn't work in your space, our 14-day return policy has you covered.</p></div></div>
-        <!-- _50 NEW: real checkout-stage ambiguity, especially relevant
-             given pre-order items with long wait times - addresses a
-             standard cart-abandonment driver even though it doesn't
-             show up as a post-purchase complaint in the review dump. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How and when will I be charged?<span class="pm">+</span></button><div class="acc-body"><p>All orders are prepaid at checkout - we don't offer cash on delivery. Your payment is taken when your order is confirmed, and the price shown at checkout is the price you pay.</p></div></div>
-        <!-- _50 NEW: sharpest negative signal in the entire review
-             dataset - only 7 mentions, but 86% rated 3-star-or-below
-             ("cancellation and returns process is shockingly bad",
-             "numerous broken promises"). A clear upfront answer won't
-             fix a slow ops process, but removes the "I had no idea
-             this would be this hard" layer of the complaint. -->
-        <!-- _54 FIX: added the missing "once shipped" clause, per
-             explicit direction after this exact gap was flagged. The
-             14-day window alone (from the dedicated Cancellation
-             Policy on the live Returns & Exchange page) doesn't cover
-             the case where an order ships faster than 14 days - the
-             live Delivery & Shipping page states separately "Once an
-             order has been shipped, it cannot be cancelled or
-             modified", which is a real, additional constraint this
-             answer was missing. Both conditions now stated together
-             so whichever happens first is clear. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I cancel my order?<span class="pm">+</span></button><div class="acc-body"><p>You can request a cancellation within 14 days of your order confirmation, provided it hasn't shipped yet - once an order has shipped, it can no longer be cancelled or modified, even within that window. After either point, your item will already be with our makers and we're unable to process a cancellation. To cancel, email us at support@fableroom.com with your order number and we'll take care of the rest.</p></div></div>
-        <!-- _53 FIX: two figures corrected against the dedicated, dated
-             delivery policy page (fableroom.com/pages/delivery-and-
-             shipping, "Last updated: 4 June, 2026") - Standard Shipping
-             was 3-5 weeks (real: 3-8 weeks) and Pre-Order was just
-             reverted from 5-10 back to 8-12 weeks per the _53 changelog
-             entry. Both were sourced from PDP inline snippets last
-             time, which turn out to be the outdated copy - the dated
-             policy page is the stronger source when the two disagree. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How long will my delivery take?<span class="pm">+</span></button><div class="acc-body"><p>Delivery time depends on availability: Ready to Ship arrives in 1-2 weeks, Standard Shipping in 3-8 weeks, and Pre-Order in 8-12 weeks - Astra is currently Pre-Order.</p></div></div>
-      </div>
-      <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Do you deliver to my area?<span class="pm">+</span></button><div class="acc-body"><p>We deliver throughout England, Scotland, and Wales. For Northern Ireland, we offer delivery of smaller items with a minimal surcharge.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Can I track my order?<span class="pm">+</span></button><div class="acc-body"><p>Yes. You'll receive tracking information via email once your order ships, and can check delivery status anytime under My Account &gt; My Orders.</p></div></div>
-        <!-- _50 NEW: second-highest volume negative theme in the whole
-             dataset - 56 mentions, 41% rated 3-star-or-below. Previously
-             this was only implied inside the "Will I be charged for
-             returns?" answer - split out on its own since the volume
-             and negativity here means it deserves a direct answer, not
-             a subordinate clause in a different question. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">What happens if my item arrives damaged or faulty?<span class="pm">+</span></button><div class="acc-body"><p>Contact us within 14 days with your order number and a photo of the damage. We'll arrange a free collection and send a replacement or full refund - whichever you prefer.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">If I don't like something, can I return it?<span class="pm">+</span></button><div class="acc-body"><p>Most products can be returned within 14 days of delivery. Collections are free if your item is damaged or faulty - otherwise a collection fee applies.</p></div></div>
-        <!-- _52 FIX: refund timeframe added, per explicit direction -
-             "refunds within 7 days of receipt" existed in the Delivery
-             accordion and the trust modal but wasn't in the FAQ at all,
-             despite this being exactly the question where someone
-             would look for it. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">How do I return something?<span class="pm">+</span></button><div class="acc-body"><p>Email support@fableroom.com with your order number, a brief description, and a photo if applicable. For furniture and large items, we'll arrange a doorstep pickup at your home. Once your return is received and inspected, your refund is issued within 7 days.</p></div></div>
-        <!-- _52 FIX: fee breakdown expanded per explicit direction - was
-             furniture-only (£25), which is correct for Astra but
-             incomplete for this FAQ's sitewide scope. Added the full
-             fee table (already accurate and live elsewhere on the
-             page - Delivery accordion) so a rug or cushion customer
-             reading this same FAQ on a different product gets the
-             right fee, not just the furniture one. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Will I be charged for returns?<span class="pm">+</span></button><div class="acc-body"><p>Faulty or damaged items are collected free within 14 days. Change-of-mind returns carry a collection fee - £25 for furniture, mirrors, and larger items, £18 for rugs and ottomans, and £5 for cushions, throws, and lamps.</p></div></div>
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Are there items I can't return?<span class="pm">+</span></button><div class="acc-body"><p>Some products are custom-made just for you and aren't eligible for return - this is always shown clearly on the product page before you order.</p></div></div>
-      </div>
-    </div>
   </section>
 
   <!-- _47 MOVED: "Complete the Look" (renamed) no longer sits here -
@@ -8580,16 +8248,6 @@ cmpSetupScroll('cmpScroll3','cmpTable3','cmpScrollTrack','cmpScrollHint3');
 cmpSetupScroll('cmpScroll3Modal','cmpTable3Modal','cmpScrollTrackModal','cmpScrollHintModal');
 function estDelivery(){var p=document.getElementById('pcode').value.trim();var r=document.getElementById('deres');if(!p){r.textContent='Enter a postcode to see your date.';r.classList.add('show');r.style.color='var(--ink-3)';return}r.innerHTML='✓ Pre-order - estimated arrival <b>late Sept</b> to <b>'+p.toUpperCase()+'</b>';r.classList.add('show');r.style.color='var(--green)'}
 function acc(b){var open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',String(!open));b.parentElement.querySelector('.acc-body').classList.toggle('open',!open)}
-// v128: toggleCouponAccordion() restored (was commented out in v127,
-// now needed again since the coupon row is back to doubling as the
-// accordion trigger, per explicit direction).
-function toggleCouponAccordion(el){
-  var panel=document.getElementById('pv2MoreOffers');
-  if(!panel)return;
-  var next=!panel.open;
-  panel.open=next;
-  el.setAttribute('aria-expanded',String(next));
-}
 function openSidebar(){document.getElementById('sidebarOverlay').classList.add('show');document.body.style.overflow='hidden'}
 function closeSidebar(){document.getElementById('sidebarOverlay').classList.remove('show');document.body.style.overflow=''}
 function switchCmpTab(btn,panelId){document.querySelectorAll('.cmp-tab').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.cmp-panel').forEach(function(p){p.classList.remove('active')});btn.classList.add('active');var panel=document.getElementById(panelId);if(panel)panel.classList.add('active')}
