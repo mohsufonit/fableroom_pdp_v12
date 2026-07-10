@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <!--
   ============================================================
+  v136 UPDATE (this file, forked from v135) - per explicit direction:
+  1. OFFER COPY CHANGED: "Extra 10% off - use code" -> "Extra 10% off
+     with" (reads into the PRIME10 pill immediately following it). Same
+     on both mobile and desktop.
+  2. MOBILE "MORE OFFERS" INDICATOR: replaced the bare "2" numeral with
+     the word "More" on mobile only. Desktop unchanged - still shows the
+     real numeral + " more offers" (e.g. "2 more offers"). Chevron
+     markup/behaviour untouched on both breakpoints.
+  ============================================================
   v135 UPDATE (this file, forked from v134) - per explicit direction:
   1. RETURN WINDOW CHANGED 30 DAYS -> 14 DAYS in all live-reachable
      copy: 4 FAQ answers (showroom, damaged/faulty, "can I return it",
@@ -6040,10 +6049,14 @@ footer{background:#EDECE9;color:#433122}
 .pv2-offer-badge{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;background:rgba(16,132,116,.08);border:1px solid rgba(16,132,116,.2);border-radius:5px;padding:1px 10px 1px 10px} /* v133 REBUILD: was 36.8px tall against the PRIME10 pill's 23.4px - "unusually big" per explicit feedback. Padding/font-size (below) now mirror .pv2-code's own box model exactly (1px vertical padding, 12.5px font-size, same border-radius) so the two pills match in height and sit flush with each other - both already share the same vertical center (both centered within .pv2-offer's row), so matching height also means their top/bottom edges now align, not just their centers. Right padding (10px) is now the SAME on mobile and desktop (was 8px on mobile, 10px on desktop) specifically so the chevron's x-offset doesn't shift between breakpoints - needed since Pay-in-3's chevron below is now hard-pinned to match this one (see .pv2-chevron). */
 .pv2-offer-badge-text{font-size:12.5px;font-weight:600;color:var(--green);white-space:nowrap} /* v133: line-height:1 override removed - PRIME10's pill text doesn't set an explicit line-height either (inherits the page default, ~1.5), and that inherited line-height is what actually determines its ~23px height. Matching that (rather than fighting it) is what makes the two pills the same height. */
 .pv2-offer-badge-text b{font-weight:700}
+.pv2-offer-badge-mobile-only{display:inline} /* v136 NEW: mobile-only "More" text, replacing the bare "2" numeral per explicit direction - desktop is unaffected, see media query below */
+.pv2-offer-badge-count{display:none} /* v136: numeral now hidden on mobile (was the only thing shown before) - shown again on desktop below, unchanged from before */
 .pv2-offer-badge-label{display:none} /* hidden on mobile - not enough room to spell out "more offers", per explicit direction only the number shows here */
 .pv2-offer-badge-chevron{width:14px;height:14px;display:flex;align-items:center;justify-content:center;color:var(--green);transition:transform .2s ease;flex-shrink:0}
 .pv2-offer[aria-expanded="true"] .pv2-offer-badge-chevron{transform:rotate(180deg)}
 @media(min-width:820px){
+  .pv2-offer-badge-mobile-only{display:none} /* v136: "More" text is mobile-only, hidden from this breakpoint up */
+  .pv2-offer-badge-count{display:inline} /* v136: numeral restored on desktop - desktop stays exactly as it was ("2 more offers") */
   .pv2-offer-badge-label{display:inline}
 }
 /* v130/superseded: the two-separate-circles version. Kept, not deleted:
@@ -6433,7 +6446,7 @@ footer{background:#EDECE9;color:#433122}
                explicit direction - text/icon stay green. -->
         <div class="pv2-offer" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2MoreOffers" onclick="toggleCouponAccordion(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCouponAccordion(this)}">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          <span class="pv2-label">Extra 10% off - use code</span>
+          <span class="pv2-label">Extra 10% off with</span>
           <span class="pv2-code">
             PRIME10
             <button class="pv2-copy-icon-inline" onclick="event.stopPropagation();copyCode(this)" aria-label="Copy code PRIME10">
@@ -6453,8 +6466,13 @@ footer{background:#EDECE9;color:#433122}
                  now positioned to match THIS badge's chevron x-position,
                  rather than the other way around - see its own comment
                  further down. -->
+          <!-- v136: badge text now differs by breakpoint - mobile shows
+               the word "More" (via .pv2-offer-badge-mobile-only);
+               desktop is unchanged and still shows the numeral + " more
+               offers" (via .pv2-offer-badge-count + .pv2-offer-badge-label).
+               Chevron markup/behaviour untouched either way. -->
           <span class="pv2-offer-badge" aria-hidden="true">
-            <span class="pv2-offer-badge-text"><b>2</b><span class="pv2-offer-badge-label"> more offers</span></span>
+            <span class="pv2-offer-badge-text"><span class="pv2-offer-badge-mobile-only">More</span><b class="pv2-offer-badge-count">2</b><span class="pv2-offer-badge-label"> more offers</span></span>
             <span class="pv2-offer-badge-chevron">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
             </span>
