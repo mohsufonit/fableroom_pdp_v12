@@ -5831,10 +5831,10 @@ footer{background:#EDECE9;color:#433122}
    the dominant element on that line (standard e-commerce hierarchy -
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
-.sb-head{display:flex;align-items:baseline;gap:2px;min-width:0;padding:4px 10px 8px 10px} /* v160: border-bottom removed - bled to card edges. Replaced with .sb-hr, inset 15% each side. */
-.sb-hr{height:1px;background:var(--ink-3);margin:0 15%}
+.sb-head{display:flex;align-items:baseline;gap:0;min-width:0;padding:4px 5px 8px 10px} /* v161: gap removed, .sb-divider now has its own explicit margin instead. */
+.sb-hr{height:1px;background:var(--ink-3);margin:0 25%} /* v161: inset increased 15%->25% per explicit direction. */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
-.sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
+.sb-divider{flex-shrink:0;color:var(--ink-3);font-weight:500;margin:0 4px} /* v161: color brightened, weight bumped, explicit 4px margin added each side. */
 .sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--heading);white-space:nowrap} /* v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
 .sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:10px} /* v156: shrunk 11.5px->10px, clearly the smallest/least-emphasized element now. */
 /* v149 UPDATE: changed from red "-20%" to green "20% OFF" per
