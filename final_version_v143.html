@@ -5790,15 +5790,55 @@ footer{background:#EDECE9;color:#433122}
    v143 UPDATE: chat-fab shrunk from 90px to 63px, so the reserved
    lane shrinks with it: 16px right-offset + 63px width + 8px buffer
    = 87px, plus the bar's own 16px left-offset = 103px total. */
-.stickybar{position:fixed;left:16px;right:auto;bottom:17px;z-index:70;max-width:calc(100% - 103px);transform:translateY(120%);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
+/* v145 FIX: .stickybar only had max-width, no width - fine when it
+   was a single row (content naturally filled the lane), but once
+   v144 split it into two rows the card shrank to fit its widest row
+   instead of filling the lane, leaving empty space between the card
+   and the chat widget. Explicit width (matching the existing
+   max-width calc) forces it to always fill the reserved 3/4 lane
+   regardless of row content. */
+.stickybar{position:fixed;left:16px;right:auto;bottom:17px;z-index:70;width:calc(100% - 103px);max-width:calc(100% - 103px);transform:translateY(120%);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
 .stickybar.show{transform:translateY(0);pointer-events:auto}
-.sb-in{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line-2);border-radius:calc(var(--radius) + 6px);padding:8px 8px 8px 12px;box-shadow:0 4px 28px rgba(43,32,16,.18),0 1px 4px rgba(43,32,16,.08);max-width:100%}
-.sb-thumb{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;border:2px solid var(--line-2)}
-.sb-info{display:flex;flex-direction:column;gap:1px;min-width:0}
-.sb-name{font-family:var(--ff-d);font-size:13px;color:var(--heading);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px}
-.sb-price{font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap}
-.sb-price s{color:var(--ink-3);font-weight:400;margin-left:4px}
+/* v144 UPDATE: restructured from one row to two rows per explicit
+   direction - title/price were getting cut off squeezed into a
+   single row alongside the button. Now: top row = thumb+name+price,
+   bottom row = full-width button. Width (max-width calc above,
+   unchanged) and the chat-fab's position/size are explicitly NOT
+   touched by this change - only the card's internal layout and
+   height. Height growth kept as tight as possible since this is a
+   sticky element sitting over page content: thumb sized down
+   30px->34px->30px, row gap 6px, button min-height 38px (was 42px),
+   padding trimmed to 8px 10px. Name no longer truncates/ellipsis -
+   full width of the row is now available so "Astra Two Door Cabinet"
+   fits without cutting off. */
+/* v146 UPDATE: restructured again per explicit direction + mockup.
+   Now: row 1 = title + price on a single line separated by a
+   divider, no thumbnail in this row. Row 2 = circular thumbnail
+   beside the button (button no longer full-width, narrower to make
+   room for the thumbnail; height increased 30% from v144's 38px min-
+   height -> 50px). A hairline border sits between the two rows,
+   matching the mockup.
+   Title truncates with ellipsis (flex-shrink + overflow hidden) so a
+   long product name can never push the price out of view or wrap -
+   the divider and price are flex-shrink:0, always fully visible. */
+.sb-in{display:flex;flex-direction:column;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line-2);border-radius:calc(var(--radius) + 6px);box-shadow:0 4px 28px rgba(43,32,16,.18),0 1px 4px rgba(43,32,16,.08);max-width:100%;overflow:hidden}
+/* v147 UPDATE: card height reduced ~30% (119.8px -> target ~84px on
+   mobile) per explicit direction - padding trimmed on both rows,
+   thumbnail and button sized down slightly to reclaim space. In the
+   same pass, title/price got a real typographic upgrade rather than
+   just shrinking everything uniformly: title now bold (was regular
+   weight, easy to miss), price bumped up in size/weight to read as
+   the dominant element on that line (standard e-commerce hierarchy -
+   price is the thing people scan for), original struck-through price
+   lightened further for contrast against the new bold current price. */
+.sb-head{display:flex;align-items:baseline;gap:6px;min-width:0;padding:4px 10px;border-bottom:1px solid var(--line-2)}
+.sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
+.sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
+.sb-price{flex-shrink:0;font-size:14px;font-weight:800;color:var(--heading);white-space:nowrap}
+.sb-price s{color:var(--ink-3);font-weight:400;margin-left:4px;font-size:12px}
 .sb-save{font-size:10.5px;font-weight:700;color:var(--sale);background:rgba(154,37,21,.08);padding:2px 6px;border-radius:4px;margin-left:3px}
+.sb-bottom{display:flex;align-items:center;gap:8px;padding:4px 10px}
+.sb-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;border:2px solid var(--line-2)}
 /* _43 FIX: same texture removal as the shared .atc,.sb-btn rule
    above - this rule redefines .sb-btn's full style (appears later in
    the stylesheet, same specificity, so it's what actually wins for
@@ -5807,7 +5847,7 @@ footer{background:#EDECE9;color:#433122}
    convention:
    .sb-btn{min-height:42px;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;flex-shrink:0;color:#fff;background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5)),var(--wood);background-size:cover;background-position:center;text-shadow:0 1px 2px rgba(0,0,0,.35)}
    .sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6)),var(--wood)} */
-.sb-btn{min-height:42px;border:none;border-radius:var(--radius);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 14px;flex-shrink:0;color:#fff;background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5));text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.sb-btn{flex:1;min-height:40px;border:none;border-radius:var(--radius);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 14px;color:#fff;background-color:#5a3d1e;background-image:linear-gradient(rgba(74,48,22,.28),rgba(40,25,10,.5));text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .sb-btn:hover{background-image:linear-gradient(rgba(50,32,14,.42),rgba(28,17,6,.6))}
 
 /* v140 - placeholder chat widget bubble, mobile + desktop. Stand-in
@@ -5948,12 +5988,45 @@ footer{background:#EDECE9;color:#433122}
      position (right:32px) its left edge now sits 95px in from the
      viewport edge (32+63), not 122px. 111px leaves the same clean
      ~16px gap past that new edge. */
-  .stickybar{left:auto;right:111px;bottom:28px;max-width:none;transform:translateY(120%)}
+  /* v145 FIX: base .stickybar rule now sets an explicit width (mobile
+     fix, see comment above that rule) - this override didn't reset
+     it back to auto, so desktop was inheriting the mobile width
+     calc, stretching the card to ~1337px and pushing it off-screen.
+     width:auto restores the original shrink-to-fit desktop sizing. */
+  .stickybar{left:auto;right:111px;bottom:28px;width:auto;max-width:none;transform:translateY(120%)}
   .stickybar.show{transform:translateY(0);pointer-events:auto}
-  .sb-thumb{width:40px;height:40px}
-  .sb-name{font-size:14px;max-width:160px}
-  .sb-price{font-size:12px}
-  .sb-btn{padding:0 20px;font-size:13px}
+  /* v148 UPDATE: per explicit direction, the v146/v147 card redesign
+     (title|price line + thumb-beside-button, shorter height) is now
+     MOBILE-ONLY. Desktop goes back to its original appearance from
+     before that redesign - one single row: thumb, then name stacked
+     above price, then the button - all in one line, same as it
+     looked pre-v146.
+     The old way of achieving this (v144, since removed) relied on a
+     single .sb-top wrapper holding exactly [thumb, info-block] that
+     could be unwrapped with display:contents to sit beside the
+     button. That wrapper doesn't exist anymore - v146 restructured
+     the markup into two separate groups instead (.sb-head holds
+     name+divider+price for the mobile single-line-with-divider look,
+     .sb-bottom holds thumb+button). Unwrapping both of those with
+     display:contents would dump 5 flat siblings (name, divider,
+     price, thumb, button) into .sb-in with no way to stack name
+     above price using flexbox alone.
+     CSS Grid solves this cleanly: unwrap both groups, then place
+     each leaf element into an explicit grid cell. Thumb spans both
+     rows (vertically centered beside the stack), name sits row 1,
+     price sits row 2 directly under it, divider is hidden (mobile-
+     only element, not part of this layout), button spans both rows
+     on the right. This is a real layout via grid-area placement, not
+     a fragile CSS trick riding on DOM order like the old approach -
+     less likely to break the next time the mobile markup changes. */
+  .sb-in{display:grid;grid-template-columns:auto auto 1fr;column-gap:10px;align-items:center;padding:8px 8px 8px 12px}
+  .sb-head{display:contents}
+  .sb-bottom{display:contents}
+  .sb-name{grid-column:2;grid-row:1;font-size:14px;font-weight:400;max-width:160px}
+  .sb-divider{display:none}
+  .sb-price{grid-column:2;grid-row:2;font-size:12px;font-weight:700}
+  .sb-thumb{grid-column:1;grid-row:1 / 3;width:40px;height:40px;align-self:center}
+  .sb-btn{grid-column:3;grid-row:1 / 3;width:auto;justify-self:end;min-height:42px;padding:0 20px;font-size:13px}
 
   .ap{padding:64px 0}
   .ap-h{font-size:34px}
@@ -6092,7 +6165,12 @@ footer{background:#EDECE9;color:#433122}
   .makers-body{padding:48px}
   .makers h3{font-size:34px}
   .foot-grid{grid-template-columns:2fr 1fr 1fr 1fr}.foot-brand{grid-column:auto}
-  .sb-thumb{display:block}.sb-name{font-size:17px}
+  /* v146: commented out, not deleted, per convention - this was
+     silently overriding the new .sb-name{font-size:15px} set earlier
+     in this same media query (later rule wins), since it sits at the
+     end of the block. .sb-thumb{display:block} was already redundant
+     (sb-thumb has no display:none anywhere to counteract).
+     .sb-thumb{display:block}.sb-name{font-size:17px} */
 }
 /* #17 Visual setup steps */
 .setup-visual{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:8px;margin-top:22px;padding:22px 16px;background:var(--surface-2);border:1px solid var(--line-2);border-radius:14px}
@@ -8223,14 +8301,18 @@ footer{background:#EDECE9;color:#433122}
 </footer>
 
 <!-- STICKY BUY BAR (v5 exact - rolled back to v50 implementation, not a variation) -->
+<!-- v146: restructured per mockup - row 1 (sb-head) is title + divider + price on one line, title truncates with ellipsis so it can never push price out of view. Row 2 (sb-bottom) is the circular thumbnail beside a taller/narrower button. Same structure used at both breakpoints now, desktop just scaled up in CSS - see .sb-in comment block for why. -->
 <div class="stickybar" id="stickybar">
   <div class="sb-in">
-    <img class="sb-thumb" src="./assets-web/cabinet-front-view.jpg" alt="">
-    <div class="sb-info">
-      <div class="sb-name">Astra Two Door Cabinet</div>
-      <div class="sb-price">£503 <s>£629</s> <span class="sb-save">-20%</span></div>
+    <div class="sb-head">
+      <span class="sb-name">Astra Two Door Cabinet</span>
+      <span class="sb-divider">|</span>
+      <span class="sb-price">£503 <s>£629</s> <span class="sb-save">-20%</span></span>
     </div>
-    <button class="sb-btn">Add to Basket</button>
+    <div class="sb-bottom">
+      <img class="sb-thumb" src="./assets-web/cabinet-front-view.jpg" alt="">
+      <button class="sb-btn">Add to Basket</button>
+    </div>
   </div>
 </div>
 
