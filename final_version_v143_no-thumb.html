@@ -5831,7 +5831,7 @@ footer{background:#EDECE9;color:#433122}
    the dominant element on that line (standard e-commerce hierarchy -
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
-.sb-head{display:flex;align-items:baseline;gap:0;min-width:0;padding:4px 5px 8px 10px} /* v161: gap removed, .sb-divider now has its own explicit margin instead. */
+.sb-head{display:flex;align-items:baseline;gap:0;min-width:0;padding:7px 5px 5px 10px} /* v164 FIX: top/bottom padding rebalanced 4px/8px -> 7px/5px (same 12px total, card height unchanged) - text pushed down toward the line per explicit direction. */
 .sb-hr{height:1px;background:var(--ink-3);margin:0 3.5%;opacity:.8} /* v163: inset reduced 6%->3.5% each side (5% longer total); opacity dropped to .8 (20% reduction). */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--ink-3);font-weight:500;margin:0 4px;opacity:.8} /* v163: opacity dropped to .8 (20% reduction) per explicit direction. */
