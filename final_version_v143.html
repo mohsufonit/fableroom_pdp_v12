@@ -5831,11 +5831,11 @@ footer{background:#EDECE9;color:#433122}
    the dominant element on that line (standard e-commerce hierarchy -
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
-.sb-head{display:flex;align-items:baseline;gap:4px;min-width:0;padding:4px 7px;border-bottom:1px solid var(--line-2)}
+.sb-head{display:flex;align-items:baseline;gap:2px;min-width:0;padding:4px 10px 4px 10px;border-bottom:1px solid var(--line-2)} /* v151 FIX: left padding was 7px vs sb-bottom's 10px, misaligning the title against the button below it - matched to 10px on both sides so title/price now align with the button's left/right edges. Gap trimmed 4px->2px to recover the width this cost the title (was fitting exactly at the old tighter padding). */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
 .sb-price{flex-shrink:0;font-size:14px;font-weight:800;color:var(--heading);white-space:nowrap}
-.sb-price s{color:var(--ink-3);font-weight:400;margin-left:2px;font-size:11.5px}
+.sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:11.5px}
 /* v149 UPDATE: changed from red "-20%" to green "20% OFF" per
    explicit direction, matching the established green-badge pattern
    already used elsewhere on this page (.setup-badge, .pp-badge,
