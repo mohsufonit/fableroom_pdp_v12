@@ -5832,7 +5832,7 @@ footer{background:#EDECE9;color:#433122}
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
 .sb-head{display:flex;align-items:baseline;gap:0;min-width:0;padding:4px 5px 8px 10px} /* v161: gap removed, .sb-divider now has its own explicit margin instead. */
-.sb-hr{height:1px;background:var(--ink-3);margin:0 25%} /* v161: inset increased 15%->25% per explicit direction. */
+.sb-hr{height:1px;background:var(--ink-3);margin:0 6%} /* v162 FIX: previous rounds went the wrong direction (15%->25% inset made the line shorter each time) - per explicit correction, the line needs to be LONGER, not shorter. Inset dropped to 6% each side, close to full width while still not literally touching the card's rounded edges. */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--ink-3);font-weight:500;margin:0 4px} /* v161: color brightened, weight bumped, explicit 4px margin added each side. */
 .sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--heading);white-space:nowrap} /* v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
