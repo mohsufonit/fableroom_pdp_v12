@@ -5844,7 +5844,7 @@ footer{background:#EDECE9;color:#433122}
    (red) on a red-tinted background - now var(--green) on a
    green-tinted background, same structure. */
 .sb-save{font-size:10px;font-weight:700;color:var(--green);background:rgba(16,132,116,.09);padding:2px 5px;border-radius:100px;margin-left:2px}
-.sb-bottom{display:flex;align-items:center;gap:8px;padding:4px 10px}
+.sb-bottom{display:flex;align-items:center;gap:8px;padding:8px 10px} /* v153 FIX: bottom padding was 4px, same as the head row - looked fine for text but too tight around the solid button block against the card's bottom edge. Increased to 8px so the button has proper breathing room. */
 .sb-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;display:none;border:2px solid var(--line-2)} /* v152: display:none on mobile (was display:block) - thumbnail removal is mobile-only now, re-shown at the desktop breakpoint below. */
 /* _43 FIX: same texture removal as the shared .atc,.sb-btn rule
    above - this rule redefines .sb-btn's full style (appears later in
