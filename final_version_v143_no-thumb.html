@@ -5831,11 +5831,11 @@ footer{background:#EDECE9;color:#433122}
    the dominant element on that line (standard e-commerce hierarchy -
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
-.sb-head{display:flex;align-items:baseline;gap:4px;min-width:0;padding:4px 7px;border-bottom:1px solid var(--line-2)}
+.sb-head{display:flex;align-items:baseline;gap:2px;min-width:0;padding:4px 10px 4px 10px;border-bottom:1px solid var(--line-2)} /* v151/v152: left padding matched to sb-bottom's 10px so title aligns with the button below it; gap trimmed to recover the width this cost the title. */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
 .sb-price{flex-shrink:0;font-size:14px;font-weight:800;color:var(--heading);white-space:nowrap}
-.sb-price s{color:var(--ink-3);font-weight:400;margin-left:2px;font-size:11.5px}
+.sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:11.5px}
 /* v149 UPDATE: changed from red "-20%" to green "20% OFF" per
    explicit direction, matching the established green-badge pattern
    already used elsewhere on this page (.setup-badge, .pp-badge,
@@ -5845,7 +5845,7 @@ footer{background:#EDECE9;color:#433122}
    green-tinted background, same structure. */
 .sb-save{font-size:10px;font-weight:700;color:var(--green);background:rgba(16,132,116,.09);padding:2px 5px;border-radius:100px;margin-left:2px}
 .sb-bottom{display:flex;align-items:center;gap:8px;padding:4px 10px}
-.sb-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;border:2px solid var(--line-2)}
+.sb-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;display:none;border:2px solid var(--line-2)} /* v152: display:none on mobile (was display:block) - thumbnail removal is mobile-only now, re-shown at the desktop breakpoint below. */
 /* _43 FIX: same texture removal as the shared .atc,.sb-btn rule
    above - this rule redefines .sb-btn's full style (appears later in
    the stylesheet, same specificity, so it's what actually wins for
@@ -6026,16 +6026,18 @@ footer{background:#EDECE9;color:#433122}
      on the right. This is a real layout via grid-area placement, not
      a fragile CSS trick riding on DOM order like the old approach -
      less likely to break the next time the mobile markup changes. */
-  /* v150 VARIANT: thumb column dropped (3-col grid -> 2-col) since
-     this variant has no thumbnail - name/price now sit in column 1,
-     button in column 2. */
-  .sb-in{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:8px 8px 8px 12px}
+  /* v152 UPDATE: v150's 2-col "no thumb" desktop grid reverted - the
+     thumbnail removal is mobile-only, desktop keeps it and goes back
+     to the original 3-column layout (thumb | name-over-price |
+     button), matching final_version_v143.html's desktop exactly. */
+  .sb-in{display:grid;grid-template-columns:auto auto 1fr;column-gap:10px;align-items:center;padding:8px 8px 8px 12px}
   .sb-head{display:contents}
   .sb-bottom{display:contents}
-  .sb-name{grid-column:1;grid-row:1;font-size:14px;font-weight:400;max-width:160px}
+  .sb-name{grid-column:2;grid-row:1;font-size:14px;font-weight:400;max-width:160px}
   .sb-divider{display:none}
-  .sb-price{grid-column:1;grid-row:2;font-size:12px;font-weight:700}
-  .sb-btn{grid-column:2;grid-row:1 / 3;min-height:42px;padding:0 20px;font-size:13px}
+  .sb-price{grid-column:2;grid-row:2;font-size:12px;font-weight:700}
+  .sb-thumb{grid-column:1;grid-row:1 / 3;display:block;width:40px;height:40px;align-self:center}
+  .sb-btn{grid-column:3;grid-row:1 / 3;width:auto;justify-self:end;min-height:42px;padding:0 20px;font-size:13px}
 
   .ap{padding:64px 0}
   .ap-h{font-size:34px}
@@ -8310,7 +8312,7 @@ footer{background:#EDECE9;color:#433122}
 </footer>
 
 <!-- STICKY BUY BAR (v5 exact - rolled back to v50 implementation, not a variation) -->
-<!-- v150 VARIANT: thumbnail removed from sb-bottom per explicit direction - this is a separate variant file (final_version_v143_no-thumb.html), the canonical final_version_v143.html keeps the thumbnail. Button (.sb-btn, already flex:1 on mobile) now fills the full row width on its own with no sibling. Desktop grid updated to drop the thumb's column - see .sb-in grid comment in the desktop media query. -->
+<!-- v152 UPDATE: thumbnail removal is mobile-only, not this whole variant file - desktop keeps the thumbnail. Markup restored to include the image (needed either way since desktop shows it); visibility is controlled by CSS now (.sb-thumb{display:none} on mobile, re-shown in the desktop media query) rather than by whether the tag exists in the HTML. -->
 <div class="stickybar" id="stickybar">
   <div class="sb-in">
     <div class="sb-head">
@@ -8319,6 +8321,7 @@ footer{background:#EDECE9;color:#433122}
       <span class="sb-price">£503 <s>£629</s> <span class="sb-save">20% OFF</span></span>
     </div>
     <div class="sb-bottom">
+      <img class="sb-thumb" src="./assets-web/cabinet-front-view.jpg" alt="">
       <button class="sb-btn">Add to Basket</button>
     </div>
   </div>
