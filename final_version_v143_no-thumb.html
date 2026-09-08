@@ -5834,8 +5834,8 @@ footer{background:#EDECE9;color:#433122}
 .sb-head{display:flex;align-items:baseline;gap:2px;min-width:0;padding:4px 10px 4px 10px;border-bottom:1px solid var(--line-2)} /* v151/v152: left padding matched to sb-bottom's 10px so title aligns with the button below it; gap trimmed to recover the width this cost the title. */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
-.sb-price{flex-shrink:0;font-size:14px;font-weight:800;color:var(--heading);white-space:nowrap}
-.sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:11.5px}
+.sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--heading);white-space:nowrap} /* v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
+.sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:10px} /* v156: shrunk 11.5px->10px, clearly the smallest/least-emphasized element now. */
 /* v149 UPDATE: changed from red "-20%" to green "20% OFF" per
    explicit direction, matching the established green-badge pattern
    already used elsewhere on this page (.setup-badge, .pp-badge,
@@ -6035,7 +6035,7 @@ footer{background:#EDECE9;color:#433122}
   .sb-bottom{display:contents}
   .sb-name{grid-column:2;grid-row:1;font-size:14px;font-weight:400;max-width:160px}
   .sb-divider{display:none}
-  .sb-price{grid-column:2;grid-row:2;font-size:12px;font-weight:700}
+  .sb-price{grid-column:2;grid-row:2;font-size:18px;font-weight:800} /* v156: bumped 12px->18px - was smaller than the 14px title (backwards), now clearly the dominant element. Title's own size/weight left untouched this round, price-only fix. */
   .sb-thumb{grid-column:1;grid-row:1 / 3;display:block;width:40px;height:40px;align-self:center}
   .sb-btn{grid-column:3;grid-row:1 / 3;width:auto;justify-self:end;min-height:42px;padding:0 20px;font-size:13px}
 
