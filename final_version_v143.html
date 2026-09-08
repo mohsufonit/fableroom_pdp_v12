@@ -5831,12 +5831,19 @@ footer{background:#EDECE9;color:#433122}
    the dominant element on that line (standard e-commerce hierarchy -
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
-.sb-head{display:flex;align-items:baseline;gap:6px;min-width:0;padding:4px 10px;border-bottom:1px solid var(--line-2)}
+.sb-head{display:flex;align-items:baseline;gap:4px;min-width:0;padding:4px 7px;border-bottom:1px solid var(--line-2)}
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
 .sb-price{flex-shrink:0;font-size:14px;font-weight:800;color:var(--heading);white-space:nowrap}
-.sb-price s{color:var(--ink-3);font-weight:400;margin-left:4px;font-size:12px}
-.sb-save{font-size:10.5px;font-weight:700;color:var(--sale);background:rgba(154,37,21,.08);padding:2px 6px;border-radius:4px;margin-left:3px}
+.sb-price s{color:var(--ink-3);font-weight:400;margin-left:2px;font-size:11.5px}
+/* v149 UPDATE: changed from red "-20%" to green "20% OFF" per
+   explicit direction, matching the established green-badge pattern
+   already used elsewhere on this page (.setup-badge, .pp-badge,
+   .comp-row .comp-save all use this same var(--green) text + 9%-
+   opacity green background + pill shape combo). Was var(--sale)
+   (red) on a red-tinted background - now var(--green) on a
+   green-tinted background, same structure. */
+.sb-save{font-size:10px;font-weight:700;color:var(--green);background:rgba(16,132,116,.09);padding:2px 5px;border-radius:100px;margin-left:2px}
 .sb-bottom{display:flex;align-items:center;gap:8px;padding:4px 10px}
 .sb-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;border:2px solid var(--line-2)}
 /* _43 FIX: same texture removal as the shared .atc,.sb-btn rule
@@ -8307,7 +8314,7 @@ footer{background:#EDECE9;color:#433122}
     <div class="sb-head">
       <span class="sb-name">Astra Two Door Cabinet</span>
       <span class="sb-divider">|</span>
-      <span class="sb-price">£503 <s>£629</s> <span class="sb-save">-20%</span></span>
+      <span class="sb-price">£503 <s>£629</s> <span class="sb-save">20% OFF</span></span>
     </div>
     <div class="sb-bottom">
       <img class="sb-thumb" src="./assets-web/cabinet-front-view.jpg" alt="">
