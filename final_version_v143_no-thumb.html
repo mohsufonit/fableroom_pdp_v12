@@ -5831,7 +5831,8 @@ footer{background:#EDECE9;color:#433122}
    the dominant element on that line (standard e-commerce hierarchy -
    price is the thing people scan for), original struck-through price
    lightened further for contrast against the new bold current price. */
-.sb-head{display:flex;align-items:baseline;gap:2px;min-width:0;padding:4px 10px 8px 10px;border-bottom:1px solid var(--ink-3)} /* v159 FIX: reverted v158's asymmetric 12px/8px back to equal 8px/8px per explicit direction. Line switched var(--line)->var(--ink-3) since it wasn't reading as visible against the card background. Mobile only. */
+.sb-head{display:flex;align-items:baseline;gap:2px;min-width:0;padding:4px 10px 8px 10px} /* v160: border-bottom removed - bled to card edges. Replaced with .sb-hr, inset 15% each side. */
+.sb-hr{height:1px;background:var(--ink-3);margin:0 15%}
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
 .sb-divider{flex-shrink:0;color:var(--line-2);font-weight:300}
 .sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--heading);white-space:nowrap} /* v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
@@ -6032,6 +6033,7 @@ footer{background:#EDECE9;color:#433122}
      button), matching final_version_v143.html's desktop exactly. */
   .sb-in{display:grid;grid-template-columns:auto auto 1fr;column-gap:10px;align-items:center;padding:8px 8px 8px 12px}
   .sb-head{display:contents}
+  .sb-hr{display:none}
   .sb-bottom{display:contents}
   .sb-name{grid-column:2;grid-row:1;font-size:14px;font-weight:400;max-width:160px}
   .sb-divider{display:none}
@@ -8320,6 +8322,7 @@ footer{background:#EDECE9;color:#433122}
       <span class="sb-divider">|</span>
       <span class="sb-price">£503 <s>£629</s> <span class="sb-save">20% OFF</span></span>
     </div>
+    <div class="sb-hr"></div>
     <div class="sb-bottom">
       <img class="sb-thumb" src="./assets-web/cabinet-front-view.jpg" alt="">
       <button class="sb-btn">Add to Basket</button>
