@@ -3866,9 +3866,10 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .kh-text b{font-weight:600;color:var(--ink-2)}
 .kh-text .kh-amt{color:#08BD5E} /* _49 FIX: reverted back to its own independent hardcoded value (was briefly pointed at var(--green) in _48) - Key Highlights isn't part of "the pricing table section" the revert request was scoped to, so it goes back to standing on its own, same as before _48. */
 .kh-text .detail{color:var(--ink-2)}
-.kh-info{flex-shrink:0;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-3);background:none;border:none;cursor:pointer;margin-top:1px;margin-left:-4px}
+.kh-info{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);cursor:pointer;margin-top:-2px;margin-left:0;transition:background .15s,border-color .15s} /* v165 FIX: enlarged 17px->24px, given a bronze-tinted background+border so it visually reads as a button. */
+.kh-info:hover{background:rgba(183,126,69,.2);border-color:rgba(183,126,69,.5);color:var(--bronze-hi)}
 .kh-ic svg{width:17px;height:17px}
-.kh-info:hover{color:var(--bronze)}
+/* v165: old hover rule superseded by the more complete one above - .kh-info:hover{color:var(--bronze)} */
 
 .buy-row{display:flex;gap:10px;margin-bottom:8px}
 .qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);flex-shrink:0}
@@ -5833,7 +5834,7 @@ footer{background:#EDECE9;color:#433122}
    lightened further for contrast against the new bold current price. */
 .sb-head{display:flex;align-items:baseline;gap:0;min-width:0;padding:7px 5px 5px 10px} /* v164 FIX: top/bottom padding rebalanced 4px/8px -> 7px/5px (same 12px total, card height unchanged) - text pushed down toward the line per explicit direction. */
 .sb-hr{height:1px;background:var(--ink-3);margin:0 3.5%;opacity:.8} /* v163: inset reduced 6%->3.5% each side (5% longer total); opacity dropped to .8 (20% reduction). */
-.sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
+.sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:clip;flex-shrink:1;min-width:0} /* v165: ellipsis removed per explicit direction - JS trims to the last whole word that fits, no "..." appended. */
 .sb-divider{flex-shrink:0;color:var(--ink-3);font-weight:500;margin:0 4px;opacity:.8} /* v163: opacity dropped to .8 (20% reduction) per explicit direction. */
 .sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--heading);white-space:nowrap} /* v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
 .sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:10px} /* v156: shrunk 11.5px->10px, clearly the smallest/least-emphasized element now. */
@@ -6601,7 +6602,7 @@ footer{background:#EDECE9;color:#433122}
           <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs John Lewis</span></span>
           <button class="kh-info" onclick="openCompareModal()" aria-label="See price comparison">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           </button>
         </li>
         <li class="kh-item">
@@ -9661,6 +9662,30 @@ setTimeout(openExit,25000);
   window.addEventListener('resize',updateOld,{passive:true});
   updateOld();
   */
+})();
+
+/* v165: sticky-card title word-boundary fit - see final_version_v143.html
+   for the full explanation. Truncated title shows the last whole word
+   that fits, never "...". Runs on load and resize. */
+(function(){
+  function fitTitleWords(el){
+    if(!el)return;
+    if(el.dataset.full===undefined)el.dataset.full=el.textContent;
+    var full=el.dataset.full;
+    var words=full.split(' ');
+    el.textContent=full;
+    if(el.scrollWidth<=el.clientWidth)return;
+    while(words.length>1&&el.scrollWidth>el.clientWidth){
+      words.pop();
+      el.textContent=words.join(' ');
+    }
+  }
+  function fitAllTitles(){
+    document.querySelectorAll('.sb-name').forEach(fitTitleWords);
+  }
+  window.addEventListener('load',fitAllTitles);
+  window.addEventListener('resize',fitAllTitles);
+  fitAllTitles();
 })();
 
 </script>
