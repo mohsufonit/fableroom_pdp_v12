@@ -3958,7 +3958,7 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    throughout. Stops once clicked, same .kh-info-clicked hook as before. */
 .kh-item-cta{position:relative;cursor:pointer;border-radius:10px;padding:6px 8px;margin:-6px -8px;overflow:hidden}
 .kh-item-cta>*{position:relative;z-index:1}
-.kh-item-cta::after{content:"";position:absolute;z-index:0;top:0;left:-60%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(232,201,164,.45),transparent);animation:kh-item-shimmer 1.4s ease-in-out infinite;pointer-events:none} /* FIX: was 2.8s - reduced 50% per direction so sweeps repeat twice as often (shorter gap between each pass) */
+.kh-item-cta::after{content:"";position:absolute;z-index:0;top:0;left:-60%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(232,201,164,.45),transparent);animation:kh-item-shimmer .75s ease-in-out infinite;pointer-events:none} /* FIX: was 1.4s (before that 2.8s) - reduced to .75s per direction, sweeps now repeat roughly every 3/4 second */
 .kh-item-cta.kh-info-clicked::after{animation:none;opacity:0}
 @keyframes kh-item-shimmer{0%{left:-60%}55%{left:130%}100%{left:130%}}
 @media(prefers-reduced-motion:reduce){.kh-item-cta::after{animation:none;opacity:0}}
