@@ -3949,9 +3949,13 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    gives it a soft flicker + underline so it reads as tappable without a separate
    icon. Stops after first click via the same .kh-info-clicked class openCompareModal()
    already applies (reused, not a new function needed). Reduced-motion safe. */
-.kh-cta{cursor:pointer;color:var(--bronze);font-weight:600;text-decoration:underline;text-decoration-color:rgba(183,126,69,.5);text-underline-offset:3px;border-radius:4px;animation:kh-cta-shine 2.2s ease-in-out infinite} /* FIX: was an opacity flicker (text faded in/out, read as "blinking on and off" per direction) - swapped for a glow/shine pulse on text-shadow instead. Text itself now stays fully opaque/stable at all times; only a soft light halo around the letters breathes in and out. */
-.kh-cta.kh-info-clicked{animation:none;text-shadow:none;text-decoration-color:transparent}
-@keyframes kh-cta-shine{0%,100%{text-shadow:0 0 0 rgba(183,126,69,0)}50%{text-shadow:0 0 6px rgba(183,126,69,.55),0 0 12px rgba(183,126,69,.3)}}
+/* Variant F FIX: client asked for an explicit outer-border flicker (not the text-shadow
+   glow B/A use). "See how we calculate" is now a small bordered pill/chip - the border
+   color + a faint outward ring pulse in intensity, text itself stays fully stable
+   (no opacity fade, per the earlier "don't blink" direction). */
+.kh-cta{cursor:pointer;display:inline-block;color:var(--bronze);font-weight:600;padding:2px 9px;border-radius:999px;border:1.5px solid rgba(183,126,69,.4);animation:kh-cta-border-pulse 2.2s ease-in-out infinite}
+.kh-cta.kh-info-clicked{animation:none;border-color:rgba(183,126,69,.4);box-shadow:none}
+@keyframes kh-cta-border-pulse{0%,100%{border-color:rgba(183,126,69,.4);box-shadow:0 0 0 0 rgba(183,126,69,0)}50%{border-color:rgba(183,126,69,.95);box-shadow:0 0 0 3px rgba(183,126,69,.16)}}
 @media(prefers-reduced-motion:reduce){.kh-cta{animation:none}}
 
 .buy-row{display:flex;gap:10px;margin-bottom:8px}
