@@ -6508,6 +6508,18 @@ footer{background:#EDECE9;color:#433122}
 .pv2-klarna svg{color:var(--bronze);flex-shrink:0}
 .pv2-klarna b{font-weight:700}
 .pv2-methods{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:13px;padding:10px 14px 13px;background:var(--surface-2)}
+/* Push 3 (2026-09-22) NEW: always-visible "Pay in 3" segmented strip, replacing the
+   click-to-expand accordion this row used to be. Same white/cream row rhythm as the
+   rest of .paypanel-v2 (10px/14px padding, var(--line-2) borders, var(--surface-2)
+   cream fill) so it reads as one clean, minimal panel rather than a redesigned
+   component bolted on. */
+.pv2-pay3-head{display:flex;align-items:center;gap:9px;padding:10px 14px;border-top:1px solid var(--line-2);background:#fff;font-size:13px;color:var(--ink)}
+.pv2-pay3-head svg{color:var(--bronze);flex-shrink:0}
+.pv2-pay3-segs{display:flex;background:var(--surface-2);border-bottom:1px solid var(--line-2)}
+.pv2-pay3-seg{flex:1;text-align:center;padding:9px 4px}
+.pv2-pay3-seg:not(:last-child){border-right:1px solid var(--line-2)}
+.pv2-pay3-seg b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.pv2-pay3-seg span{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.03em}
 /* Pay in 3 accordion toggle */
 .pv2-klarna--top{cursor:pointer;position:relative;padding-left:14px;padding-right:34px} /* v126: padding-left was mirrored to 34px to keep the icon+text group centered against the chevron (see old comment below) - now that the row is left-aligned (justify-content:flex-start above), left padding goes back to the normal 14px matching .pv2-offer; right padding stays at 34px for chevron clearance. v123: was padding-right:34px only (for the chevron) with padding-left still at the base 14px - since the chevron is position:absolute (out of flex flow), that asymmetry just shifted the centered icon+text group left of true-center, out of step with .pv2-methods below which has symmetric padding. Mirrored to 34px both sides so it now centers on the same axis. */
 .pv2-chevron{position:absolute;right:25px;top:50%;transform:translateY(-50%);transition:transform .2s ease;color:var(--bronze) !important;flex-shrink:0} /* v133: right was 14px - moved to 25px, measured to match the "2 more offers" badge's chevron x-position exactly (887px center, on a 919px-wide row, in the reference desktop test), per explicit direction that THIS chevron should align to that one, not the reverse. */
@@ -6968,31 +6980,26 @@ footer{background:#EDECE9;color:#433122}
           prototype - £503/3 = £167.67, calculated independently, not
           read from a widget).
         -->
-        <div class="pv2-klarna pv2-klarna--top" id="pv2Toggle" onclick="togglePayWidgets(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2Widgets">
+        <!-- Push 3 (2026-09-22) REDESIGN: "Pay in 3" replaced with the always-visible
+             segmented strip (Variant 7 of the redesign artifact) per direction - the
+             prior click-to-expand accordion measured very low engagement (~3s attention).
+             This version needs no click: the icon+label row plus 3 equal £167.67
+             segments are always visible, in the same cream (var(--surface-2)) tone the
+             per-vendor rows below already use. The 3 real vendor logos are not
+             duplicated here since .pv2-methods (right below, unchanged) already shows
+             them. togglePayWidgets() JS is no longer called by this row but left in
+             place, unused by this instance - not deleted. Original accordion markup is
+             preserved in git history / prior file versions rather than kept as an
+             inline comment here (same reasoning as the Getting It To You removal
+             earlier: nesting is unsafe with comments already inside it). -->
+        <div class="pv2-pay3-head">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          <!-- v128: copy fixed - was "Pay in 3 - £167.67/mo interest-free
-               BNPL", which didn't parse (mixed a per-instalment amount
-               with a "/mo" suffix, then tacked the "BNPL" jargon on the
-               end). Rewritten as a plain, correctly-formed sentence -
-               and kept short enough to stay on one line (adding "each"
-               at the end wrapped to two lines and made this row taller
-               than the offer row above it, which explicit direction
-               said should match). -->
-          <span>Pay in 3 interest-free instalments of <b>£167.67</b></span>
-          <svg class="pv2-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          <span>Pay in 3 interest-free instalments</span>
         </div>
-        <div class="pv2-widgets" id="pv2Widgets" hidden>
-          <div class="pv2-widget">
-            <p><b>Pay in 3</b> interest-free instalments of <b>£167.67</b> with <img src="./assets-web/pay-shoppay.png" alt="Shop Pay" class="pv2-widget-logo"></p>
-            <a href="#" class="pv2-widget-link">Learn more</a>
-          </div>
-          <div class="pv2-widget">
-            <p>3 payments of <b>£167.67</b> at 0% interest with Klarna <a href="#" class="pv2-widget-link">Learn more</a><br>18+, T&amp;C apply, Credit subject to status.</p>
-            <span class="pv2-widget-badge"><img src="./assets-web/pay-klarna.png" alt="Klarna" class="pv2-widget-badge-img"></span>
-          </div>
-          <div class="pv2-widget">
-            <p>Pay in 3 interest-free payments on purchases from £30-£2,000 with <img src="./assets-web/pay-paypal.png" alt="PayPal" class="pv2-widget-logo">. <a href="#" class="pv2-widget-link">Learn more</a></p>
-          </div>
+        <div class="pv2-pay3-segs">
+          <div class="pv2-pay3-seg"><b>£167.67</b><span>Today</span></div>
+          <div class="pv2-pay3-seg"><b>£167.67</b><span>Month 2</span></div>
+          <div class="pv2-pay3-seg"><b>£167.67</b><span>Month 3</span></div>
         </div>
         <!-- v138 ROLLBACK: restored per explicit direction (was removed
              in v126). -->
