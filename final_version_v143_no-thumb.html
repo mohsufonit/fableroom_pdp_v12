@@ -3945,6 +3945,14 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .kh-info.kh-info-clicked::before{animation:none;opacity:0}
 @keyframes kh-info-pulse{0%{transform:scale(1);opacity:.55}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}
 @media(prefers-reduced-motion:reduce){.kh-info::before{animation:none;opacity:0}}
+/* Push 3 (2026-09-23): "See how?" text-glow pulse, replacing the .kh-info icon ring pulse
+   above (that rule is now unused - kept, not deleted). Text itself stays fully opaque/stable
+   at all times (no opacity flicker); only a soft light halo around the letters breathes in
+   and out. Same pattern already proven on the A/B copy-test variants, ported in here. */
+.kh-cta{cursor:pointer;color:var(--bronze);font-weight:700;text-decoration:underline;text-decoration-color:rgba(183,126,69,.5);text-underline-offset:2px;border-radius:4px;animation:kh-cta-shine 2.2s ease-in-out infinite}
+.kh-cta.kh-info-clicked{animation:none;text-shadow:none;text-decoration-color:transparent}
+@keyframes kh-cta-shine{0%,100%{text-shadow:0 0 0 rgba(183,126,69,0)}50%{text-shadow:0 0 6px rgba(183,126,69,.55),0 0 12px rgba(183,126,69,.3)}}
+@media(prefers-reduced-motion:reduce){.kh-cta{animation:none}}
 
 .buy-row{display:flex;gap:10px;margin-bottom:8px}
 .qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);flex-shrink:0}
@@ -6801,11 +6809,13 @@ footer{background:#EDECE9;color:#433122}
       <ul class="kh-list">
         <li class="kh-item">
           <span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-          <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs John Lewis</span></span>
-          <button class="kh-info" onclick="openCompareModal(this)" aria-label="See price comparison"><!-- Push 1 (2026-09-21): passes `this` so openCompareModal() can stop the new attention-pulse ring (see .kh-info::before in the CSS) after first click -->
-            <!-- Push 1 (2026-09-21) FIX: added stroke-linecap/linejoin="round" - without it the "M12 8h.01" dot (the top of the "i") has no linecap so it rendered as a near-invisible flat sliver instead of a round dot, making the glyph read as a short strip rather than a clear "i". Round caps fix both the dot and the vertical stroke's ends. -->
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          </button>
+          <!-- Push 3 (2026-09-23): info icon (.kh-info button) removed per direction. "See how?"
+               is now the clickable trigger (role=button, keyboard accessible) with the same
+               attention-pulse treatment, moved from a ring around the icon to a text-shadow glow
+               on "See how?" itself (.kh-cta / kh-cta-shine, same pattern already proven on the
+               A/B copy-test variants). Stops after first click via the same .kh-info-clicked
+               class openCompareModal() already applies (reused, no JS changes needed). -->
+          <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs John Lewis. <span class="kh-cta" role="button" tabindex="0" onclick="openCompareModal(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCompareModal(this)}" aria-label="See how you save £396 vs John Lewis">See how?</span></span></span>
         </li>
         <li class="kh-item">
           <span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
