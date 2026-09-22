@@ -6521,7 +6521,8 @@ footer{background:#EDECE9;color:#433122}
    something to read at a glance instead of three identical grey rows, which is what
    makes people register "oh, this is a real, easy plan" before they even engage. */
 .pv2-pay3-tl-wrap{display:block;position:relative;padding:10px 30px 9px 12px}
-.pv2-pay3-tl-head{display:flex;align-items:center;gap:7px;margin-bottom:8px} /* FIX: named -tl-head (not -pay3-head) - that name collides with an unused leftover rule from an earlier redesign attempt further below in this same file (see its own comment) which sets unwanted padding/border/background that would otherwise leak in via equal-specificity cascade order */
+.pv2-pay3-panel{margin-top:10px} /* the gap between the offers/PRIME10 box and this new standalone Pay in 3 box - .paypanel-v2's own margin-bottom:12px still applies to the FIRST box, this adds the matching space above the second */
+.pv2-pay3-tl-head{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:8px} /* center-aligned per direction (was left-aligned) - FIX: named -tl-head (not -pay3-head) - that name collides with an unused leftover rule from an earlier redesign attempt further below in this same file (see its own comment) which sets unwanted padding/border/background that would otherwise leak in via equal-specificity cascade order */
 .pv2-pay3-tl-head svg{color:var(--bronze);flex-shrink:0}
 .pv2-pay3-tl-head span{font-size:12.5px;font-weight:600;color:var(--ink)}
 .pv2-pay3-tl{display:flex}
@@ -6968,6 +6969,13 @@ footer{background:#EDECE9;color:#433122}
             <span class="pv2-signup-arrow">→</span>
           </div>
         </details>
+      </div>
+      <!-- Push 3 (2026-09-22) NEW: "Pay in 3" split out into its own separate bordered
+           box, per direction - was sharing one outer border with the offers/PRIME10
+           panel above, now gets its own .paypanel-v2 card (same border/radius styling,
+           margin-top for the gap between the two boxes) so the two are visually
+           distinct sections rather than one merged panel. -->
+      <div class="paypanel-v2 pv2-pay3-panel">
         <!--
           STATUS: this accordion is CONFIRMED PRODUCT SCOPE - not a design
           variation/experiment to A/B or revert. Build as final UI.
