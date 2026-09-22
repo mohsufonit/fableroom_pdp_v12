@@ -6508,20 +6508,31 @@ footer{background:#EDECE9;color:#433122}
 .pv2-klarna svg{color:var(--bronze);flex-shrink:0}
 .pv2-klarna b{font-weight:700}
 .pv2-methods{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:13px;padding:10px 14px 13px;background:var(--surface-2)}
-/* Push 3 (2026-09-22) REVISED - real checkpoint timeline matching the reference
-   screenshot: 3 dots on a connecting line, bold amount + small caps label under each.
-   .pv2-pay3-tl-wrap overrides the base .pv2-klarna--top row (which is a single-line
-   flex row by default) into a block layout tall enough for the 3-line timeline, and
-   moves the chevron to an absolute top-right corner since it's no longer a natural
-   single-line flex sibling. */
-.pv2-pay3-tl-wrap{display:block;position:relative;padding:14px 34px 12px 14px}
+/* Push 3 (2026-09-22) REVISED AGAIN per direction: (1) sized down overall - dots,
+   type and padding all reduced, the block was reading too tall; (2) a heading row
+   ("Pay in 3 easy instalments") restored above the timeline, since removing it
+   entirely last round went too far the other way; (3) colour psychology applied to
+   the three checkpoints instead of uniform grey - "Today" stays bronze (the brand's
+   primary/CTA colour, drawing the eye to the immediate, concrete step), while
+   "Month 2"/"Month 3" shift to var(--green) (this page's free/savings colour) to
+   visually reinforce "interest-free" specifically on the two payments that are
+   further away and need the most reassurance that there's no catch. The colour
+   progression itself (present -> reassurance) is the click driver: it gives the eye
+   something to read at a glance instead of three identical grey rows, which is what
+   makes people register "oh, this is a real, easy plan" before they even engage. */
+.pv2-pay3-tl-wrap{display:block;position:relative;padding:10px 30px 9px 12px}
+.pv2-pay3-tl-head{display:flex;align-items:center;gap:7px;margin-bottom:8px} /* FIX: named -tl-head (not -pay3-head) - that name collides with an unused leftover rule from an earlier redesign attempt further below in this same file (see its own comment) which sets unwanted padding/border/background that would otherwise leak in via equal-specificity cascade order */
+.pv2-pay3-tl-head svg{color:var(--bronze);flex-shrink:0}
+.pv2-pay3-tl-head span{font-size:12.5px;font-weight:600;color:var(--ink)}
 .pv2-pay3-tl{display:flex}
 .pv2-pay3-tl-step{flex:1;text-align:center;position:relative}
-.pv2-pay3-tl-step:not(:last-child)::after{content:"";position:absolute;top:4px;left:55%;width:90%;height:1px;background:rgba(183,126,69,.4)}
-.pv2-pay3-tl-step i{display:block;width:9px;height:9px;border-radius:50%;background:var(--bronze);margin:0 auto 8px;position:relative;z-index:1}
-.pv2-pay3-tl-step b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
-.pv2-pay3-tl-step span{display:block;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
-.pv2-pay3-tl-wrap .pv2-chevron{position:absolute;right:14px;top:14px;transform:none} /* higher specificity than the base .pv2-chevron rule further below, so it reliably wins regardless of source order */
+.pv2-pay3-tl-step:not(:last-child)::after{content:"";position:absolute;top:3px;left:55%;width:90%;height:1px;background:rgba(183,126,69,.35)}
+.pv2-pay3-tl-step i{display:block;width:7px;height:7px;border-radius:50%;background:var(--bronze);margin:0 auto 6px;position:relative;z-index:1}
+.pv2-pay3-tl-step b{display:block;font-size:12.5px;font-weight:700;color:var(--ink)}
+.pv2-pay3-tl-step span{display:block;font-size:9px;font-weight:700;color:var(--bronze);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.pv2-pay3-tl-step.future i{background:var(--green)}
+.pv2-pay3-tl-step.future span{color:var(--green)}
+.pv2-pay3-tl-wrap .pv2-chevron{position:absolute;right:12px;top:12px;transform:none} /* higher specificity than the base .pv2-chevron rule further below, so it reliably wins regardless of source order */
 .pv2-pay3-tl-wrap[aria-expanded="true"] .pv2-chevron{transform:rotate(180deg)}
 /* Push 3 (2026-09-22) NEW: always-visible "Pay in 3" segmented strip, replacing the
    click-to-expand accordion this row used to be. Same white/cream row rhythm as the
@@ -7015,10 +7026,14 @@ footer{background:#EDECE9;color:#433122}
              unchanged) - a small chevron sits top-right as the only affordance that
              it's tappable, since the reference image itself doesn't show one. -->
         <div class="pv2-klarna pv2-klarna--top pv2-pay3-tl-wrap" id="pv2Toggle" onclick="togglePayWidgets(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2Widgets">
+          <div class="pv2-pay3-tl-head">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            <span>Pay in 3 easy instalments</span>
+          </div>
           <div class="pv2-pay3-tl">
             <div class="pv2-pay3-tl-step"><i></i><b>£167.67</b><span>Today</span></div>
-            <div class="pv2-pay3-tl-step"><i></i><b>£167.67</b><span>Month 2</span></div>
-            <div class="pv2-pay3-tl-step"><i></i><b>£167.67</b><span>Month 3</span></div>
+            <div class="pv2-pay3-tl-step future"><i></i><b>£167.67</b><span>Month 2</span></div>
+            <div class="pv2-pay3-tl-step future"><i></i><b>£167.67</b><span>Month 3</span></div>
           </div>
           <svg class="pv2-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
         </div>
