@@ -6980,26 +6980,30 @@ footer{background:#EDECE9;color:#433122}
           prototype - £503/3 = £167.67, calculated independently, not
           read from a widget).
         -->
-        <!-- Push 3 (2026-09-22) REDESIGN: "Pay in 3" replaced with the always-visible
-             segmented strip (Variant 7 of the redesign artifact) per direction - the
-             prior click-to-expand accordion measured very low engagement (~3s attention).
-             This version needs no click: the icon+label row plus 3 equal £167.67
-             segments are always visible, in the same cream (var(--surface-2)) tone the
-             per-vendor rows below already use. The 3 real vendor logos are not
-             duplicated here since .pv2-methods (right below, unchanged) already shows
-             them. togglePayWidgets() JS is no longer called by this row but left in
-             place, unused by this instance - not deleted. Original accordion markup is
-             preserved in git history / prior file versions rather than kept as an
-             inline comment here (same reasoning as the Getting It To You removal
-             earlier: nesting is unsafe with comments already inside it). -->
-        <div class="pv2-pay3-head">
+        <!-- Push 3 (2026-09-22) REVERT: the always-visible segmented-strip redesign
+             (Variant 7) that briefly replaced this accordion has been reverted back to
+             the original click-to-expand version per direction - client wanted the
+             original kept as its own separate, unmodified file, with the new timeline
+             redesign shipped as a distinct file/link instead rather than overwriting
+             this one. .pv2-pay3-head/.pv2-pay3-segs CSS (added for that redesign) is
+             left in place, unused now - not deleted. -->
+        <div class="pv2-klarna pv2-klarna--top" id="pv2Toggle" onclick="togglePayWidgets(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2Widgets">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          <span>Pay in 3 interest-free instalments</span>
+          <span>Pay in 3 interest-free instalments of <b>£167.67</b></span>
+          <svg class="pv2-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <div class="pv2-pay3-segs">
-          <div class="pv2-pay3-seg"><b>£167.67</b><span>Today</span></div>
-          <div class="pv2-pay3-seg"><b>£167.67</b><span>Month 2</span></div>
-          <div class="pv2-pay3-seg"><b>£167.67</b><span>Month 3</span></div>
+        <div class="pv2-widgets" id="pv2Widgets" hidden>
+          <div class="pv2-widget">
+            <p><b>Pay in 3</b> interest-free instalments of <b>£167.67</b> with <img src="./assets-web/pay-shoppay.png" alt="Shop Pay" class="pv2-widget-logo"></p>
+            <a href="#" class="pv2-widget-link">Learn more</a>
+          </div>
+          <div class="pv2-widget">
+            <p>3 payments of <b>£167.67</b> at 0% interest with Klarna <a href="#" class="pv2-widget-link">Learn more</a><br>18+, T&amp;C apply, Credit subject to status.</p>
+            <span class="pv2-widget-badge"><img src="./assets-web/pay-klarna.png" alt="Klarna" class="pv2-widget-badge-img"></span>
+          </div>
+          <div class="pv2-widget">
+            <p>Pay in 3 interest-free payments on purchases from £30-£2,000 with <img src="./assets-web/pay-paypal.png" alt="PayPal" class="pv2-widget-logo">. <a href="#" class="pv2-widget-link">Learn more</a></p>
+          </div>
         </div>
         <!-- v138 ROLLBACK: restored per explicit direction (was removed
              in v126). -->
