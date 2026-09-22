@@ -1,0 +1,179 @@
+<title>Key Highlight Variants</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#2c2c2c; --ink-2:#505050; --ink-3:#736c58;
+    --bronze:#b77e45; --bronze-hi:#a06b35; --line:#e4ddcf;
+    --ff-b:'HK Grotesk',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff-b);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px}
+  .page-title{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--ink-3);margin:0 0 4px;text-transform:uppercase}
+  .page-sub{font-size:13px;color:var(--ink-3);margin:0 0 28px}
+
+  .block{padding:22px 0;border-bottom:1px solid var(--line)}
+  .block:last-child{border-bottom:none}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--bronze);background:rgba(183,126,69,.1);border-radius:5px;padding:2px 8px;margin-bottom:10px}
+
+  /* ================= verbatim production CSS below (final_version_v143_no-thumb.html) ================= */
+  .kh-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin:0}
+  .kh-item{display:flex;align-items:flex-start;gap:6px;background:none;border:none;padding:0;overflow:visible}
+  .kh-ic{width:19px;height:19px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px;opacity:.9}
+  .kh-ic svg{width:19px;height:19px}
+  .kh-text{font-size:15px;color:var(--ink-2);line-height:1.45;flex:0 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip}
+  .kh-text b{font-weight:600;color:var(--ink-2)}
+  .kh-text .kh-amt{color:#08BD5E;font-size:16px}
+  .kh-text .detail{color:var(--ink-2)}
+
+  .kh-info{position:relative;flex-shrink:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);cursor:pointer;margin-top:-2px;margin-left:0;transition:background .15s,border-color .15s}
+  .kh-info:hover{background:rgba(183,126,69,.2);border-color:rgba(183,126,69,.5);color:var(--bronze-hi)}
+  .kh-info::before{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--bronze);opacity:0;z-index:-1;pointer-events:none;animation:kh-info-pulse 2.2s ease-out infinite}
+  .kh-info.kh-info-clicked::before{animation:none;opacity:0}
+  @keyframes kh-info-pulse{0%{transform:scale(1);opacity:.55}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}
+
+  /* Variant A */
+  .A .kh-cta{cursor:pointer;color:var(--bronze);font-weight:700;text-decoration:underline;text-decoration-color:rgba(183,126,69,.5);text-underline-offset:2px;border-radius:4px;animation:kh-cta-shine 2.2s ease-in-out infinite}
+  .A .kh-cta.kh-info-clicked{animation:none;text-shadow:none;text-decoration-color:transparent}
+  @keyframes kh-cta-shine{0%,100%{text-shadow:0 0 0 rgba(183,126,69,0)}50%{text-shadow:0 0 6px rgba(183,126,69,.55),0 0 12px rgba(183,126,69,.3)}}
+
+  /* Variant B (same shine keyframe, own weight/offset) */
+  .B .kh-cta{cursor:pointer;color:var(--bronze);font-weight:600;text-decoration:underline;text-decoration-color:rgba(183,126,69,.5);text-underline-offset:3px;border-radius:4px;animation:kh-cta-shine 2.2s ease-in-out infinite}
+  .B .kh-cta.kh-info-clicked{animation:none;text-shadow:none;text-decoration-color:transparent}
+
+  /* Variant D */
+  .D .kh-item-cta{cursor:pointer;border-radius:10px;padding:6px 8px;margin:-6px -8px;animation:kh-item-flicker 2.4s ease-in-out infinite}
+  .D .kh-item-cta.kh-info-clicked{animation:none;background:transparent;box-shadow:none}
+  @keyframes kh-item-flicker{0%,100%{background:transparent;box-shadow:0 0 0 0 rgba(183,126,69,0)}50%{background:rgba(183,126,69,.07);box-shadow:0 0 0 1px rgba(183,126,69,.18)}}
+
+  /* Variant E */
+  .E .kh-item-cta{position:relative;cursor:pointer;border-radius:10px;padding:6px 8px;margin:-6px -8px;overflow:hidden}
+  .E .kh-item-cta>*{position:relative;z-index:1}
+  .E .kh-item-cta::after{content:"";position:absolute;z-index:0;top:0;left:-60%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(232,201,164,.45),transparent);animation:kh-item-shimmer 1.25s ease-in-out infinite;pointer-events:none}
+  .E .kh-item-cta.kh-info-clicked::after{animation:none;opacity:0}
+  @keyframes kh-item-shimmer{0%{left:-60%}55%{left:130%}100%{left:130%}}
+
+  /* Variant F */
+  .F .kh-cta{cursor:pointer;display:inline-block;color:var(--bronze);font-weight:600;padding:2px 9px;border-radius:999px;border:1.5px solid rgba(183,126,69,.4);animation:kh-cta-border-pulse 2.2s ease-in-out infinite}
+  .F .kh-cta.kh-info-clicked{animation:none;border-color:rgba(183,126,69,.4);box-shadow:none}
+  @keyframes kh-cta-border-pulse{0%,100%{border-color:rgba(183,126,69,.4);box-shadow:0 0 0 0 rgba(183,126,69,0)}50%{border-color:rgba(183,126,69,.95);box-shadow:0 0 0 3px rgba(183,126,69,.16)}}
+
+  @media(prefers-reduced-motion:reduce){
+    .kh-info::before,.A .kh-cta,.B .kh-cta,.D .kh-item-cta,.E .kh-item-cta::after,.F .kh-cta,.G .kh-cta{animation:none!important}
+  }
+  /* ================= end verbatim production CSS ================= */
+
+  /* New copy variants G/H - reuse the exact existing treatments (G = A's text-glow shine, H = C's icon ring-pulse) rather than inventing new animation CSS */
+  .G .kh-cta{cursor:pointer;color:var(--bronze);font-weight:700;text-decoration:underline;text-decoration-color:rgba(183,126,69,.5);text-underline-offset:2px;border-radius:4px;animation:kh-cta-shine 2.2s ease-in-out infinite}
+  .G .kh-cta.kh-info-clicked{animation:none;text-shadow:none;text-decoration-color:transparent}
+</style>
+
+<div class="wrap">
+  <p class="page-title">Key Highlights &mdash; variant preview</p>
+  <p class="page-sub">Exact production markup/CSS per variant, white background, no restyling. Click any highlighted trigger.</p>
+
+  <div class="block A">
+    <span class="tag">Variant A &middot; savings angle &middot; See how?</span>
+    <ul class="kh-list">
+      <li class="kh-item">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="openCompareModal(this)">See how?</span></span></span>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block B">
+    <span class="tag">Variant B &middot; savings angle &middot; See how?</span>
+    <ul class="kh-list">
+      <li class="kh-item">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b><span class="kh-amt">£396</span> saved</b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="openCompareModal(this)">See how?</span></span></span>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block C">
+    <span class="tag">Variant C &middot; icon restored, ring pulse</span>
+    <ul class="kh-list">
+      <li class="kh-item">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b>Why is this <span class="kh-amt">£396</span> cheaper</b> <span class="detail">than <b>John Lewis</b>?</span></span>
+        <button class="kh-info" onclick="openCompareModal(this)" aria-label="See price comparison">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </button>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block D">
+    <span class="tag">Variant D &middot; whole row, wash pulse</span>
+    <ul class="kh-list">
+      <li class="kh-item kh-item-cta" role="button" tabindex="0" onclick="openCompareModal(this)">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b>You're paying <span class="kh-amt">£396</span> less</b> <span class="detail">than <b>John Lewis</b> shoppers. <span style="text-decoration:underline;text-underline-offset:2px;color:var(--bronze);font-weight:700">See how?</span></span></span>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block E">
+    <span class="tag">Variant E &middot; whole row, shimmer sweep</span>
+    <ul class="kh-list">
+      <li class="kh-item kh-item-cta" role="button" tabindex="0" onclick="openCompareModal(this)">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b>You're paying <span class="kh-amt">£396</span> less</b> <span class="detail">than <b>John Lewis</b> shoppers. <span style="text-decoration:underline;text-underline-offset:2px;color:var(--bronze);font-weight:700">See how?</span></span></span>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block F">
+    <span class="tag">Variant F &middot; See how we calculate.</span>
+    <ul class="kh-list">
+      <li class="kh-item">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b><span class="kh-amt">£396</span> cheaper</b> <span class="detail">than <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="openCompareModal(this)">See how we calculate.</span></span></span>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block G">
+    <span class="tag">Variant G &middot; John Lewis charges £396 more. See why.</span>
+    <ul class="kh-list">
+      <li class="kh-item">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b>John Lewis charges <span class="kh-amt">£396</span> more.</b> <span class="detail"><span class="kh-cta" role="button" tabindex="0" onclick="openCompareModal(this)">See why.</span></span></span>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+
+  <div class="block H">
+    <span class="tag">Variant H &middot; Same cabinet, £396 less than <b>John Lewis</b></span>
+    <ul class="kh-list">
+      <li class="kh-item">
+        <span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kh-text"><b>Same cabinet, <span class="kh-amt">£396</span> less</b> <span class="detail">than <b>John Lewis</b></span></span>
+        <button class="kh-info" onclick="openCompareModal(this)" aria-label="See price comparison">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </button>
+      </li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span></li>
+      <li class="kh-item"><span class="kh-ic"><svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function openCompareModal(el){ if(el) el.classList.add('kh-info-clicked'); }
+</script>
