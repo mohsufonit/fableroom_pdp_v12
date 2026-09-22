@@ -6493,8 +6493,8 @@ footer{background:#EDECE9;color:#433122}
 .pv2-more-badge{position:absolute;right:10px;top:9px;background:var(--green);color:#fff;font-size:9px;font-weight:700;line-height:1;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}
 */
 .pv2-offer .pv2-label{font-size:12px;white-space:nowrap}
-.pv2-offer .pv2-code{font-family:var(--ff-b);font-weight:700;color:var(--green);background:rgba(16,132,116,.12);border:1px solid rgba(16,132,116,.3);padding:1px 6px 1px 8px;border-radius:5px;letter-spacing:.06em;font-size:12.5px;display:inline-flex;align-items:center;gap:5px} /* Push 3 (2026-09-22) FIX: was bronze (color/background/border) - per direction the PRIME10 code pill is now green instead. v128: vertical padding reduced 3px->1px (also left 9px->8px) - the pill was the tallest child in the row (27.4px) and was the actual cause of the offer row being taller than the Pay-in-3 row; tightening it down is what let the row-level padding fix (above) actually equalize the two heights. Also changed to inline-flex to fit the new .pv2-copy-icon-inline snugly inside, beside the code text. */
-.pv2-copy-icon-inline{flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--green);background:none;border:none;padding:0;cursor:pointer;opacity:.75} /* Push 3 (2026-09-22) FIX: was var(--bronze) - now matches the pill's own green (see .pv2-offer .pv2-code above) instead of staying bronze against a green box. v128 NEW: copy icon now lives INSIDE the PRIME10 pill (was a separate button at the row's far right in v127), sized to sit comfortably beside the code text. */
+.pv2-offer .pv2-code{font-family:var(--ff-b);font-weight:700;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);padding:1px 6px 1px 8px;border-radius:5px;letter-spacing:.06em;font-size:12.5px;display:inline-flex;align-items:center;gap:5px} /* Push 3 (2026-09-22) REVERT: briefly changed to green, reverted back to the original bronze per direction. v128: vertical padding reduced 3px->1px (also left 9px->8px) - the pill was the tallest child in the row (27.4px) and was the actual cause of the offer row being taller than the Pay-in-3 row; tightening it down is what let the row-level padding fix (above) actually equalize the two heights. Also changed to inline-flex to fit the new .pv2-copy-icon-inline snugly inside, beside the code text. */
+.pv2-copy-icon-inline{flex-shrink:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--bronze);background:none;border:none;padding:0;cursor:pointer;opacity:.75} /* Push 3 (2026-09-22) REVERT: briefly changed to green to match the pill, reverted back to bronze along with it. v128 NEW: copy icon now lives INSIDE the PRIME10 pill (was a separate button at the row's far right in v127), sized to sit comfortably beside the code text. */
 .pv2-copy-icon-inline:hover{opacity:1}
 /* v127/superseded: the old standalone far-right copy icon button - no
    longer used now that the copy icon lives inside the pill. Kept, not
@@ -7846,239 +7846,17 @@ footer{background:#EDECE9;color:#433122}
          the page's own zone background - was camouflaging) to a
          lighter, bordered tone so the card reads as a distinct card.
        ============================================================ -->
-  <!-- Push 1 (2026-09-19): this section used to be id="carouselsZone" and
-       held THREE items (the Features & Specs accordion card, "The
-       Details" carousel, and "The Craft" carousel below). The first two
-       have been moved UP the page to sit right after the buy box (see
-       the "Push 1" note there, in place of the removed Product Story
-       section) - only "The Craft" carousel stays here, at this zone's
-       original DOM position (unchanged - between "Frequently Bought
-       Together" above and whatever follows below). Renamed id to
-       "craftZone" since "carouselsZone" is now used by the relocated
-       section higher up the page; id="carouselsZone" was never targeted
-       by any CSS/JS selector (only referenced in comments), so this
-       rename is safe. Kept class="carousels-zone" so this section keeps
-       the same dark full-bleed background/padding treatment as before. -->
-  <section class="carousels-zone" id="craftZone">
-    <div class="fb-carousel-groups">
-
-      <div class="fb-carousel-group" id="craftCarouselCol">
-        <div class="bento-grid" id="bentoGrid">
-      <!-- THE CRAFT - Type B, _32 REBUILD: was one static contained
-           image - now an embedded fan/stack carousel of the 4 "Meet
-           the Makers" steps (workshop -> hand-finish -> quality check
-           -> arrives), motion pattern per the provided reference
-           (center card sharp/scaled up, neighbours blurred/faded to
-           the sides) but in brand colours (bronze/dark) instead of
-           the reference's orange. The full non-carousel
-           .makers-journey component stays in the CSS, still unused,
-           for a possible future brand-story page. _33 FIX: header
-           arrow removed per explicit feedback - it never opened
-           anything (the carousel is already the inline "expanded"
-           state), so keeping it read as broken rather than
-           intentional.
-           CONTENT SYSTEM (3 tiers, same convention as the parallax
-           section above):
-           1. UNIVERSAL - "Shaped in our workshop in {ORIGIN_LOCATION}"
-              / "{MATERIAL}, shaped and finished entirely by hand" /
-              "Checked with care before it leaves - details a photo
-              can't show" / "Packaged with care, set up in minutes" -
-              the last two are true regardless of material, the first
-              two need the two bracketed values filled per SKU.
-           2. CATEGORY - {ORIGIN_LOCATION} is NOT simply "whatever this
-              SKU's own origin is" - per the live FAQ, most Fableroom
-              products are India-made but "a few collections are
-              sourced from Vietnam" (project context doc Section 2)
-              with no documented rule for which. Don't default to
-              India for a new SKU without checking its own live spec
-              sheet first. {MATERIAL} category options match
-              Fableroom's real filter values (Wood/Marble & Stone/
-              Metal/Reclaimed Wood/Glass/Bone Inlay/Upholstery/Wool).
-              The 4th step's "set up in minutes" claim is Practical-
-              card-dependent (tier below) - don't reuse it for a SKU
-              whose live listing says Moderate/Full assembly.
-           3. PRODUCT (Astra) - {ORIGIN_LOCATION}="India" (confirmed
-              for this SKU specifically, not a category default),
-              {MATERIAL}="Iron". -->
-      <div class="bento-card-b bento-card-craft">
-        <div class="bento-card-b-head">
-          <div>
-            <h3>The Craft</h3>
-            <p>Every piece is shaped and finished by hand by skilled artisans.</p>
-          </div>
-        </div>
-        <div class="craft-carousel" id="craftCarousel">
-          <div class="craft-track" id="craftTrack">
-            <div class="mosaic-cell craft-slide ph-accent1" data-dir="left">
-              <img src="./assets-web/craft-origin-workshop.jpg" alt="The workshop, India"
-                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
-              <div class="placeholder" style="display:none">craft-origin-workshop.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 01</span><h4>The Workshop</h4><p>Shaped in our workshop in India</p></div>
-            </div>
-            <div class="mosaic-cell craft-slide ph-rust" data-dir="left">
-              <img src="./assets-web/craft-technique-hand-finish.jpg" alt="Iron, shaped and hand-finished"
-                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
-              <div class="placeholder" style="display:none">craft-technique-hand-finish.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 02</span><h4>By Hand</h4><p>Iron, shaped and finished entirely by hand</p></div>
-            </div>
-            <div class="mosaic-cell craft-slide ph-bronze" data-dir="left">
-              <img src="./assets-web/craft-quality-corner-check.jpg" alt="Every piece is checked with care before it leaves"
-                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
-              <div class="placeholder" style="display:none">craft-quality-corner-check.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 03</span><h4>Quality Checked</h4><p>Checked with care before it leaves - details a photo can't show</p></div>
-            </div>
-            <div class="mosaic-cell craft-slide ph-accent2" data-dir="left">
-              <img src="./assets-web/craft-arrival-living-room.jpg" alt="Arrives ready for your home"
-                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
-              <div class="placeholder" style="display:none">craft-arrival-living-room.jpg</div>
-              <div class="craft-slide-copy"><span class="craft-step-tag">Step 04</span><h4>Ready for Home</h4><p>Packaged with care, set up in minutes</p></div>
-            </div>
-          </div>
-          <div class="craft-controls">
-            <button class="craft-nav" onclick="craftGo(-1)" aria-label="Previous step">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <div class="craft-dots" id="craftDots"></div>
-            <button class="craft-nav" onclick="craftGo(1)" aria-label="Next step">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- _47 FIX: moved INSIDE #carouselsZone (was its own section right
-         after, sitting on the page's default white background - a
-         jarring white strip directly under a dark section). Now a
-         plain div inside the same dark zone, inheriting its #1b1408
-         background and full-bleed width for free, with a border-top
-         matching the same divider style already used between the
-         Pillars/Craft groups above, for visual consistency within the
-         zone. Per explicit direction ("it should be just below the
-         craft thing with the brownish background"). -->
-    <div class="rtb-strip rtb-strip--inzone">
-      <div class="pt-trust">
-        <div class="pt-trust-item">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v15M8 21h8M5 7h14M5 7l-2.2 5a3 3 0 0 0 6.2 0L5 7Zm14 0l-2.2 5a3 3 0 0 0 6.2 0L19 7Z"/></svg>
-          <b>Fairly priced</b>
-          <span>No inflated retail markup</span>
-        </div>
-        <div class="pt-trust-item">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16L12 21 4 9Z"/><path d="M4 9l4-6h8l4 6"/><path d="M9 3l3 6 3-6"/></svg>
-          <b>Beautifully crafted</b>
-          <span>Traditional techniques</span>
-        </div>
-        <div class="pt-trust-item">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16Z"/><path d="M4 20 20 4"/></svg>
-          <b>Ethically sourced</b>
-          <span>Fair wages, vetted makers</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-      <!-- SIZE & FIT - Type B, _33 REBUILD. Was a single doors-open
-           photo, which is Storage content wearing a Size & Fit label -
-           it never actually showed size or fit. Rebuilt as a scale
-           diagram (per the provided "Space & Dimension Fit" reference)
-           comparing Astra's real height against a standard UK internal
-           doorway. Numbers are the verified spec-sheet figures (see
-           the Full Specifications accordion) - 104x46x82cm, not
-           invented. The doorway comparison uses 198cm, the standard UK
-           internal door height - general public knowledge, not an
-           Astra-specific claim. Deliberately NOT copying the
-           reference's "clears doorways from 76cm / fits all UK lifts"
-           line - that's a specific logistics claim this project has no
-           verified figure for; the honest scope here is a visual size
-           comparison only. Storage is still covered by the card's own
-           subhead ("Two doors, ample storage") and the caption line
-           below, both pulled from the verified product description
-           (see the Product Description accordion) rather than invented
-           separately for this card. -->
-      <!-- _41 REMOVED: the SIZE & FIT (Type B, scale-diagram) card
-           used to sit here. Per explicit direction, cut entirely -
-           see the _41 top-of-file changelog entry. .sizefit-* CSS
-           stays in the file, unused, in case this gets revived
-           (same "kept, not deleted" treatment as .makers-journey). -->
-
-
-
-  <!-- PRD NOTE: the full 4-step "Meet the Makers" journey markup
-       (.makers-journey, non-carousel) is kept in the CSS/unused below
-       the fold of this comment's reach, in case a dedicated
-       brand-story page wants the original non-carousel version later. -->
-
-  <!-- ============================================================
-       _61 REMOVED - PHASE 2. "In Your Room / Loved in real homes"
-       section commented out per explicit direction (not deleted -
-       flagged for a later phase, per the never-delete convention).
-       Re-enable by uncommenting this whole block. The section's JS
-       ("IYR rotating reviews", further down this file) already
-       guards against its elements being absent
-       (if(!slides.length||!dotsWrap)return;), so leaving this
-       commented out needs no other change - no dead-JS errors.
-       NOTE: the original inline HTML comment that used to sit right
-       above this section ("A+ IN YOUR ROOM...") was removed here -
-       nesting an HTML comment inside another one breaks at the
-       first "--&gt;", which would have prematurely closed this
-       block and exposed the section again.
-
-  <section class="ap">
-    <div class="ap-head"><span class="eyebrow">In your room</span><h2 class="ap-h">Loved in real homes</h2></div>
-    <div class="quoteblock">
-      <img src="./assets-web/cabinet-in-living-room.jpg" alt="Astra Two Door Cabinet styled in a living room">
-      <div class="qcard">
-        <span class="qm">&ldquo;</span>
-        <div class="qcard-reviews" id="qcardReviews">
-          <div class="qr-slide active"><p>Exactly what my conservatory needed - stylish, practical, and the finish is even more beautiful in person.</p><cite>Vanessa W. &middot; Verified buyer</cite></div>
-          <div class="qr-slide"><p>The finish is even more stunning in person. Photos really do not do it justice.</p><cite>Sarah M. &middot; Verified buyer</cite></div>
-          <div class="qr-slide"><p>Solid quality. Feels genuinely premium and worth every single penny.</p><cite>James K. &middot; Verified buyer</cite></div>
-          <div class="qr-slide"><p>Love the depth of the patina - absolutely no two are the same. Ours is perfect.</p><cite>David L. &middot; Verified buyer</cite></div>
-        </div>
-        <div class="qr-dots" id="qrDots"></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-       ============================================================ -->
-
-  <!-- _41 MOVED: "Frequently Bought Together" (#bundle) no longer
-       sits here - relocated to directly after the Parallax/Finish
-       section (#finish), per explicit direction. See the _41 top-of-
-       file changelog entry and its new location earlier in this
-       file, right after #finish's closing </section>. -->
-
-  <div class="divider"></div>
-
-  <!-- A+ 10 · CUSTOMERS ALSO LOVED (was "Complete the Look" /
-       "Pairs beautifully with") - _47 MOVED here from the very end of
-       the page (was sitting after Reviews, right before the footer)
-       to directly before Fair Pricing, per explicit direction.
-       Renamed per explicit direction ("rename it to something else -
-       customers also loved these or something else that makes
-       sense") - eyebrow/heading now frame it as a social-proof
-       cross-sell rather than a styling suggestion, which fits its new
-       position better (right before the value/pricing section) than
-       the old "pairs beautifully with" framing did. Card image ratio
-       fixed from square (1:1) to 3:4 per explicit direction - see
-       .railcard .ri below. -->
-  <section class="ap">
-    <div class="ap-head"><span class="eyebrow">Customer favourites</span><h2 class="ap-h">Customers also loved</h2></div>
-    <div class="rail">
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-three-quarter-view.jpg" alt=""><div class="rn">Astra Console Table</div><div class="rp">£389</div></a>
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-top-corner-closeup.jpg" alt=""><div class="rn">Astra Side Table</div><div class="rp">£215</div></a>
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-front-view.jpg" alt=""><div class="rn">Alder Two Door Cabinet</div><div class="rp">£472</div></a>
-      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-angled-detail.jpg" alt=""><div class="rn">Cayman Wooden Cabinet</div><div class="rp">£540</div></a>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
+  <!-- Push 3 (2026-09-22) MOVED: the Value section (id="compare") relocated
+       here per explicit client direction - it now sits directly below
+       "Complete the Astra set" (#bundle, Frequently Bought Together), swapping
+       relative order with The Craft carousel (id="craftZone"), which moved down
+       to this section's old spot (see the matching note right above #craftZone
+       further down this file). Only the two sections' DOM positions changed;
+       the id="compare" attribute, its content, and its CSS/JS are untouched, so
+       the sticky section nav's "Fair Pricing" link (href="#compare") still
+       resolves correctly. The dead fb-story comment block and the historical
+       pillars-carousel changelog comments directly above this line were left
+       exactly where they were - only the live section element itself moved. -->
   <section id="compare" class="ap">
     <div class="ap-head" style="position:relative">
       <span class="eyebrow">Value</span>
@@ -8231,6 +8009,248 @@ footer{background:#EDECE9;color:#433122}
              would otherwise be an empty div. See the _45 top-of-file
              changelog entry and the new section right after
              #carouselsZone closes. -->
+      </div>
+    </div>
+  </section>
+
+
+      <!-- SIZE & FIT - Type B, _33 REBUILD. Was a single doors-open
+           photo, which is Storage content wearing a Size & Fit label -
+           it never actually showed size or fit. Rebuilt as a scale
+           diagram (per the provided "Space & Dimension Fit" reference)
+           comparing Astra's real height against a standard UK internal
+           doorway. Numbers are the verified spec-sheet figures (see
+           the Full Specifications accordion) - 104x46x82cm, not
+           invented. The doorway comparison uses 198cm, the standard UK
+           internal door height - general public knowledge, not an
+           Astra-specific claim. Deliberately NOT copying the
+           reference's "clears doorways from 76cm / fits all UK lifts"
+           line - that's a specific logistics claim this project has no
+           verified figure for; the honest scope here is a visual size
+           comparison only. Storage is still covered by the card's own
+           subhead ("Two doors, ample storage") and the caption line
+           below, both pulled from the verified product description
+           (see the Product Description accordion) rather than invented
+           separately for this card. -->
+      <!-- _41 REMOVED: the SIZE & FIT (Type B, scale-diagram) card
+           used to sit here. Per explicit direction, cut entirely -
+           see the _41 top-of-file changelog entry. .sizefit-* CSS
+           stays in the file, unused, in case this gets revived
+           (same "kept, not deleted" treatment as .makers-journey). -->
+
+
+
+  <!-- PRD NOTE: the full 4-step "Meet the Makers" journey markup
+       (.makers-journey, non-carousel) is kept in the CSS/unused below
+       the fold of this comment's reach, in case a dedicated
+       brand-story page wants the original non-carousel version later. -->
+
+  <!-- ============================================================
+       _61 REMOVED - PHASE 2. "In Your Room / Loved in real homes"
+       section commented out per explicit direction (not deleted -
+       flagged for a later phase, per the never-delete convention).
+       Re-enable by uncommenting this whole block. The section's JS
+       ("IYR rotating reviews", further down this file) already
+       guards against its elements being absent
+       (if(!slides.length||!dotsWrap)return;), so leaving this
+       commented out needs no other change - no dead-JS errors.
+       NOTE: the original inline HTML comment that used to sit right
+       above this section ("A+ IN YOUR ROOM...") was removed here -
+       nesting an HTML comment inside another one breaks at the
+       first "--&gt;", which would have prematurely closed this
+       block and exposed the section again.
+
+  <section class="ap">
+    <div class="ap-head"><span class="eyebrow">In your room</span><h2 class="ap-h">Loved in real homes</h2></div>
+    <div class="quoteblock">
+      <img src="./assets-web/cabinet-in-living-room.jpg" alt="Astra Two Door Cabinet styled in a living room">
+      <div class="qcard">
+        <span class="qm">&ldquo;</span>
+        <div class="qcard-reviews" id="qcardReviews">
+          <div class="qr-slide active"><p>Exactly what my conservatory needed - stylish, practical, and the finish is even more beautiful in person.</p><cite>Vanessa W. &middot; Verified buyer</cite></div>
+          <div class="qr-slide"><p>The finish is even more stunning in person. Photos really do not do it justice.</p><cite>Sarah M. &middot; Verified buyer</cite></div>
+          <div class="qr-slide"><p>Solid quality. Feels genuinely premium and worth every single penny.</p><cite>James K. &middot; Verified buyer</cite></div>
+          <div class="qr-slide"><p>Love the depth of the patina - absolutely no two are the same. Ours is perfect.</p><cite>David L. &middot; Verified buyer</cite></div>
+        </div>
+        <div class="qr-dots" id="qrDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+       ============================================================ -->
+
+  <!-- _41 MOVED: "Frequently Bought Together" (#bundle) no longer
+       sits here - relocated to directly after the Parallax/Finish
+       section (#finish), per explicit direction. See the _41 top-of-
+       file changelog entry and its new location earlier in this
+       file, right after #finish's closing </section>. -->
+
+  <div class="divider"></div>
+
+  <!-- A+ 10 · CUSTOMERS ALSO LOVED (was "Complete the Look" /
+       "Pairs beautifully with") - _47 MOVED here from the very end of
+       the page (was sitting after Reviews, right before the footer)
+       to directly before Fair Pricing, per explicit direction.
+       Renamed per explicit direction ("rename it to something else -
+       customers also loved these or something else that makes
+       sense") - eyebrow/heading now frame it as a social-proof
+       cross-sell rather than a styling suggestion, which fits its new
+       position better (right before the value/pricing section) than
+       the old "pairs beautifully with" framing did. Card image ratio
+       fixed from square (1:1) to 3:4 per explicit direction - see
+       .railcard .ri below. -->
+  <section class="ap">
+    <div class="ap-head"><span class="eyebrow">Customer favourites</span><h2 class="ap-h">Customers also loved</h2></div>
+    <div class="rail">
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-three-quarter-view.jpg" alt=""><div class="rn">Astra Console Table</div><div class="rp">£389</div></a>
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-top-corner-closeup.jpg" alt=""><div class="rn">Astra Side Table</div><div class="rp">£215</div></a>
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-front-view.jpg" alt=""><div class="rn">Alder Two Door Cabinet</div><div class="rp">£472</div></a>
+      <a class="railcard" href="#"><img class="ri" src="./assets-web/cabinet-angled-detail.jpg" alt=""><div class="rn">Cayman Wooden Cabinet</div><div class="rp">£540</div></a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Push 3 (2026-09-22) MOVED: The Craft carousel (id="craftZone") relocated
+       here, to the spot the Value section (id="compare") used to occupy, per
+       explicit client direction - swapping relative order with Value, which
+       moved up to sit directly below "Complete the Astra set" (#bundle). See
+       the matching note above #compare further up this file. Only this
+       section's DOM position changed; its id, content, and CSS/JS are
+       untouched. The Push 1 (2026-09-19) note immediately below, which
+       explains this section's own history/rename to "craftZone", moved along
+       with the section since it documents this section's identity. -->
+  <!-- Push 1 (2026-09-19): this section used to be id="carouselsZone" and
+       held THREE items (the Features & Specs accordion card, "The
+       Details" carousel, and "The Craft" carousel below). The first two
+       have been moved UP the page to sit right after the buy box (see
+       the "Push 1" note there, in place of the removed Product Story
+       section) - only "The Craft" carousel stays here, at this zone's
+       original DOM position (unchanged - between "Frequently Bought
+       Together" above and whatever follows below). Renamed id to
+       "craftZone" since "carouselsZone" is now used by the relocated
+       section higher up the page; id="carouselsZone" was never targeted
+       by any CSS/JS selector (only referenced in comments), so this
+       rename is safe. Kept class="carousels-zone" so this section keeps
+       the same dark full-bleed background/padding treatment as before. -->
+  <section class="carousels-zone" id="craftZone">
+    <div class="fb-carousel-groups">
+
+      <div class="fb-carousel-group" id="craftCarouselCol">
+        <div class="bento-grid" id="bentoGrid">
+      <!-- THE CRAFT - Type B, _32 REBUILD: was one static contained
+           image - now an embedded fan/stack carousel of the 4 "Meet
+           the Makers" steps (workshop -> hand-finish -> quality check
+           -> arrives), motion pattern per the provided reference
+           (center card sharp/scaled up, neighbours blurred/faded to
+           the sides) but in brand colours (bronze/dark) instead of
+           the reference's orange. The full non-carousel
+           .makers-journey component stays in the CSS, still unused,
+           for a possible future brand-story page. _33 FIX: header
+           arrow removed per explicit feedback - it never opened
+           anything (the carousel is already the inline "expanded"
+           state), so keeping it read as broken rather than
+           intentional.
+           CONTENT SYSTEM (3 tiers, same convention as the parallax
+           section above):
+           1. UNIVERSAL - "Shaped in our workshop in {ORIGIN_LOCATION}"
+              / "{MATERIAL}, shaped and finished entirely by hand" /
+              "Checked with care before it leaves - details a photo
+              can't show" / "Packaged with care, set up in minutes" -
+              the last two are true regardless of material, the first
+              two need the two bracketed values filled per SKU.
+           2. CATEGORY - {ORIGIN_LOCATION} is NOT simply "whatever this
+              SKU's own origin is" - per the live FAQ, most Fableroom
+              products are India-made but "a few collections are
+              sourced from Vietnam" (project context doc Section 2)
+              with no documented rule for which. Don't default to
+              India for a new SKU without checking its own live spec
+              sheet first. {MATERIAL} category options match
+              Fableroom's real filter values (Wood/Marble & Stone/
+              Metal/Reclaimed Wood/Glass/Bone Inlay/Upholstery/Wool).
+              The 4th step's "set up in minutes" claim is Practical-
+              card-dependent (tier below) - don't reuse it for a SKU
+              whose live listing says Moderate/Full assembly.
+           3. PRODUCT (Astra) - {ORIGIN_LOCATION}="India" (confirmed
+              for this SKU specifically, not a category default),
+              {MATERIAL}="Iron". -->
+      <div class="bento-card-b bento-card-craft">
+        <div class="bento-card-b-head">
+          <div>
+            <h3>The Craft</h3>
+            <p>Every piece is shaped and finished by hand by skilled artisans.</p>
+          </div>
+        </div>
+        <div class="craft-carousel" id="craftCarousel">
+          <div class="craft-track" id="craftTrack">
+            <div class="mosaic-cell craft-slide ph-accent1" data-dir="left">
+              <img src="./assets-web/craft-origin-workshop.jpg" alt="The workshop, India"
+                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+              <div class="placeholder" style="display:none">craft-origin-workshop.jpg</div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">Step 01</span><h4>The Workshop</h4><p>Shaped in our workshop in India</p></div>
+            </div>
+            <div class="mosaic-cell craft-slide ph-rust" data-dir="left">
+              <img src="./assets-web/craft-technique-hand-finish.jpg" alt="Iron, shaped and hand-finished"
+                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+              <div class="placeholder" style="display:none">craft-technique-hand-finish.jpg</div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">Step 02</span><h4>By Hand</h4><p>Iron, shaped and finished entirely by hand</p></div>
+            </div>
+            <div class="mosaic-cell craft-slide ph-bronze" data-dir="left">
+              <img src="./assets-web/craft-quality-corner-check.jpg" alt="Every piece is checked with care before it leaves"
+                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+              <div class="placeholder" style="display:none">craft-quality-corner-check.jpg</div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">Step 03</span><h4>Quality Checked</h4><p>Checked with care before it leaves - details a photo can't show</p></div>
+            </div>
+            <div class="mosaic-cell craft-slide ph-accent2" data-dir="left">
+              <img src="./assets-web/craft-arrival-living-room.jpg" alt="Arrives ready for your home"
+                   onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+              <div class="placeholder" style="display:none">craft-arrival-living-room.jpg</div>
+              <div class="craft-slide-copy"><span class="craft-step-tag">Step 04</span><h4>Ready for Home</h4><p>Packaged with care, set up in minutes</p></div>
+            </div>
+          </div>
+          <div class="craft-controls">
+            <button class="craft-nav" onclick="craftGo(-1)" aria-label="Previous step">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="craft-dots" id="craftDots"></div>
+            <button class="craft-nav" onclick="craftGo(1)" aria-label="Next step">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- _47 FIX: moved INSIDE #carouselsZone (was its own section right
+         after, sitting on the page's default white background - a
+         jarring white strip directly under a dark section). Now a
+         plain div inside the same dark zone, inheriting its #1b1408
+         background and full-bleed width for free, with a border-top
+         matching the same divider style already used between the
+         Pillars/Craft groups above, for visual consistency within the
+         zone. Per explicit direction ("it should be just below the
+         craft thing with the brownish background"). -->
+    <div class="rtb-strip rtb-strip--inzone">
+      <div class="pt-trust">
+        <div class="pt-trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v15M8 21h8M5 7h14M5 7l-2.2 5a3 3 0 0 0 6.2 0L5 7Zm14 0l-2.2 5a3 3 0 0 0 6.2 0L19 7Z"/></svg>
+          <b>Fairly priced</b>
+          <span>No inflated retail markup</span>
+        </div>
+        <div class="pt-trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16L12 21 4 9Z"/><path d="M4 9l4-6h8l4 6"/><path d="M9 3l3 6 3-6"/></svg>
+          <b>Beautifully crafted</b>
+          <span>Traditional techniques</span>
+        </div>
+        <div class="pt-trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4C10 4 4 10 4 20c10 0 16-6 16-16Z"/><path d="M4 20 20 4"/></svg>
+          <b>Ethically sourced</b>
+          <span>Fair wages, vetted makers</span>
+        </div>
       </div>
     </div>
   </section>
