@@ -6508,13 +6508,21 @@ footer{background:#EDECE9;color:#433122}
 .pv2-klarna svg{color:var(--bronze);flex-shrink:0}
 .pv2-klarna b{font-weight:700}
 .pv2-methods{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:13px;padding:10px 14px 13px;background:var(--surface-2)}
-/* Push 3 (2026-09-22) NEW - compact 3-checkpoint timeline, folded into the existing
-   trigger row (see the <span class="pv2-pay3-tl"> comment above). Deliberately tiny
-   (5px dots, 9px connecting segments) so it reads as a glyph beside the label, not a
-   separate visual block - the whole point was to NOT take up extra vertical space. */
-.pv2-pay3-tl{display:inline-flex;align-items:center;gap:2px;flex-shrink:0;margin-right:2px}
-.pv2-pay3-tl i{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
-.pv2-pay3-tl b{width:9px;height:1px;background:var(--green);opacity:.45;display:inline-block}
+/* Push 3 (2026-09-22) REVISED - real checkpoint timeline matching the reference
+   screenshot: 3 dots on a connecting line, bold amount + small caps label under each.
+   .pv2-pay3-tl-wrap overrides the base .pv2-klarna--top row (which is a single-line
+   flex row by default) into a block layout tall enough for the 3-line timeline, and
+   moves the chevron to an absolute top-right corner since it's no longer a natural
+   single-line flex sibling. */
+.pv2-pay3-tl-wrap{display:block;position:relative;padding:14px 34px 12px 14px}
+.pv2-pay3-tl{display:flex}
+.pv2-pay3-tl-step{flex:1;text-align:center;position:relative}
+.pv2-pay3-tl-step:not(:last-child)::after{content:"";position:absolute;top:4px;left:55%;width:90%;height:1px;background:rgba(183,126,69,.4)}
+.pv2-pay3-tl-step i{display:block;width:9px;height:9px;border-radius:50%;background:var(--bronze);margin:0 auto 8px;position:relative;z-index:1}
+.pv2-pay3-tl-step b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.pv2-pay3-tl-step span{display:block;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.pv2-pay3-tl-wrap .pv2-chevron{position:absolute;right:14px;top:14px;transform:none} /* higher specificity than the base .pv2-chevron rule further below, so it reliably wins regardless of source order */
+.pv2-pay3-tl-wrap[aria-expanded="true"] .pv2-chevron{transform:rotate(180deg)}
 /* Push 3 (2026-09-22) NEW: always-visible "Pay in 3" segmented strip, replacing the
    click-to-expand accordion this row used to be. Same white/cream row rhythm as the
    rest of .paypanel-v2 (10px/14px padding, var(--line-2) borders, var(--surface-2)
@@ -6994,21 +7002,24 @@ footer{background:#EDECE9;color:#433122}
              redesign shipped as a distinct file/link instead rather than overwriting
              this one. .pv2-pay3-head/.pv2-pay3-segs CSS (added for that redesign) is
              left in place, unused now - not deleted. -->
-        <!-- Push 3 (2026-09-22) NEW FILE (separate from the main working file, per
-             direction): compact timeline trigger row replacing the plain sentence.
-             Same single-line height/padding as the original row (no extra vertical
-             space taken) - a tiny 3-checkpoint timeline is folded directly into the
-             row instead of sitting as its own block above/below it, left-aligned
-             beside the label. Colour psychology: the timeline itself uses var(--green)
-             (this page's "free/savings" colour, already used for the 20% off badge
-             and PRIME10 pill) to reinforce "interest-free" specifically, while the
-             icon/chevron stay bronze for brand consistency. Click/expand behaviour
-             (togglePayWidgets, aria-expanded, the real vendor widgets below) is
-             completely unchanged - this only replaces the trigger row's contents. -->
-        <div class="pv2-klarna pv2-klarna--top" id="pv2Toggle" onclick="togglePayWidgets(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2Widgets">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-          <span class="pv2-pay3-tl" aria-hidden="true"><i></i><b></b><i></i><b></b><i></i></span>
-          <span>Pay in 3 &middot; <b>£167.67</b> each, interest-free</span>
+        <!-- Push 3 (2026-09-22) REVISED per reference screenshot: the earlier compact
+             single-line version (5px dots folded beside a text label) was NOT what was
+             asked for - replaced with a real visible checkpoint timeline matching the
+             reference exactly: 3 bronze dots on a connecting line, bold £167.67 under
+             each dot, small uppercase Today/Month 2/Month 3 label under that. No
+             standalone "Pay in 3 interest-free instalments" sentence anymore - the
+             timeline itself carries that meaning, per direction. Dots/line use
+             var(--bronze) (matching the reference image's tan/brown tone) rather than
+             the green used in the previous attempt. Whole block stays the click/expand
+             trigger (togglePayWidgets, aria-expanded, real vendor widgets below
+             unchanged) - a small chevron sits top-right as the only affordance that
+             it's tappable, since the reference image itself doesn't show one. -->
+        <div class="pv2-klarna pv2-klarna--top pv2-pay3-tl-wrap" id="pv2Toggle" onclick="togglePayWidgets(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2Widgets">
+          <div class="pv2-pay3-tl">
+            <div class="pv2-pay3-tl-step"><i></i><b>£167.67</b><span>Today</span></div>
+            <div class="pv2-pay3-tl-step"><i></i><b>£167.67</b><span>Month 2</span></div>
+            <div class="pv2-pay3-tl-step"><i></i><b>£167.67</b><span>Month 3</span></div>
+          </div>
           <svg class="pv2-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
         </div>
         <div class="pv2-widgets" id="pv2Widgets" hidden>
