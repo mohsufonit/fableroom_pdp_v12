@@ -6012,7 +6012,7 @@ footer{background:#EDECE9;color:#433122}
 .sb-hr{height:1px;background:var(--ink-3);margin:0 3.5%;opacity:.8} /* v163: inset reduced 6%->3.5% each side (5% longer total); opacity dropped to .8 (20% reduction). */
 .sb-name{font-family:var(--ff-d);font-size:13px;font-weight:700;color:var(--heading);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:clip;flex-shrink:1;min-width:0} /* v165: ellipsis removed per explicit direction - JS trims to the last whole word that fits, no "..." appended. */
 .sb-divider{flex-shrink:0;color:var(--ink-3);font-weight:500;margin:0 4px;opacity:.8} /* v163: opacity dropped to .8 (20% reduction) per explicit direction. */
-.sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--heading);white-space:nowrap} /* v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
+.sb-price{flex-shrink:0;font-size:16px;font-weight:800;color:var(--bronze);white-space:nowrap} /* Push 3 (2026-09-22) FIX: was var(--heading) - per direction changed to the same brown/bronze accent used by .p-now (the main price block), so the sticky bar's £503 matches. v156: bumped 14px->16px so current price is clearly the dominant element vs the 13px title - title itself untouched this round, price-only hierarchy fix. */
 .sb-price s{color:var(--ink-3);font-weight:400;margin-left:1px;font-size:10px} /* v156: shrunk 11.5px->10px, clearly the smallest/least-emphasized element now. */
 /* v149 UPDATE: changed from red "-20%" to green "20% OFF" per
    explicit direction, matching the established green-badge pattern
