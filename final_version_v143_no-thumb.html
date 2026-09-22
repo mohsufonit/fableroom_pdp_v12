@@ -6476,7 +6476,7 @@ footer{background:#EDECE9;color:#433122}
 .pv2-offer[aria-expanded="true"] .pv2-offer-badge-chevron{transform:rotate(180deg)}
 @media(min-width:820px){
   .pv2-offer-badge-mobile-only{display:none} /* v136: "More" text is mobile-only, hidden from this breakpoint up */
-  .pv2-offer-badge-count{display:inline} /* v136: numeral restored on desktop - desktop stays exactly as it was ("2 more offers") */
+  .pv2-offer-badge-count{display:none} /* Push 3 (2026-09-22) FIX: was display:inline ("2 more offers") - per direction the numeral no longer shows on desktop, replaced with a plain "More Offers" label instead (see .pv2-offer-badge-label text change in the HTML). */
   .pv2-offer-badge-label{display:inline}
 }
 /* v130/superseded: the two-separate-circles version. Kept, not deleted:
@@ -6912,13 +6912,17 @@ footer{background:#EDECE9;color:#433122}
                  now positioned to match THIS badge's chevron x-position,
                  rather than the other way around - see its own comment
                  further down. -->
-          <!-- v136: badge text now differs by breakpoint - mobile shows
-               the word "More" (via .pv2-offer-badge-mobile-only);
-               desktop is unchanged and still shows the numeral + " more
-               offers" (via .pv2-offer-badge-count + .pv2-offer-badge-label).
-               Chevron markup/behaviour untouched either way. -->
+          <!-- v136: badge text differs by breakpoint - mobile shows the word
+               "More" (via .pv2-offer-badge-mobile-only). Push 3 (2026-09-22)
+               FIX: desktop used to show the numeral + " more offers" (e.g.
+               "2 more offers") - per direction the count is now hidden on
+               desktop too (see the media query above) and the label text
+               changed to a plain "More Offers". .pv2-offer-badge-count
+               (the "2") is left in the markup, just hidden at both
+               breakpoints now - not deleted, in case the count needs
+               reinstating later. Chevron markup/behaviour untouched. -->
           <span class="pv2-offer-badge" aria-hidden="true">
-            <span class="pv2-offer-badge-text"><span class="pv2-offer-badge-mobile-only">More</span><b class="pv2-offer-badge-count">2</b><span class="pv2-offer-badge-label"> more offers</span></span>
+            <span class="pv2-offer-badge-text"><span class="pv2-offer-badge-mobile-only">More</span><b class="pv2-offer-badge-count">2</b><span class="pv2-offer-badge-label">More Offers</span></span>
             <span class="pv2-offer-badge-chevron">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
             </span>
