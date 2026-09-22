@@ -1,6 +1,46 @@
 <!DOCTYPE html>
 <!--
   ============================================================
+  Push 1 (gallery zoom) UPDATE (this file, forked from v141), 2026-09-21
+  - per explicit client direction, and the last unbuilt item from the
+  performance report's Push 1 rollout plan ("session recordings show
+  users trying to zoom into product images, and the option currently
+  isn't there"). Adds real zoom to the FULLSCREEN GALLERY LIGHTBOX
+  (#lightbox / #lbStage / #lbImg) only - the inline peek-carousel gallery
+  above it already owns its own swipe/scroll-snap gesture and is left
+  untouched, per the report's own framing that this is a lightbox-click
+  feature.
+  1. MOBILE - real two-finger pinch-to-zoom on #lbImg (vanilla touch
+     events, distance-between-two-touch-points scaling, no library).
+     Scale clamped 1x-4x. One-finger pan/drag while zoomed in.
+     Double-tap resets to 1x. The pinch/pan handlers coexist with the
+     PRE-EXISTING single-finger horizontal swipe-to-navigate (the
+     touchstart/touchend pair originally added under "swipe support
+     inside the lightbox stage") by (a) only starting a pinch when a
+     SECOND touch point appears, and (b) only ever treating single-
+     finger movement as pan - never as swipe-navigate - once the image
+     is already zoomed past 1x; swipe-to-navigate still works exactly
+     as before whenever the image is at 1x. See "PUSH 1 CHANGE" comment
+     at the old swipe listener for the exact supersession.
+  2. DESKTOP - no touch/pinch equivalent, so added a visible zoom
+     affordance per direction ("add a zoom zoom out thing in the scroll
+     thing that it automatically turns into zoom in zoom out"): (a)
+     mouse-wheel-to-zoom while hovering the lightbox image, and (b)
+     +/- and reset buttons (.lb-zoom-controls) styled to match the
+     existing .lb-close/.lb-arrow circular dark-glass icon language,
+     with a live zoom % readout. Click-and-drag mouse panning once
+     zoomed in; double-click also resets to 1x.
+  3. Zoom state (scale/pan) resets whenever the displayed image changes
+     (lbShow, i.e. switching slides/thumbnails/arrows) and whenever the
+     lightbox is closed, so it never carries over unexpectedly.
+  New CSS: see "PUSH 1 - GALLERY ZOOM" block added after the existing
+  .lightbox/.lb-* rules. New HTML: .lb-zoom-controls markup added inside
+  #lightbox, after #lbStage. New JS: lbZoom state + lbApplyZoom/
+  lbResetZoom/lbClampPan/lbZoomStep, plus the rewritten touch block and
+  small additions to lbShow/closeLightbox, all under "Fullscreen gallery
+  lightbox". No external library added - vanilla touch/wheel/mouse
+  events only, consistent with the existing swipe implementation.
+  ============================================================
   v141 UPDATE (this file, forked from v140) - per explicit direction:
   DESKTOP STICKY BAR / CHAT WIDGET FIX CORRECTED - position only,
   size untouched.
@@ -3755,6 +3795,23 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .lb-thumbs::-webkit-scrollbar{display:none}
 .lb-thumbs img{width:56px;height:56px;object-fit:cover;border-radius:6px;opacity:.45;cursor:pointer;border:2px solid transparent;flex-shrink:0}
 .lb-thumbs img.active{opacity:1;border-color:var(--bronze)}
+/* PUSH 1 - GALLERY ZOOM (pinch mobile / wheel+buttons desktop), 2026-09-21.
+   .lb-stage touch-action overridden from pan-y (set above) to none: the
+   stage no longer needs the browser's own vertical-pan allowance now that
+   it hosts custom pinch/pan/wheel handling, and none stops the browser's
+   native double-tap/pinch zoom from fighting our own. .lb-stage img gets
+   a transform-origin (pinch/wheel zoom is centered on the image, panning
+   moves it via translate) - transition is left unset by default and only
+   set briefly, in JS, for the snap-animated button/reset/double-tap
+   cases, so continuous pinch/wheel/drag stays lag-free. */
+.lb-stage{touch-action:none}
+.lb-stage img{transform-origin:center center;will-change:transform}
+.lb-stage.zoomed img{cursor:grab}
+.lb-stage.zoomed img:active{cursor:grabbing}
+.lb-zoom-controls{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:100px;padding:5px 7px;z-index:3}
+.lb-zoom-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.14);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;flex-shrink:0}
+.lb-zoom-btn:hover{background:rgba(255,255,255,.26)}
+.lb-zoom-pct{color:#fff;font-size:11.5px;font-weight:600;min-width:36px;text-align:center;letter-spacing:.02em}
 @media(min-width:820px){
   .lb-arrow{width:50px;height:50px}
   .lb-prev{left:24px}
@@ -3858,18 +3915,36 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .p-sub b{color:var(--ink-2);font-weight:600}
 
 /* KEY HIGHLIGHTS - compact pill-card rows, icon + bold headline + light detail */
-.kh-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0 0 20px} /* v128: was 24px - reduced to 20px to exactly match .dimstrip's own margin-bottom:20px below, per explicit direction that the gap above and below the dimension strip (to Key Highlights and to the Price block respectively) should be uniform/balanced, not two different numbers. */
+.kh-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin:0 0 20px} /* Push 1: gap 7px->8px, small bump to match enlarged text so lines don't feel cramped. v128: was 24px - reduced to 20px to exactly match .dimstrip's own margin-bottom:20px below, per explicit direction that the gap above and below the dimension strip (to Key Highlights and to the Price block respectively) should be uniform/balanced, not two different numbers. */
 .kh-divider{border:none;border-top:1px solid var(--line-2);margin:15px auto 17px;width:25%} /* 15px above, 17px below */
-.kh-item{display:flex;align-items:flex-start;gap:5px;background:none;border:none;padding:0;overflow:visible} /* _56 FIX: was 9px - the only other icon+text pairing on the page (the RTB strip) uses 5px, so this didn't match per the spacing audit. Unified to 5px rather than leaving two different icon-to-text gap values on the same page. */
-.kh-ic{width:17px;height:17px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px;opacity:.9} /* v127: added opacity:.9 (10% reduction) per explicit direction, on top of v126's stroke-width 2->1.5 thinning */
-.kh-text{font-size:13.5px;color:var(--ink-2);line-height:1.4;flex:0 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip}
+.kh-item{display:flex;align-items:flex-start;gap:6px;background:none;border:none;padding:0;overflow:visible} /* Push 1: gap 5px->6px to match enlarged icon. _56 FIX: was 9px - the only other icon+text pairing on the page (the RTB strip) uses 5px, so this didn't match per the spacing audit. Unified to 5px rather than leaving two different icon-to-text gap values on the same page. */
+.kh-ic{width:19px;height:19px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px;opacity:.9} /* Push 1: 17px->19px (~12%) for legibility per perf report. v127: added opacity:.9 (10% reduction) per explicit direction, on top of v126's stroke-width 2->1.5 thinning */
+.kh-text{font-size:15px;color:var(--ink-2);line-height:1.45;flex:0 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip} /* Push 1: font-size 13.5px->15px (~11%), line-height 1.4->1.45 for the taller text */
 .kh-text b{font-weight:600;color:var(--ink-2)}
-.kh-text .kh-amt{color:#08BD5E} /* _49 FIX: reverted back to its own independent hardcoded value (was briefly pointed at var(--green) in _48) - Key Highlights isn't part of "the pricing table section" the revert request was scoped to, so it goes back to standing on its own, same as before _48. */
+.kh-text .kh-amt{color:#08BD5E;font-size:16px} /* Push 1: added explicit font-size 16px so the "You save £X" figure scales up along with the rest of the enlarged block (previously just inherited .kh-text's 13.5px). _49 FIX: reverted back to its own independent hardcoded value (was briefly pointed at var(--green) in _48) - Key Highlights isn't part of "the pricing table section" the revert request was scoped to, so it goes back to standing on its own, same as before _48. */
 .kh-text .detail{color:var(--ink-2)}
-.kh-info{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);cursor:pointer;margin-top:-2px;margin-left:0;transition:background .15s,border-color .15s} /* v165 FIX: enlarged 17px->24px, given a bronze-tinted background+border so it visually reads as a button. */
+.kh-info{position:relative;flex-shrink:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bronze);background:rgba(183,126,69,.12);border:1px solid rgba(183,126,69,.3);cursor:pointer;margin-top:-2px;margin-left:0;transition:background .15s,border-color .15s} /* v165 FIX: enlarged 17px->24px, given a bronze-tinted background+border so it visually reads as a button. Push 1 (2026-09-21): added position:relative so the ::before pulse ring below can anchor to it. */
 .kh-info:hover{background:rgba(183,126,69,.2);border-color:rgba(183,126,69,.5);color:var(--bronze-hi)}
-.kh-ic svg{width:17px;height:17px}
+.kh-ic svg{width:19px;height:19px} /* Push 1: 17px->19px to match .kh-ic container */
 /* v165: old hover rule superseded by the more complete one above - .kh-info:hover{color:var(--bronze)} */
+/* Push 1 (2026-09-21): info icon attention pulse. Perf report flagged the
+   .kh-info button (enlarged in v165 above) still gets almost no clicks and
+   "needs to be...more clearly clickable" - client asked for a subtle
+   blinking/pulsing outer ring, like a common "tap me" notification-ping
+   hint, not a fast/jarring blink. Implemented as an ::before ring that
+   expands and fades on loop (sonar-ping pattern), kept slow (2s) and
+   soft (ease-out, low peak opacity) per direction. Ring sits behind the
+   icon (z-index -1) and is sized bigger than the 24px button so it has
+   room to expand without being clipped - .kh-item/.kh-list above both
+   already have overflow:visible, so nothing crops it. Stops once the
+   visitor has clicked the icon once (JS adds .kh-info-clicked, see
+   openCompareModal() in the script block) since the ring's only job -
+   drawing a first look - is done after that; kept as plain CSS (no
+   localStorage) since this only needs to last the one page view. */
+.kh-info::before{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--bronze);opacity:0;z-index:-1;pointer-events:none;animation:kh-info-pulse 2.2s ease-out infinite}
+.kh-info.kh-info-clicked::before{animation:none;opacity:0}
+@keyframes kh-info-pulse{0%{transform:scale(1);opacity:.55}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}
+@media(prefers-reduced-motion:reduce){.kh-info::before{animation:none;opacity:0}}
 
 .buy-row{display:flex;gap:10px;margin-bottom:8px}
 .qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);flex-shrink:0}
@@ -4572,6 +4647,45 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    unevenness was pure spacing, not an extra element.) */
 .feat-specs-head{ max-width:1200px;margin:0 auto;padding:6px 16px 16px;text-align:center; }
 .feat-specs-head .ap-h{ color:#f2e9db; }
+/* Push 4 FIX (2026-09-21): real Playwright measurement (local HTTP
+   server, actual screenshots at 390px + 1440px, not computed-style
+   guesses) showed the gap from this heading's bottom edge to the
+   visible card surface of "The Details" carousel below it
+   (#pillarsCarouselCol's .bento-card-b) was 54px - made up of the
+   shared .ap-head class's own margin-bottom:26px (this element
+   carries both .ap-head and .feat-specs-head, id="specs") plus
+   #pillarsCarouselCol's inherited .fb-carousel-group{padding:28px 0}
+   top padding (28px), 26+28=54 - vs the nav-to-heading gap above it
+   (#secnav bottom to this heading's top) which measures 20px and is
+   correct/unchanged. Per explicit client direction the heading-to-
+   card gap should match that 20px exactly, not just be reduced.
+   Zeroed this element's own margin-bottom via the #specs id selector
+   below (specificity beats the shared .ap-head class regardless of
+   source order, so this override works no matter where it sits) and
+   gave #pillarsCarouselCol a scoped 20px top-padding override next to
+   its existing padding-bottom override, so the full 20px lives in one
+   place (the carousel column's own top padding) rather than a split
+   across two rules. Scoped to the #specs id (not the shared .ap-head
+   class, which #compare/#delivery/#faq also override independently)
+   and to the #pillarsCarouselCol id (not the shared .fb-carousel-group
+   class, which #craftCarouselCol also uses and must stay at 28px top
+   padding). Re-measured after this change with the same real
+   screenshot method at both viewports: nav->heading gap unchanged at
+   20px, heading->card gap now also exactly 20px at both mobile and
+   desktop (no breakpoint-specific override needed since none of the
+   rules being touched had one to begin with). */
+#specs{ margin-bottom:0; }
+/* Push 2 FIX (spacing bugs surfaced by the Push 1 move): #carouselsZone's
+   36px top padding (from the shared .carousels-zone class, still correct
+   for #craftZone further down which reuses the same class unchanged) was
+   sized for the OLD single-zone layout where this heading was the only
+   thing at the very top of a much taller block. In the new, shorter
+   carouselsZone (heading + one carousel + one accordion, right after the
+   buy box) that same 36px plus the heading's own 6px padding-top read as
+   an oversized, unbalanced gap before "Features and Specifications" per
+   explicit feedback. Scoped to the #carouselsZone id (not the shared
+   .carousels-zone class) so #craftZone's own top padding is untouched. */
+#carouselsZone{ padding-top:20px; }
 @media(min-width:820px){
   /* _41 FIX: was order:3 (pushed to the end, below both carousels).
      Per explicit direction #featSpecsCard now sits FIRST via DOM
@@ -4606,6 +4720,18 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
 .feat-specs-card .spectable tr{ border-bottom:1px solid rgba(232,201,164,.12); }
 .feat-specs-card .spectable td:first-child{ color:rgba(242,233,219,.55); }
 .feat-specs-card .spectable td:last-child{ color:#f2e9db; }
+/* Push 2 FIX: "Details and Dimensions" now defaults to open (per the
+   Push 1 reorder), which exposed a spacing bug that was invisible while
+   every accordion item defaulted to closed: the shared .acc-body's
+   18px padding-bottom (base rule, further down this file) sits between
+   the spectable and this item's own .acc border-bottom divider, but that
+   18px reads as too tight once there's a full 12-row table inside -
+   the divider line visually crowds/overlaps the table's last row on
+   both mobile and desktop. Bumped the open body's bottom padding here
+   specifically (not the shared .acc-body rule, which would also affect
+   the Delivery section's and FAQ's own default-open items) so the
+   divider clears the table content with real breathing room. */
+.feat-specs-card .acc-body.open{ padding-bottom:28px; }
 
 .bento-section{
   position:relative;background:#1b1408;padding:36px 16px 28px;overflow:visible;
@@ -5233,16 +5359,66 @@ h1,h2,h3,h4{font-family:var(--ff-d);color:var(--heading);font-weight:400;line-he
    ============================================================ */
 .fb-carousel-groups{ max-width:1200px;margin:0 auto; }
 .fb-carousel-group{ padding:28px 0; }
-/* _49 FIX: #featSpecsCard is the first .fb-carousel-group, sitting
-   directly under the "Features and Specifications" heading - its
-   inherited 28px top padding was stacking on top of the heading's
-   own bottom spacing (.feat-specs-head padding-bottom 16px + .ap-head
-   margin-bottom 26px = 42px already), giving 70px total below the
-   heading vs only 42px above it. Zeroed just the top so both now
-   match at 42px, per explicit direction ("spacing above should be
-   the same as spacing below"). Bottom padding (28px, spacing before
-   Pillars starts) is untouched. */
-#featSpecsCard{ padding-top:0; }
+/* _49 FIX (superseded by Push 3 below, kept per never-delete convention):
+   #featSpecsCard was the first .fb-carousel-group, sitting directly under
+   the "Features and Specifications" heading - its inherited 28px top
+   padding was stacking on top of the heading's own bottom spacing
+   (.feat-specs-head padding-bottom 16px + .ap-head margin-bottom 26px =
+   42px already), giving 70px total below the heading vs only 42px above
+   it. Zeroed just the top so both now matched at 42px:
+   #featSpecsCard{ padding-top:0; } */
+/* Push 2 FIX (superseded by Push 3 below, kept per never-delete
+   convention): this comment block (_49) was written when #featSpecsCard
+   sat FIRST, directly under the heading, with #pillarsCarouselCol
+   following it. Push 1 reversed that order - "The Details" carousel
+   (#pillarsCarouselCol) now comes first and #featSpecsCard follows it -
+   but #pillarsCarouselCol never got a matching bottom-padding trim, so
+   it still carried the full 28px .fb-carousel-group default before the
+   divider line to #featSpecsCard, on top of that divider's own line and
+   #featSpecsCard's already-zeroed top padding. Trimmed to 8px:
+   #pillarsCarouselCol{ padding-bottom:8px; } */
+/* Push 3 FIX (2026-09-21): the Push 1/Push 2 fixes above were made from
+   computed-style numbers only, never an actual rendered screenshot - and
+   verifying this time with the page actually served over local HTTP
+   (real images loading) and real Playwright screenshots at 390px and
+   1440px showed the previous "fix" was NOT sufficient, exactly as the
+   client reported. Measuring the real rendered boxes:
+     - #pillarsCarouselCol's visible card (.bento-card-b, bg #241c14)
+       bottom edge to the divider line = only 8px (the old trim above).
+     - #featSpecsCard's own padding-top was still 0, so its visible card
+       (.bento-card-b.feat-specs-card, same #241c14 bg) began with ZERO
+       gap below the divider - its rounded top corner sat flush against
+       the divider hairline, reading exactly as the reported "overlapping/
+       colliding" line, not as a clean divider between two cards.
+     - Meanwhile the heading ("Features and Specifications") to the first
+       card (#pillarsCarouselCol) top gap measured 42px - and per explicit
+       direction the divider's above/below gaps should match THAT value,
+       not use separate ad-hoc numbers (8px above vs ~0px below vs 42px
+       for the heading was three different values for what should read as
+       one consistent rhythm).
+     - Set both to 40px (matching the 42px heading gap within a couple of
+       px - kept a touch under to avoid this middle divider ever reading
+       as a bigger gap than the top of the whole stretch) - same value at
+       both mobile (390px) and desktop (1440px) since neither of these
+       rules had a breakpoint-specific override to begin with, and the
+       heading gap they're matching doesn't either. Re-screenshotted after
+       this change at both viewports to confirm: the divider now sits
+       with clean, equal breathing room above (off "The Details" card)
+       and below (off the "Features and Specs" card), matching the
+       heading-to-card rhythm above it. Scoped to the #pillarsCarouselCol/
+       #featSpecsCard ids (not the shared .fb-carousel-group class) so
+       #craftZone's own single-item divider-free layout is unaffected. */
+#featSpecsCard{ padding-top:40px; }
+#pillarsCarouselCol{ padding-bottom:40px; }
+/* Push 4 FIX (2026-09-21): scoped top-padding override so the
+   heading("Features and Specifications")-to-card gap above this
+   carousel column equals the 20px nav-to-heading gap, paired with the
+   #specs{margin-bottom:0} override above - see that comment for the
+   full before/after measurement. Scoped to the #pillarsCarouselCol id,
+   not the shared .fb-carousel-group class (28px top padding, used
+   here as -> also used unchanged by #craftCarouselCol further down,
+   which must keep its own 28px top gap under "The Craft" heading). */
+#pillarsCarouselCol{ padding-top:20px; }
 .fb-carousel-group + .fb-carousel-group{ border-top:1px solid rgba(232,201,164,.12); }
 /* _46 FIX: per explicit direction, "The Details" and "The Craft"
    should stack one below the other on desktop, not sit side by side
@@ -6462,6 +6638,19 @@ footer{background:#EDECE9;color:#433122}
         <button class="lb-arrow lb-next" aria-label="Next image" onclick="lbNav(1)">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
         </button>
+        <!-- PUSH 1 ADD: zoom controls, 2026-09-21 - mobile pinches directly
+             on the image above; these buttons are the desktop affordance
+             (no touch/pinch there) but are left visible on all sizes since
+             they're also a handy explicit control on touch devices. See
+             lbZoomStep/lbResetZoom in JS. -->
+        <div class="lb-zoom-controls" id="lbZoomControls">
+          <button class="lb-zoom-btn" id="lbZoomOut" type="button" aria-label="Zoom out" onclick="lbZoomStep(-1)">−</button>
+          <span class="lb-zoom-pct" id="lbZoomPct">100%</span>
+          <button class="lb-zoom-btn" id="lbZoomIn" type="button" aria-label="Zoom in" onclick="lbZoomStep(1)">+</button>
+          <button class="lb-zoom-btn" id="lbZoomReset" type="button" aria-label="Reset zoom" title="Reset zoom" onclick="lbResetZoom()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          </button>
+        </div>
       </div>
       <div class="lb-thumbs" id="lbThumbs"></div>
     </div>
@@ -6599,18 +6788,19 @@ footer{background:#EDECE9;color:#433122}
       -->
       <ul class="kh-list">
         <li class="kh-item">
-          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs John Lewis</span></span>
-          <button class="kh-info" onclick="openCompareModal()" aria-label="See price comparison">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <button class="kh-info" onclick="openCompareModal(this)" aria-label="See price comparison"><!-- Push 1 (2026-09-21): passes `this` so openCompareModal() can stop the new attention-pulse ring (see .kh-info::before in the CSS) after first click -->
+            <!-- Push 1 (2026-09-21) FIX: added stroke-linecap/linejoin="round" - without it the "M12 8h.01" dot (the top of the "i") has no linecap so it rendered as a near-invisible flat sliver instead of a round dot, making the glyph read as a short strip rather than a clear "i". Round caps fix both the dot and the vertical stroke's ends. -->
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           </button>
         </li>
         <li class="kh-item">
-          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>One-of-a-kind patina</b>, <span class="detail">hand-applied by artisans</span></span>
         </li>
         <li class="kh-item">
-          <span class="kh-ic"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
           <span class="kh-text"><b>Made direct</b>, <span class="detail">with no middleman markup</span></span>
         </li>
       </ul>
@@ -6688,7 +6878,7 @@ footer{background:#EDECE9;color:#433122}
                "New" tag, an offer-count pill in a different style, etc).
              - Background changed from green-tinted to white/none, per
                explicit direction - text/icon stay green. -->
-        <div class="pv2-offer" role="button" tabindex="0" aria-expanded="false" aria-controls="pv2MoreOffers" onclick="toggleCouponAccordion(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCouponAccordion(this)}">
+        <div class="pv2-offer" role="button" tabindex="0" aria-expanded="true" aria-controls="pv2MoreOffers" onclick="toggleCouponAccordion(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCouponAccordion(this)}"><!-- Push 1: default-open - aria-expanded set to true to match the <details open> below -->
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           <span class="pv2-label">Extra 10% off with</span>
           <span class="pv2-code">
@@ -6730,7 +6920,7 @@ footer{background:#EDECE9;color:#433122}
           the current cart or product, so it updates automatically as
           offers are added, removed, or expire.
         -->
-        <details class="pv2-more" id="pv2MoreOffers">
+        <details class="pv2-more" id="pv2MoreOffers" open><!-- Push 1: default-open per perf report; toggleCouponAccordion() still toggles it closed/open as before -->
           <summary style="display:none">2 more active offers</summary>
           <div class="pv2-more-item"><svg class="pv2-more-item-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> £50 off orders over £599 - <strong>auto-applied</strong></div>
           <div class="pv2-more-item"><svg class="pv2-more-item-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> £75 off orders over £749 - <strong>auto-applied</strong></div>
@@ -7060,12 +7250,23 @@ footer{background:#EDECE9;color:#433122}
 <!-- PRICE BREAKDOWN MODAL (#19) -->
 
 <!-- STICKY SECTION NAV -->
+<!-- Push 1 (2026-09-19): "Overview" (#finish) link removed - it pointed at
+     the Product Story/parallax section, which has been deleted entirely
+     (see the Push 1 note above the section that replaced it). Remaining
+     links kept in the same order/labels/anchors - that order already
+     matches the new physical section order on the page ("Features and
+     Specs" is now the first main content section after the buy box,
+     followed by Fair Pricing/Delivery/Reviews, unchanged). "active"
+     default moved to "Features and Specs" since it's now the first link;
+     the scroll-tracking JS further down re-evaluates this on scroll
+     anyway. -->
 <nav class="secnav" id="secnav" aria-label="Sections">
   <div class="secnav-in">
-    <a href="#finish" class="active">Overview</a>
-    <a href="#specs">Features and Specs</a>
+    <a href="#specs" class="active">Features and Specs</a>
     <a href="#compare">Fair Pricing</a>
-    <a href="#delivery">Delivery</a>
+    <!-- Push 3 (2026-09-22): "Delivery" link removed - its target section (#delivery,
+         "Getting It To You") has been removed from the page entirely, its content
+         merged into the Features & Specs card's "Care & Delivery" accordion instead. -->
     <a href="#reviews">Reviews</a>
   </div>
 </nav>
@@ -7097,63 +7298,276 @@ footer{background:#EDECE9;color:#433122}
        context doc Section 6.6) as the shared notation across this whole
        file when documenting tiers 1-2 - only tier-3 product values ever
        render as plain text on the live page. -->
-  <section id="finish" class="parallax-story">
-    <div class="parallax-pin">
-      <div class="parallax-shell">
-        <div class="parallax-copy">
-          <!-- _50i: eyebrow ("The Finish") removed per explicit direction -->
-          <!-- _29 MODULAR NOTE (headline/body/closing line below), grounded
-               against 6 real Fableroom metal SKUs (Astra cabinet+bedside,
-               Nova cabinet, Danton, Lyra mirror, Sara side table):
-               UNIVERSAL: sentence shapes only.
-               CATEGORY (light-reactive finish SKUs only - confirmed shared
-               by Astra + Nova cabinets + Astra bedside table; does NOT hold
-               for static finishes like Lyra mirror's antique brass, or
-               fixed-gradient finishes like Sara's ombre):
-                 Headline "A Finish That Catches the Light" - no tokens,
-                   gate by category.
-                 Body: "Solid {MATERIAL}, finished entirely by hand - the
-                   {FINISH_NAME} glaze shifts in colour and depth as the
-                   light moves across it."
-                 Closing line, light-reactive version: "{COLOUR_A} fading
-                   into {COLOUR_B}, catching new light with every glance."
-               CATEGORY (fixed-gradient/ombre finishes - confirmed real
-               pattern via Sara Ombre Iron Side Table, which uses the same
-               fade structure without a light claim): closing line becomes
-               "{COLOUR_A} fading into {COLOUR_B}, for a bold, dimensional
-               look" - same shape, no light-dependency claim.
-               PRODUCT (Astra, live below): MATERIAL=iron,
-               FINISH_NAME=galaxy-inspired, COLOUR_A=warm gold,
-               COLOUR_B=deep rust and black. -->
-          <h2>A Finish That<br>Catches the Light</h2>
-          <p>Solid iron, finished entirely by hand - the galaxy-inspired glaze shifts in colour and depth as the light moves across it.</p>
-          <div class="parallax-meta">
-            <span class="parallax-meta-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg><span>Metal</span></span>
-            <!-- _29: "Hand-Finished" -> "Handcrafted" - checked 6 real
-                 Fableroom product pages (Astra cabinet+bedside, Nova
-                 cabinet, Danton, Lyra mirror, Sara side table) and
-                 "Hand-Finished" appears on ZERO of them. "Handcrafted" is
-                 the term Fableroom actually uses (confirmed on Nova's and
-                 Sara's real trust badges). The old "Hand-Finished" choice
-                 was a Troopod-only substitution to avoid duplicating
-                 "Artisanal Craftsmanship" elsewhere on this same page -
-                 real-vocabulary match wins here instead.
-                 MODULAR NOTE: this tag is not guaranteed present for every
-                 SKU - Lyra mirror carries no craftsmanship badge at all.
-                 Treat as optional per SKU, not a fixed 3-tag set. -->
-            <span class="parallax-meta-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8c0 5-3 8-6 10-3-2-6-5-6-10a6 6 0 0 1 12 0Z"/><path d="M9.5 12l1.8 1.8L14.5 10"/></svg><span>Handcrafted</span></span>
-            <span class="parallax-meta-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/></svg><span>Lasting Quality</span></span>
+  <!-- Push 1 (2026-09-19): "Product Story" (the parallax section that used
+       to live here, id="finish") has been REMOVED ENTIRELY per the perf
+       report - it was a heavy scroll-parallax block with 3 layered images
+       and its own scroll-driven JS, cut for page-weight/performance
+       reasons. Its CSS (.parallax-story/.parallax-pin/.parallax-shell/
+       .parallax-copy/.parallax-meta/.parallax-meta-item/.parallax-scene/
+       .px-disk/.px-card/.px-label etc, further up this file) and its
+       dedicated scroll-parallax JS (the [data-depth] handler, further
+       down this file) are left in place, unused, per the never-delete
+       convention - low risk to leave as dead code vs. risk chasing every
+       reference. Nothing else on the page targets id="finish" or reads
+       [data-depth] outside that same JS block, so this is safe.
+       In its place, "The Details" carousel + the Features & Specs
+       accordion card (previously much further down the page, inside
+       #carouselsZone alongside "The Craft") have been moved UP to sit
+       here, immediately after the buy box, per the same perf report -
+       see the "Push 1" note on the section immediately below. "The
+       Craft" carousel did NOT move - it stays behind at the old
+       #carouselsZone location, now in its own split-off section (see
+       the "Push 1" note there). The sticky section nav's "Overview"
+       link (which pointed at #finish) has also been removed - see the
+       <nav class="secnav"> markup above. -->
+  <section class="carousels-zone" id="carouselsZone">
+    <!-- _34 NEW - "Features and Specifications" consolidated section, per
+         explicit direction. Replaces two previously separate things:
+         1. The old #specs block (Dimensions & details / Product
+            Description accordions) that used to sit between the Details
+            and Craft carousels as its own 3rd flex item.
+         2. The old Care+Assembly carousel tile (5th slide in the Pillars
+            carousel) - its content (Easy Care icon grid + Minimal
+            Assembly Required) is now two accordion items here instead of
+            a tile, per explicit direction ("care guide and stuff lets
+            have it as an accordion instead of a tile").
+         Sits ABOVE both carousels (same DOM position on mobile and
+         desktop - centered heading, centered single-column card, not
+         squeezed between/below the two carousels like the old #specs
+         block was). Card reuses .bento-card-b (same background/radius/
+         padding as "The Details"/"The Craft" cards) per explicit
+         direction ("the external card/container... similar to how craft
+         and the details have it"). Order per explicit direction: Product
+         Description, Details and Dimensions, Care Guide, Assembly - not
+         the old order (Dimensions first). Kept the same accordion width/
+         max-width as before (700px) rather than widening it, and
+         centered it instead of the old 2-column side-by-side desktop
+         layout (.specs-accs, now unused - kept, not deleted). Care Guide
+         text is the same verbatim source already used in the Delivery
+         section's "Care & Buying Guide" accordion (not re-derived,
+         re-typed from the same real source). -->
+    <!-- _36 FIX: moved back to ABOVE both carousels (was briefly placed
+         between/below them in _35) - per explicit direction, and because
+         that positioning was breaking the sticky category nav. The nav's
+         "Specs" tab (<a href="#specs">) and its scroll-tracking JS
+         (secs=navlinks.map(a => document.querySelector(a.getAttribute(
+         'href')))) both depend on an element with id="specs" existing -
+         _34/_35 had renamed this element's id to #featSpecsGroup/
+         #featSpecs, silently breaking that link and the active-tab
+         highlighting. Restored id="specs" on the wrapper so the nav
+         works again, and renamed the nav's own label from "Specs" to
+         "Features and Specs" to match this section's real heading (see
+         the <nav class="secnav"> markup further down).
+         Also removed the Assembly sub-block from the Care Guide
+         accordion per explicit direction - "Assembly Required: Minimal
+         Assembly Required" is already in the Details and Dimensions
+         table above it, so repeating it a second time here added
+         nothing. Back to plain "Care Guide", care text only. -->
+    <!-- _38 FIX: heading and card decoupled - previous versions moved
+         them together as one unit. Per explicit direction: the "Features
+         and Specifications" TITLE always sits above both carousels (both
+         breakpoints, fixed position, not part of the flex reorder below).
+         Only the accordion CARD itself moves: sits between the two
+         carousels in DOM order (correct for mobile - stacks naturally
+         between Details and Craft) and gets pushed below both on desktop
+         via flex order+flex-basis (same trick the old #specs block
+         used, now scoped to just the card, not the heading). -->
+    <!-- Push 1 (2026-09-19): this whole zone (heading + The Details
+         carousel + the Features & Specs accordion card) moved up from
+         its old position further down the page (between "Frequently
+         Bought Together" and "The Craft") to sit right after the buy
+         box, replacing the removed Product Story/parallax section - see
+         the Push 1 note above. Within the zone, "The Details" carousel
+         (#pillarsCarouselCol) now sits FIRST and the accordion card
+         (#featSpecsCard) SECOND - reversed from their old order - per
+         the confirmed target order (Buy box -> The Details -> Features
+         & Specs). Internal markup of both is unchanged, only their
+         position/order moved. "The Craft" (#craftCarouselCol) is NOT
+         part of this zone anymore - it stayed behind in its own section
+         at this zone's old DOM location. -->
+    <div class="ap-head feat-specs-head" id="specs">
+      <h2 class="ap-h">Features and Specifications</h2>
+    </div>
+
+    <div class="fb-carousel-groups">
+
+      <div class="fb-carousel-group" id="pillarsCarouselCol">
+        <!-- _55 FIX: heading had no card background behind it (unlike
+             "The Craft", whose heading and carousel share one
+             .bento-card-b card) - explicit feedback these should
+             match. Reusing .bento-card-b here gives it the identical
+             background/padding/radius for free. -->
+        <div class="bento-card-b">
+        <div class="bento-card-b-head">
+          <div>
+            <h3>The Details</h3>
+            <p>Everything you need to know, from build to care.</p>
           </div>
         </div>
-        <div class="parallax-scene" aria-label="Layered views of the material/finish">
-          <span class="px-disk px-disk--one" data-depth="-0.08"></span>
-          <span class="px-disk px-disk--two" data-depth="0.14"></span>
-          <figure class="px-card px-card--left" data-depth="0.1" data-rotate="-3"><img src="./assets-web/cabinet-in-living-room.jpg" alt="The cabinet in a styled living room"></figure>
-          <figure class="px-card px-card--hero" data-depth="-0.12" data-rotate="2"><img src="./assets-web/cabinet-patina-closeup.jpg" alt="Macro close-up of the hand-applied galaxy finish"></figure>
-          <figure class="px-card px-card--right" data-depth="0.18" data-rotate="3"><img src="./assets-web/cabinet-lifestyle-closeup.jpg" alt="Close-up lifestyle view of the cabinet"></figure>
-          <div class="px-label" data-depth="-0.2">Warm gold fading into deep rust and black, catching new light with every glance.</div>
+        <div class="fb-carousel" id="fbCarouselPillars">
+          <div class="fb-track">
+
+            <!-- _27 STRUCTURAL CHANGE - restored the tile-merge restructure that
+                 was previously done in a different branch of this file and got
+                 lost when this lineage diverged before it. Old 3-icon "Features"
+                 (Build/Finish/Style) + 3-icon "Benefits" (Real Storage/Unique/
+                 Long-Lasting) replaced with THREE tiles: Build+Long-Lasting
+                 (2 icons), Finish+Unique (2 icons), standalone Real Storage
+                 (1 icon). Style retired - its copy duplicated Lifestyle's own
+                 body text nearly verbatim. Carousel goes from 4 slides to 5.
+                 Icons used are the _25 rechecked set (solid slab/swatch/circles/
+                 hourglass/open box), not the old mismatched ones.
+                 No JS changes needed - the icon-blend-card controller and the
+                 fb-carousel dot/track engine both already work off however many
+                 .ibc-col / .fb-slide elements exist. -->
+
+            <!-- BUILD + LONG-LASTING -->
+            <!-- _39 FIX: was cycling between two separate captions (Build's,
+                 then Long-Lasting's) with the icons switching active state -
+                 per explicit direction, replaced with ONE static combined
+                 sentence (both claims merged, like Lifestyle's single fixed
+                 caption) shown permanently, both icons highlighted together
+                 instead of one at a time. data-static-caption on the card
+                 tells the controller to skip cycling entirely - see the
+                 icon-blend-card controller JS. Sentence is the same merged
+                 copy already drafted earlier this session, not new writing. -->
+            <div class="fb-slide" data-dir="left">
+              <div class="bento-lifestyle">
+                <img src="./assets-web/feature-build.jpg" alt="Astra Two Door Cabinet - solid iron corner detail, built to last">
+                <div class="ibc-scrim"></div>
+                <div class="bl-cap">
+                  <h3>Solid Iron, Built to Last</h3>
+                  <p>Won't sag, wobble, or warp like cheaper furniture.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- FINISH + UNIQUE -->
+            <!-- _39 FIX: same treatment as Build+Long-Lasting above - one
+                 static combined sentence instead of cycling between Finish's
+                 and Unique's separate captions. -->
+            <div class="fb-slide" data-dir="left">
+              <div class="bento-lifestyle">
+                <img src="./assets-web/cabinet-patina-closeup.jpg" alt="Astra Two Door Cabinet - macro close-up of the hand-applied galaxy finish">
+                <div class="ibc-scrim"></div>
+                <div class="bl-cap">
+                  <h3>Hand-Finished, One of a Kind</h3>
+                  <p>Natural variation means no two are ever alike.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- REAL STORAGE (standalone) -->
+            <div class="fb-slide" data-dir="left">
+              <div class="bento-lifestyle">
+                <img src="./assets-web/benefit-organisation.jpg" alt="Astra Two Door Cabinet interior with linens and books organised, patina finish and steel hinge visible">
+                <div class="ibc-scrim"></div>
+                <div class="bl-cap">
+                  <h3>Real Storage, Ample Space</h3>
+                  <p>Space for linens, books, and everyday clutter.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- LIFESTYLE -->
+            <div class="fb-slide" data-dir="left">
+              <div class="bento-lifestyle">
+                <img src="./assets-web/feature-style.jpg" alt="The Astra Two Door Cabinet styled across different interiors"
+                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
+                <div class="placeholder" style="display:none">feature-style.jpg<br><span style="opacity:.6">(placeholder)</span></div>
+                <div class="ibc-scrim"></div>
+                <div class="bl-cap">
+                  <h3>At Home in Any Style</h3>
+                  <p>Suits contemporary, eclectic, glam, rustic, and industrial interiors.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="fb-controls">
+            <button class="fb-nav" type="button" data-fb-nav="-1" aria-label="Previous card">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="fb-dots"></div>
+            <button class="fb-nav" type="button" data-fb-nav="1" aria-label="Next card">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
         </div>
       </div>
+
+      <div class="fb-carousel-group" id="featSpecsCard">
+        <div class="bento-card-b feat-specs-card">
+          <!-- Push 1: reordered per perf report - "Details and Dimensions" now
+               first and open by default (was 2nd, closed). Order is now
+               Details and Dimensions, Product Description, Care & Buying
+               Guide (this card has no separate "Key Features" item - the
+               3-item order above was the actual current DOM order; "Key
+               Features" referenced in the brief doesn't exist as its own
+               accordion item in this file). Default-open pattern
+               (aria-expanded="true" + .acc-body.open) copied from the
+               Delivery section's "Delivery options" item, the page's other
+               default-open accordion. -->
+          <!-- Push 3 FIX (2026-09-22): "Details and Dimensions" reverted to closed by default per direction - was default-open since the Push 1 reorder. -->
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Details and Dimensions<span class="pm">+</span></button>
+            <div class="acc-body">
+              <table class="spectable">
+                <tr><td>SKU</td><td>TRCB00001A</td></tr>
+                <tr><td>Colour</td><td>Metallic</td></tr>
+                <tr><td>Material</td><td>Iron</td></tr>
+                <tr><td>Style</td><td>Contemporary, Eclectic, Glam, Rustic, Industrial</td></tr>
+                <tr><td>Width</td><td>104 cm</td></tr>
+                <tr><td>Depth</td><td>46 cm</td></tr>
+                <tr><td>Height</td><td>82 cm</td></tr>
+                <tr><td>Weight</td><td>42.9 kg</td></tr>
+                <tr><td>Packaging Dimensions</td><td>(W) 112cm | (D) 54cm | (H) 84cm</td></tr>
+                <tr><td>Packaging Weight</td><td>50.52 kg</td></tr>
+                <tr><td>Assembly Required</td><td>Minimal Assembly Required</td></tr>
+                <tr><td>Country Of Origin</td><td>India</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Product Description<span class="pm">+</span></button>
+            <div class="acc-body"><p>The Astra Cabinet brings celestial beauty into everyday living. Crafted from iron, its luminous galaxy-inspired finish shifts with the light, creating depth and intrigue. Two doors open to ample storage, offering a chic way to organise linens, books, or everyday essentials.</p></div>
+          </div>
+          <!-- v126: renamed "Care Guide" to "Care & Buying Guide" and
+               added the Buying Guide paragraph, per explicit direction -
+               this now carries the same fuller content that used to live
+               in the Delivery section's "Care & Buying Guide" accordion
+               (removed from there, see the Delivery & Returns section
+               changelog note above). Care paragraph itself is unchanged
+               verbatim. -->
+          <!-- Push 3 (2026-09-22): renamed "Care & Buying Guide" -> "Care & Delivery" per
+               direction. Shipping + Returns content below is now merged in verbatim from
+               the client, matching the Delivery/Returns copy that previously lived in the
+               standalone "Getting It To You" section (#delivery further down the page) -
+               same pricing table figures and same real policy links
+               (fableroom.com/pages/delivery-and-shipping, fableroom.com/pages/return-refund)
+               already used there, reused rather than invented. The "Getting It To You"
+               section's own Delivery options + Returns Policy accordions have been
+               commented out there now that this content lives here instead (see that
+               section's changelog note). Care Guide/Buying Guide paragraphs unchanged. -->
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care &amp; Delivery<span class="pm">+</span></button>
+            <div class="acc-body"><p><b>Care Guide</b></p><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p><p style="margin-top:12px"><b>Buying Guide</b></p><p>Many of our cabinets feature natural materials - from solid wood to stone or metal accents - so gentle variations in grain, colour, and texture are expected. Lighting and screen settings may also cause slight colour differences. These natural details aren't flaws; they're what make each FableRoom piece feel unique, crafted with care, and truly one of a kind.</p><p style="margin-top:12px"><b>Shipping</b></p><p>We offer doorstep delivery for your order. Delivery fee of £3.95 applies for orders under £100, £7.95 for orders over £100, or £14.95 for items requiring 2-man delivery. There is an additional £30 surcharge for all Northern Ireland orders.</p><p>Delivery timelines are listed on each product page.</p><p>For larger items, our Room of Choice Delivery service brings your piece right to the space you want for just £20.</p><p style="margin-top:10px"><a href="https://fableroom.com/pages/delivery-and-shipping" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read more about our shipping policy →</a></p><p style="margin-top:12px"><b>Returns</b></p><p>Most products can be returned within 14 days of delivery. Collections are free if your item is damaged or faulty. If not, we charge a collection fee. <a href="https://fableroom.com/pages/return-refund" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read more →</a></p></div>
+          </div>
+          <!-- Push 3 (2026-09-22): "Finance & payment" moved here from the now-removed
+               "Getting It To You" section (#delivery, see its removal note further down
+               the page) per direction, as its own accordion item in this same card.
+               Content unchanged verbatim - still the Klarna widget placeholder noted
+               there as needing to be swapped for Shopify's real native on-site-messaging
+               component at dev time. -->
+          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Finance &amp; payment<span class="pm">+</span></button>
+            <div class="acc-body"><p>We currently accept payment with Visa, Mastercard, Maestro, American Express, Apple Pay, Google Pay, Shop Pay, Paypal and Klarna.</p>
+              <div class="pv2-widget" style="margin-top:10px;border-bottom:none;padding-bottom:0">
+                <p>3 payments at 0% interest with Klarna <a href="#" class="pv2-widget-link">Learn more</a><br>18+, T&amp;C apply, Credit subject to status.</p>
+                <span class="pv2-widget-badge"><img src="./assets-web/pay-klarna.png" alt="Klarna" class="pv2-widget-badge-img"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -7414,218 +7828,21 @@ footer{background:#EDECE9;color:#433122}
          the page's own zone background - was camouflaging) to a
          lighter, bordered tone so the card reads as a distinct card.
        ============================================================ -->
-  <section class="carousels-zone" id="carouselsZone">
-    <!-- _34 NEW - "Features and Specifications" consolidated section, per
-         explicit direction. Replaces two previously separate things:
-         1. The old #specs block (Dimensions & details / Product
-            Description accordions) that used to sit between the Details
-            and Craft carousels as its own 3rd flex item.
-         2. The old Care+Assembly carousel tile (5th slide in the Pillars
-            carousel) - its content (Easy Care icon grid + Minimal
-            Assembly Required) is now two accordion items here instead of
-            a tile, per explicit direction ("care guide and stuff lets
-            have it as an accordion instead of a tile").
-         Sits ABOVE both carousels (same DOM position on mobile and
-         desktop - centered heading, centered single-column card, not
-         squeezed between/below the two carousels like the old #specs
-         block was). Card reuses .bento-card-b (same background/radius/
-         padding as "The Details"/"The Craft" cards) per explicit
-         direction ("the external card/container... similar to how craft
-         and the details have it"). Order per explicit direction: Product
-         Description, Details and Dimensions, Care Guide, Assembly - not
-         the old order (Dimensions first). Kept the same accordion width/
-         max-width as before (700px) rather than widening it, and
-         centered it instead of the old 2-column side-by-side desktop
-         layout (.specs-accs, now unused - kept, not deleted). Care Guide
-         text is the same verbatim source already used in the Delivery
-         section's "Care & Buying Guide" accordion (not re-derived,
-         re-typed from the same real source). -->
-    <!-- _36 FIX: moved back to ABOVE both carousels (was briefly placed
-         between/below them in _35) - per explicit direction, and because
-         that positioning was breaking the sticky category nav. The nav's
-         "Specs" tab (<a href="#specs">) and its scroll-tracking JS
-         (secs=navlinks.map(a => document.querySelector(a.getAttribute(
-         'href')))) both depend on an element with id="specs" existing -
-         _34/_35 had renamed this element's id to #featSpecsGroup/
-         #featSpecs, silently breaking that link and the active-tab
-         highlighting. Restored id="specs" on the wrapper so the nav
-         works again, and renamed the nav's own label from "Specs" to
-         "Features and Specs" to match this section's real heading (see
-         the <nav class="secnav"> markup further down).
-         Also removed the Assembly sub-block from the Care Guide
-         accordion per explicit direction - "Assembly Required: Minimal
-         Assembly Required" is already in the Details and Dimensions
-         table above it, so repeating it a second time here added
-         nothing. Back to plain "Care Guide", care text only. -->
-    <!-- _38 FIX: heading and card decoupled - previous versions moved
-         them together as one unit. Per explicit direction: the "Features
-         and Specifications" TITLE always sits above both carousels (both
-         breakpoints, fixed position, not part of the flex reorder below).
-         Only the accordion CARD itself moves: sits between the two
-         carousels in DOM order (correct for mobile - stacks naturally
-         between Details and Craft) and gets pushed below both on desktop
-         via flex order+flex-basis (same trick the old #specs block
-         used, now scoped to just the card, not the heading). -->
-    <div class="ap-head feat-specs-head" id="specs">
-      <h2 class="ap-h">Features and Specifications</h2>
-    </div>
-
+  <!-- Push 1 (2026-09-19): this section used to be id="carouselsZone" and
+       held THREE items (the Features & Specs accordion card, "The
+       Details" carousel, and "The Craft" carousel below). The first two
+       have been moved UP the page to sit right after the buy box (see
+       the "Push 1" note there, in place of the removed Product Story
+       section) - only "The Craft" carousel stays here, at this zone's
+       original DOM position (unchanged - between "Frequently Bought
+       Together" above and whatever follows below). Renamed id to
+       "craftZone" since "carouselsZone" is now used by the relocated
+       section higher up the page; id="carouselsZone" was never targeted
+       by any CSS/JS selector (only referenced in comments), so this
+       rename is safe. Kept class="carousels-zone" so this section keeps
+       the same dark full-bleed background/padding treatment as before. -->
+  <section class="carousels-zone" id="craftZone">
     <div class="fb-carousel-groups">
-
-      <!-- _41 MOVED HERE: #featSpecsCard now sits first, on top of
-           both carousels (both breakpoints), per explicit direction.
-           Moved verbatim from its old position between Pillars and
-           Craft - content unchanged. See the _41 top-of-file
-           changelog entry. -->
-      <div class="fb-carousel-group" id="featSpecsCard">
-        <div class="bento-card-b feat-specs-card">
-          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Product Description<span class="pm">+</span></button>
-            <div class="acc-body"><p>The Astra Cabinet brings celestial beauty into everyday living. Crafted from iron, its luminous galaxy-inspired finish shifts with the light, creating depth and intrigue. Two doors open to ample storage, offering a chic way to organise linens, books, or everyday essentials.</p></div>
-          </div>
-          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Details and Dimensions<span class="pm">+</span></button>
-            <div class="acc-body">
-              <table class="spectable">
-                <tr><td>SKU</td><td>TRCB00001A</td></tr>
-                <tr><td>Colour</td><td>Metallic</td></tr>
-                <tr><td>Material</td><td>Iron</td></tr>
-                <tr><td>Style</td><td>Contemporary, Eclectic, Glam, Rustic, Industrial</td></tr>
-                <tr><td>Width</td><td>104 cm</td></tr>
-                <tr><td>Depth</td><td>46 cm</td></tr>
-                <tr><td>Height</td><td>82 cm</td></tr>
-                <tr><td>Weight</td><td>42.9 kg</td></tr>
-                <tr><td>Packaging Dimensions</td><td>(W) 112cm | (D) 54cm | (H) 84cm</td></tr>
-                <tr><td>Packaging Weight</td><td>50.52 kg</td></tr>
-                <tr><td>Assembly Required</td><td>Minimal Assembly Required</td></tr>
-                <tr><td>Country Of Origin</td><td>India</td></tr>
-              </table>
-            </div>
-          </div>
-          <!-- v126: renamed "Care Guide" to "Care & Buying Guide" and
-               added the Buying Guide paragraph, per explicit direction -
-               this now carries the same fuller content that used to live
-               in the Delivery section's "Care & Buying Guide" accordion
-               (removed from there, see the Delivery & Returns section
-               changelog note above). Care paragraph itself is unchanged
-               verbatim. -->
-          <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care &amp; Buying Guide<span class="pm">+</span></button>
-            <div class="acc-body"><p><b>Care Guide</b></p><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p><p style="margin-top:12px"><b>Buying Guide</b></p><p>Many of our cabinets feature natural materials - from solid wood to stone or metal accents - so gentle variations in grain, colour, and texture are expected. Lighting and screen settings may also cause slight colour differences. These natural details aren't flaws; they're what make each FableRoom piece feel unique, crafted with care, and truly one of a kind.</p></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="fb-carousel-group" id="pillarsCarouselCol">
-        <!-- _55 FIX: heading had no card background behind it (unlike
-             "The Craft", whose heading and carousel share one
-             .bento-card-b card) - explicit feedback these should
-             match. Reusing .bento-card-b here gives it the identical
-             background/padding/radius for free. -->
-        <div class="bento-card-b">
-        <div class="bento-card-b-head">
-          <div>
-            <h3>The Details</h3>
-            <p>Everything you need to know, from build to care.</p>
-          </div>
-        </div>
-        <div class="fb-carousel" id="fbCarouselPillars">
-          <div class="fb-track">
-
-            <!-- _27 STRUCTURAL CHANGE - restored the tile-merge restructure that
-                 was previously done in a different branch of this file and got
-                 lost when this lineage diverged before it. Old 3-icon "Features"
-                 (Build/Finish/Style) + 3-icon "Benefits" (Real Storage/Unique/
-                 Long-Lasting) replaced with THREE tiles: Build+Long-Lasting
-                 (2 icons), Finish+Unique (2 icons), standalone Real Storage
-                 (1 icon). Style retired - its copy duplicated Lifestyle's own
-                 body text nearly verbatim. Carousel goes from 4 slides to 5.
-                 Icons used are the _25 rechecked set (solid slab/swatch/circles/
-                 hourglass/open box), not the old mismatched ones.
-                 No JS changes needed - the icon-blend-card controller and the
-                 fb-carousel dot/track engine both already work off however many
-                 .ibc-col / .fb-slide elements exist. -->
-
-            <!-- BUILD + LONG-LASTING -->
-            <!-- _39 FIX: was cycling between two separate captions (Build's,
-                 then Long-Lasting's) with the icons switching active state -
-                 per explicit direction, replaced with ONE static combined
-                 sentence (both claims merged, like Lifestyle's single fixed
-                 caption) shown permanently, both icons highlighted together
-                 instead of one at a time. data-static-caption on the card
-                 tells the controller to skip cycling entirely - see the
-                 icon-blend-card controller JS. Sentence is the same merged
-                 copy already drafted earlier this session, not new writing. -->
-            <div class="fb-slide" data-dir="left">
-              <div class="bento-lifestyle">
-                <img src="./assets-web/feature-build.jpg" alt="Astra Two Door Cabinet - solid iron corner detail, built to last">
-                <div class="ibc-scrim"></div>
-                <div class="bl-cap">
-                  <h3>Solid Iron, Built to Last</h3>
-                  <p>Won't sag, wobble, or warp like cheaper furniture.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- FINISH + UNIQUE -->
-            <!-- _39 FIX: same treatment as Build+Long-Lasting above - one
-                 static combined sentence instead of cycling between Finish's
-                 and Unique's separate captions. -->
-            <div class="fb-slide" data-dir="left">
-              <div class="bento-lifestyle">
-                <img src="./assets-web/cabinet-patina-closeup.jpg" alt="Astra Two Door Cabinet - macro close-up of the hand-applied galaxy finish">
-                <div class="ibc-scrim"></div>
-                <div class="bl-cap">
-                  <h3>Hand-Finished, One of a Kind</h3>
-                  <p>Natural variation means no two are ever alike.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- REAL STORAGE (standalone) -->
-            <div class="fb-slide" data-dir="left">
-              <div class="bento-lifestyle">
-                <img src="./assets-web/benefit-organisation.jpg" alt="Astra Two Door Cabinet interior with linens and books organised, patina finish and steel hinge visible">
-                <div class="ibc-scrim"></div>
-                <div class="bl-cap">
-                  <h3>Real Storage, Ample Space</h3>
-                  <p>Space for linens, books, and everyday clutter.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- LIFESTYLE -->
-            <div class="fb-slide" data-dir="left">
-              <div class="bento-lifestyle">
-                <img src="./assets-web/feature-style.jpg" alt="The Astra Two Door Cabinet styled across different interiors"
-                     onerror="var ph=this.parentElement.querySelector('.placeholder');this.remove();ph.style.display='flex'">
-                <div class="placeholder" style="display:none">feature-style.jpg<br><span style="opacity:.6">(placeholder)</span></div>
-                <div class="ibc-scrim"></div>
-                <div class="bl-cap">
-                  <h3>At Home in Any Style</h3>
-                  <p>Suits contemporary, eclectic, glam, rustic, and industrial interiors.</p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-          <div class="fb-controls">
-            <button class="fb-nav" type="button" data-fb-nav="-1" aria-label="Previous card">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <div class="fb-dots"></div>
-            <button class="fb-nav" type="button" data-fb-nav="1" aria-label="Next card">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          </div>
-        </div>
-        </div>
-      </div>
-
-      <!-- _41 MOVED: #featSpecsCard no longer sits here (was between
-           Pillars and Craft, pushed below both on desktop via
-           order:3) - moved to be the FIRST child of
-           .fb-carousel-groups, before #pillarsCarouselCol, so it
-           sits on top of both carousels on both breakpoints, per
-           explicit direction. See the _41 top-of-file changelog
-           entry and its new location above. -->
 
       <div class="fb-carousel-group" id="craftCarouselCol">
         <div class="bento-grid" id="bentoGrid">
@@ -8008,74 +8225,20 @@ footer{background:#EDECE9;color:#433122}
        a colliding id="makersJourney" - left behind by the _29 edit that
        should have moved this section, not copied it. Fixed now. -->
 
-  <!-- A+ 8 · DELIVERY & RETURNS -->
-  <section id="delivery" class="ap">
-    <div class="ap-head"><span class="eyebrow">Delivery &amp; returns</span><h2 class="ap-h">Getting it to you</h2></div>
-    <div class="acc-grid">
-      <div>
-        <div class="acc"><button class="acc-btn" aria-expanded="true" onclick="acc(this)">Delivery options<span class="pm">+</span></button>
-          <div class="acc-body open"><p>We deliver across England, Scotland and Wales. A £30 surcharge applies to Northern Ireland.</p>
-            <table class="dtable"><thead><tr><th>Service</th><th>Time</th><th>Cost</th></tr></thead>
-            <tbody><tr><td>Doorstep (under £100)</td><td>1–2 wks</td><td>£3.95</td></tr><tr><td>Doorstep (over £100)</td><td>1–2 wks</td><td>£7.95</td></tr><tr><td>2-Man delivery</td><td>1–2 wks</td><td>£14.95</td></tr><tr><td>Room of choice</td><td>Arranged</td><td>£20.00</td></tr></tbody></table>
-            <p style="margin-top:10px;font-size:12px;color:var(--ink-3)">Final delivery cost is confirmed and added at checkout.</p>
-            <p style="margin-top:10px"><a href="https://fableroom.com/pages/delivery-and-shipping" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full delivery policy →</a></p>
-          </div>
-        </div>
-        <!-- v126: "Pre-order timeline" accordion removed per explicit
-             direction. Kept as a comment, not deleted:
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Pre-order timeline<span class="pm">+</span></button>
-          <div class="acc-body"><p><b>Pre-Order  -  Arrives in 8&ndash;12 weeks</b></p><p>These are new designs we&rsquo;ve approved and want to give you early access to. They&rsquo;re still in production on the shop floor, which means they take longer than Standard Shipping. By ordering early, you lock in:</p><ul style="margin-top:10px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)"><li>10% off the regular price (auto-applied)</li><li>Priority dispatch when production is complete</li></ul></div></div>
-        -->
-        <!-- v126: "Care & Buying Guide" accordion removed from here per
-             explicit direction - moved to the Features & Specifications
-             section instead (replacing the plain "Care Guide" item
-             there with this same content, renamed to match). Kept as a
-             comment here, not deleted:
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Care &amp; Buying Guide<span class="pm">+</span></button>
-          <div class="acc-body"><p><b>Care Guide</b></p><p>Dust your cabinet regularly with a soft, dry cloth, and use a lightly dampened one only when needed. Keep it away from excess moisture, direct sunlight, and heat to prevent warping or fading. Always lift objects rather than dragging them, and check fittings from time to time to ensure everything stays stable and secure. If storing, make sure the cabinet is fully dry and follow any recommended protective treatments.</p><p style="margin-top:12px"><b>Buying Guide</b></p><p>Many of our cabinets feature natural materials - from solid wood to stone or metal accents - so gentle variations in grain, colour, and texture are expected. Lighting and screen settings may also cause slight colour differences. These natural details aren't flaws; they're what make each FableRoom piece feel unique, crafted with care, and truly one of a kind.</p></div></div>
-        -->
-      </div>
-      <div>
-        <!-- v138 ROLLBACK: restored per explicit direction (was removed
-             in v126). v138 FIX: the old body copy ("Or spread the cost
-             with Klarna - 3 interest-free payments of £167.67") was
-             Troop asserting Klarna's own terms in agency-written prose -
-             replaced with an actual widget placeholder instead, matching
-             the same .pv2-widget pattern already used in the Offer/BNPL
-             accordion higher up the page. This still needs to be swapped
-             for Shopify's real native Klarna on-site-messaging component
-             at dev time - it is NOT us claiming what Klarna offers, it's
-             a stand-in for their own widget. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Finance &amp; payment<span class="pm">+</span></button>
-          <div class="acc-body"><p>We currently accept payment with Visa, Mastercard, Maestro, American Express, Apple Pay, Google Pay, Shop Pay, Paypal and Klarna.</p>
-            <div class="pv2-widget" style="margin-top:10px;border-bottom:none;padding-bottom:0">
-              <p>3 payments at 0% interest with Klarna <a href="#" class="pv2-widget-link">Learn more</a><br>18+, T&amp;C apply, Credit subject to status.</p>
-              <span class="pv2-widget-badge"><img src="./assets-web/pay-klarna.png" alt="Klarna" class="pv2-widget-badge-img"></span>
-            </div>
-          </div></div>
-        <!-- v126 NEW: merged "Returns Policy" accordion, per explicit
-             direction - combines the former separate "30-day returns"
-             and "365-day guarantee" accordions (both removed from below,
-             kept as comments) into one. Returns-policy link now points
-             to the real live URL (was a "#" placeholder). v138: added an
-             explicit "14 days" mention to the body per direction - the
-             window was previously only implied by the accordion's old
-             title, never stated in the body copy itself. -->
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">Returns Policy<span class="pm">+</span></button>
-          <div class="acc-body"><p>Most items can be returned within <b>14 days</b> of delivery. Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:12px"><b>365-Day Guarantee</b></p><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p><p style="margin-top:10px"><a href="https://fableroom.com/pages/return-refund" target="_blank" rel="noopener" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
-        <!-- v126: former standalone "30-day returns" accordion. Kept as
-             a comment, not deleted, per the never-delete convention:
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">30-day returns<span class="pm">+</span></button>
-          <div class="acc-body"><p>Faulty or damaged items are collected free. Changed your mind? A collection fee applies: £25 for furniture, mirrors, and large items; £18 for rugs and ottomans; £5 for cushions, throws, and lamps.</p><p>Email support@fableroom.com with your order number - refunds land within 7 days of receipt.</p><p style="margin-top:10px"><a href="#" style="color:var(--bronze);font-weight:600;font-size:13px">Read our full returns policy →</a></p></div></div>
-        -->
-        <!-- v126: former standalone "365-day guarantee" accordion. Kept
-             as a comment, not deleted, per the never-delete convention:
-        <div class="acc"><button class="acc-btn" aria-expanded="false" onclick="acc(this)">365-day guarantee<span class="pm">+</span></button>
-          <div class="acc-body"><p>Any verifiable defect or deterioration within a year? We'll repair, replace or refund - your choice. Covers manufacturing and material faults (not accidental damage or normal wear).</p></div></div>
-        -->
-      </div>
-    </div>
-  </section>
+  <!-- Push 3 (2026-09-22) REMOVAL: entire "Getting It To You" (#delivery) section
+       removed per direction, now that its remaining accordion (Finance & Payment)
+       has moved into the Features & Specifications section's card, and Delivery
+       options / Returns Policy were already merged into that same card's
+       "Care & Delivery" accordion in the prior Push 3 edit above. The sticky
+       section nav's "Delivery" link (which pointed at #delivery) has also been
+       removed - see the <nav class="secnav"> markup further up the file. Full
+       original section markup is preserved in git history / prior file versions
+       rather than kept as an inline HTML comment here, since it contained several
+       of its own nested HTML comments that can't be wrapped in an outer comment
+       without breaking (an inner "-->" would close the wrapper early). Shared
+       CSS classes used here (.ap, .ap-head, .acc-grid, .acc, .acc-body, .dtable)
+       are page-wide and used elsewhere, so left untouched/unremoved. -->
+
 
   <div class="divider"></div>
 
@@ -8595,6 +8758,60 @@ setActiveState(0);
 
 /* ── Fullscreen gallery lightbox ── */
 var lb={el:null,img:null,counter:null,thumbsWrap:null,index:0,open:false};
+/* PUSH 1 ADD: zoom state for the lightbox image, 2026-09-21. scale is
+   clamped [min,max]; tx/ty are the current pan offset in px, applied
+   together as one CSS transform by lbApplyZoom(). See lbShow/
+   closeLightbox below for where this resets, and the touch/wheel/mouse
+   handlers further down in initLightbox() for where it's driven. */
+var lbZoom={scale:1,tx:0,ty:0,min:1,max:4};
+function lbApplyZoom(){
+  if(!lb.img)return;
+  lb.img.style.transform='translate('+lbZoom.tx+'px,'+lbZoom.ty+'px) scale('+lbZoom.scale+')';
+  if(lb.el){
+    var stageEl=document.getElementById('lbStage');
+    if(stageEl)stageEl.classList.toggle('zoomed',lbZoom.scale>1.01);
+  }
+  var pct=document.getElementById('lbZoomPct');
+  if(pct)pct.textContent=Math.round(lbZoom.scale*100)+'%';
+}
+/* clamps pan so the zoomed image can't be dragged/panned off past its
+   own edges - approximated from the stage box and current scale, which
+   is accurate enough since the image is centered and object-fit:contain
+   within the stage at scale 1 */
+function lbClampPan(){
+  var stage=document.getElementById('lbStage');
+  if(!stage)return;
+  var maxX=(stage.clientWidth*(lbZoom.scale-1))/2;
+  var maxY=(stage.clientHeight*(lbZoom.scale-1))/2;
+  if(maxX<0)maxX=0;
+  if(maxY<0)maxY=0;
+  lbZoom.tx=Math.max(-maxX,Math.min(maxX,lbZoom.tx));
+  lbZoom.ty=Math.max(-maxY,Math.min(maxY,lbZoom.ty));
+}
+/* snap-animated reset to 1x - used by double-tap/double-click, the
+   reset button, and whenever zoom needs to be cleared programmatically */
+function lbResetZoom(){
+  lbZoom.scale=1;lbZoom.tx=0;lbZoom.ty=0;
+  if(lb.img){
+    lb.img.style.transition='transform .2s ease';
+    lbApplyZoom();
+    setTimeout(function(){if(lb.img)lb.img.style.transition=''},220);
+  }else{
+    lbApplyZoom();
+  }
+}
+/* stepped zoom for the desktop +/- buttons */
+function lbZoomStep(dir){
+  var next=lbZoom.scale+dir*0.5;
+  if(next<=1.01){lbZoom.scale=1;lbZoom.tx=0;lbZoom.ty=0;}
+  else lbZoom.scale=Math.max(lbZoom.min,Math.min(lbZoom.max,next));
+  lbClampPan();
+  if(lb.img){
+    lb.img.style.transition='transform .2s ease';
+    lbApplyZoom();
+    setTimeout(function(){if(lb.img)lb.img.style.transition=''},220);
+  }
+}
 function initLightbox(){
   lb.el=document.getElementById('lightbox');
   lb.img=document.getElementById('lbImg');
@@ -8609,14 +8826,121 @@ function initLightbox(){
     t.onclick=function(){lbShow(i)};
     lb.thumbsWrap.appendChild(t);
   });
-  /* swipe support inside the lightbox stage */
+  /* PUSH 1 CHANGE, 2026-09-21: this replaces the original two-listener
+     swipe support ("var sx=0; stage.addEventListener('touchstart',
+     function(e){sx=e.touches[0].clientX})" + a touchend computing
+     dx=e.changedTouches[0].clientX-sx and calling lbNav on a >40px
+     threshold - unchanged logic, just folded in below) - extended so it
+     coexists with two-finger pinch-to-zoom and one-finger pan-when-
+     zoomed instead of conflicting with them. Rule of thumb kept simple:
+     a second touch point starts/continues a pinch; a single touch pans
+     when already zoomed in (scale>1) and otherwise behaves exactly like
+     the original swipe-to-navigate. */
   var stage=document.getElementById('lbStage');
-  var sx=0;
-  stage.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
-  stage.addEventListener('touchend',function(e){
-    var dx=e.changedTouches[0].clientX-sx;
-    if(Math.abs(dx)>40){lbNav(dx<0?1:-1)}
+  var sx=0,sy=0;
+  var pinchActive=false,pinchStartDist=0,pinchStartScale=1;
+  /* canPan: this single touch is ALLOWED to pan (image is zoomed in).
+     isPanning: it has actually MOVED past a tiny threshold, so this
+     gesture really is a pan, not a stationary tap. Keeping these
+     separate matters because a single-finger TAP while zoomed in must
+     still be recognised as a tap (for double-tap-to-reset) - if we
+     called it "panning" the instant scale>1 (regardless of movement),
+     a stationary double-tap could never reach the reset check below. */
+  var canPan=false,isPanning=false,panStartX=0,panStartY=0,panStartTx=0,panStartTy=0;
+  var lastTapTime=0;
+  function touchDist(a,b){
+    var dx=b.clientX-a.clientX,dy=b.clientY-a.clientY;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+  stage.addEventListener('touchstart',function(e){
+    if(e.touches.length===2){
+      pinchActive=true;
+      pinchStartDist=touchDist(e.touches[0],e.touches[1]);
+      pinchStartScale=lbZoom.scale;
+      canPan=false;isPanning=false;
+    }else if(e.touches.length===1){
+      sx=e.touches[0].clientX;sy=e.touches[0].clientY;
+      pinchActive=false;
+      canPan=lbZoom.scale>1.01;
+      isPanning=false;
+      panStartX=sx;panStartY=sy;
+      panStartTx=lbZoom.tx;panStartTy=lbZoom.ty;
+    }
   },{passive:true});
+  stage.addEventListener('touchmove',function(e){
+    if(e.touches.length===2&&pinchStartDist>0){
+      var dist=touchDist(e.touches[0],e.touches[1]);
+      var next=pinchStartScale*(dist/pinchStartDist);
+      lbZoom.scale=Math.max(lbZoom.min,Math.min(lbZoom.max,next));
+      lbClampPan();
+      lbApplyZoom();
+    }else if(e.touches.length===1&&canPan){
+      var mdx=e.touches[0].clientX-panStartX,mdy=e.touches[0].clientY-panStartY;
+      if(!isPanning&&(Math.abs(mdx)>4||Math.abs(mdy)>4))isPanning=true;
+      if(isPanning){
+        lbZoom.tx=panStartTx+mdx;
+        lbZoom.ty=panStartTy+mdy;
+        lbClampPan();
+        lbApplyZoom();
+      }
+    }
+  },{passive:true});
+  stage.addEventListener('touchend',function(e){
+    if(e.touches.length>0)return; /* wait for all fingers up (pinch->pan handoff) */
+    if(!pinchActive&&!isPanning&&e.changedTouches&&e.changedTouches.length){
+      var dx=e.changedTouches[0].clientX-sx;
+      var dy=e.changedTouches[0].clientY-sy;
+      /* double-tap (two quick, small-movement taps) resets zoom - checked
+         regardless of zoom level, since canPan/isPanning above only gate
+         actual dragging, not a stationary tap */
+      if(Math.abs(dx)<10&&Math.abs(dy)<10){
+        var now=Date.now();
+        if(now-lastTapTime<320){lbResetZoom();lastTapTime=0;}
+        else lastTapTime=now;
+      }else if(lbZoom.scale<=1.01&&Math.abs(dx)>40){
+        /* original swipe-to-navigate - only when not zoomed in */
+        lbNav(dx<0?1:-1);
+      }
+    }
+    if(lbZoom.scale<1.01){lbZoom.scale=1;lbZoom.tx=0;lbZoom.ty=0;lbApplyZoom();}
+    pinchActive=false;pinchStartDist=0;canPan=false;isPanning=false;
+  },{passive:true});
+  /* PUSH 1 ADD: desktop mouse-wheel zoom while hovering the image (no
+     pinch/touch on desktop, so this is the equivalent gesture), plus
+     click-and-drag panning once zoomed in, and double-click to reset -
+     all scoped to >=820px so it doesn't fight the touch handlers above
+     on hybrid touch+trackpad devices */
+  stage.addEventListener('wheel',function(e){
+    if(window.innerWidth<820)return;
+    e.preventDefault();
+    var next=lbZoom.scale+(e.deltaY<0?0.18:-0.18);
+    if(next<=1.01){lbZoom.scale=1;lbZoom.tx=0;lbZoom.ty=0;}
+    else lbZoom.scale=Math.max(lbZoom.min,Math.min(lbZoom.max,next));
+    lbClampPan();
+    lbApplyZoom();
+  },{passive:false});
+  var mouseDown=false,mdx=0,mdy=0,mdtx=0,mdty=0;
+  stage.addEventListener('mousedown',function(e){
+    if(window.innerWidth<820||lbZoom.scale<=1.01)return;
+    mouseDown=true;mdx=e.clientX;mdy=e.clientY;mdtx=lbZoom.tx;mdty=lbZoom.ty;
+    if(lb.img)lb.img.style.cursor='grabbing';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!mouseDown)return;
+    lbZoom.tx=mdtx+(e.clientX-mdx);
+    lbZoom.ty=mdty+(e.clientY-mdy);
+    lbClampPan();
+    lbApplyZoom();
+  });
+  document.addEventListener('mouseup',function(){
+    if(!mouseDown)return;
+    mouseDown=false;
+    if(lb.img)lb.img.style.cursor=lbZoom.scale>1.01?'grab':'';
+  });
+  stage.addEventListener('dblclick',function(){
+    if(window.innerWidth>=820)lbResetZoom();
+  });
   document.addEventListener('keydown',function(e){
     if(!lb.open)return;
     if(e.key==='Escape')closeLightbox();
@@ -8633,6 +8957,12 @@ function lbShow(i){
     t.classList.toggle('active',k===lb.index);
     if(k===lb.index)t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   });
+  /* PUSH 1 ADD: reset zoom whenever the displayed image changes (arrow
+     nav, thumbnail click, swipe-settle) so zoom never carries over from
+     one slide to the next */
+  lbZoom.scale=1;lbZoom.tx=0;lbZoom.ty=0;
+  if(lb.img)lb.img.style.transition='';
+  lbApplyZoom();
 }
 function openLightbox(i){
   if(!lb.el)initLightbox();
@@ -8646,6 +8976,9 @@ function closeLightbox(){
   lb.el.classList.remove('show');
   lb.open=false;
   document.body.style.overflow='';
+  /* PUSH 1 ADD: clear zoom state on close so reopening always starts at 1x */
+  lbZoom.scale=1;lbZoom.tx=0;lbZoom.ty=0;
+  if(lb.img){lb.img.style.transition='';lbApplyZoom();}
   /* keep the main gallery in sync with whatever was last viewed in the lightbox */
   show(lb.index);
 }
@@ -8798,7 +9131,7 @@ document.addEventListener('DOMContentLoaded',clbInit);
 
 function openTrust(key){document.getElementById('tm-'+key).classList.add('show');document.body.style.overflow='hidden'}
 function closeTrust(key){document.getElementById('tm-'+key).classList.remove('show');document.body.style.overflow=''}
-function openCompareModal(){document.getElementById('compareModal').classList.add('show');document.body.style.overflow='hidden'}
+function openCompareModal(btn){document.getElementById('compareModal').classList.add('show');document.body.style.overflow='hidden';if(btn)btn.classList.add('kh-info-clicked')} /* Push 1 (2026-09-21): accepts the clicked .kh-info button and marks it kh-info-clicked, which stops the CSS attention-pulse ring (see .kh-info::before) since its job - getting a first click - is done. Optional param kept backward-compatible in case anything else calls openCompareModal() without an argument. */
 function closeCompareModal(){document.getElementById('compareModal').classList.remove('show');document.body.style.overflow=''}
 /* _32 NEW - Care modal open/close, same pattern as compare modal above. */
 function openCareModal(){document.getElementById('careModal').classList.add('show');document.body.style.overflow='hidden'}
