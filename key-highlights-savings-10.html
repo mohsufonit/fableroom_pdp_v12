@@ -1,0 +1,110 @@
+<title>Savings Angle Variants</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#2c2c2c; --ink-2:#505050; --ink-3:#736c58;
+    --bronze:#b77e45; --bronze-hi:#a06b35; --line:#e4ddcf;
+    --ff-b:'HK Grotesk',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff-b);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px}
+  .page-title{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--ink-3);margin:0 0 4px;text-transform:uppercase}
+  .page-sub{font-size:13px;color:var(--ink-3);margin:0 0 28px}
+
+  .block{padding:18px 0;border-bottom:1px solid var(--line)}
+  .block:last-child{border-bottom:none}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--bronze);background:rgba(183,126,69,.1);border-radius:5px;padding:2px 8px;margin-bottom:8px}
+
+  /* ================= verbatim production CSS (final_version_v143_no-thumb.html) ================= */
+  .kh-item{display:flex;align-items:flex-start;gap:6px;background:none;border:none;padding:0;overflow:visible}
+  .kh-ic{width:19px;height:19px;border-radius:0;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--bronze);margin-top:1px;opacity:.9}
+  .kh-ic svg{width:19px;height:19px}
+  .kh-text{font-size:15px;color:var(--ink-2);line-height:1.45}
+  .kh-text b{font-weight:600;color:var(--ink-2)}
+  .kh-text .kh-amt{color:#08BD5E;font-size:16px}
+  .kh-text .detail{color:var(--ink-2)}
+
+  /* Same "See how?" pulse treatment used on the live A/B variants - text-shadow glow,
+     no icon, stops after first click. All 10 rows below reuse this one treatment so
+     the comparison is purely about the COPY, not the animation. */
+  .kh-cta{cursor:pointer;color:var(--bronze);font-weight:700;text-decoration:underline;text-decoration-color:rgba(183,126,69,.5);text-underline-offset:2px;border-radius:4px;animation:kh-cta-shine 2.2s ease-in-out infinite}
+  .kh-cta.clicked{animation:none;text-shadow:none;text-decoration-color:transparent}
+  @keyframes kh-cta-shine{0%,100%{text-shadow:0 0 0 rgba(183,126,69,0)}50%{text-shadow:0 0 6px rgba(183,126,69,.55),0 0 12px rgba(183,126,69,.3)}}
+  @media(prefers-reduced-motion:reduce){.kh-cta{animation:none}}
+</style>
+
+<div class="wrap">
+  <p class="page-title">Key Highlights &mdash; savings angle, 10 copy variants</p>
+  <p class="page-sub">Same treatment throughout (no icon, "See how?" trigger with a soft glow pulse) &mdash; only the lead sentence changes, each one a straight savings claim.</p>
+
+  <div class="block">
+    <span class="tag">1</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">2</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b><span class="kh-amt">£396</span> saved</b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">3</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>You're <span class="kh-amt">£396</span> better off</b> <span class="detail">than <b>John Lewis</b> shoppers. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">4</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>Save <span class="kh-amt">£396</span></b> <span class="detail">buying direct vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">5</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b><span class="kh-amt">£396</span> in your pocket</b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">6</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>You save <span class="kh-amt">£396</span></b> <span class="detail">&mdash; same craftsmanship, better price. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">7</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>That's <span class="kh-amt">£396</span> saved</b> <span class="detail">vs <b>John Lewis</b>, guaranteed. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">8</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>You pocket <span class="kh-amt">£396</span></b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">9</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b><span class="kh-amt">£396</span> lower</b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+  <div class="block">
+    <span class="tag">10</span>
+    <div class="kh-item"><span class="kh-ic"><svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="kh-text"><b>Save <span class="kh-amt">£396</span> today</b> <span class="detail">vs <b>John Lewis</b>. <span class="kh-cta" role="button" tabindex="0" onclick="this.classList.add('clicked')">See how?</span></span></span>
+    </div>
+  </div>
+
+</div>
